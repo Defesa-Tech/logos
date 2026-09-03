@@ -114,6 +114,23 @@ export const invitesService = {
     }
   },
 
+  async create(data: Partial<InviteRecord>) {
+    const token =
+      data.token ||
+      Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 8)
+    const now = new Date()
+    now.setDate(now.getDate() + 7)
+    return pb.collection('invites').create<InviteRecord>({
+      token,
+      email: data.email,
+      whatsapp: data.whatsapp,
+      role: data.role || 'member',
+      person: data.person || undefined,
+      used: false,
+      expires: data.expires || now.toISOString(),
+    })
+  },
+
   async delete(id: string) {
     return pb.collection('invites').delete(id)
   },

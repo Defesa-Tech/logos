@@ -78,7 +78,19 @@
   }
 
   .midnight-gradient {
-    background: linear-gradient(145deg, #1e2b37 0%, #2c3e50 60%, #34495e 100%);
+    background: linear-gradient(145deg, #182430 0%, #243444 45%, #2c3e50 100%);
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .glass-card-dark {
+    background: rgba(44, 62, 80, 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
   }
 
   .card-subtle-hover {
@@ -88,9 +100,23 @@
   }
 
   .card-subtle-hover:hover {
-    transform: scale(1.015);
+    transform: translateY(-2px);
     box-shadow:
-      0 10px 25px -5px rgba(44, 62, 80, 0.08),
+      0 12px 28px -6px rgba(44, 62, 80, 0.08),
       0 8px 10px -6px rgba(44, 62, 80, 0.04);
+  }
+
+  /* Safe area for mobile viewport bottom */
+  .safe-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  /* Custom scrollbar */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }

@@ -11,6 +11,8 @@ import {
   Heart,
   Phone,
   Trash2,
+  X,
+  Sparkles,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { familiesService, personsService } from '@/services/church'
@@ -178,7 +180,7 @@ export default function Families() {
   }
 
   const familyRoleLabels: Record<FamilyRole, string> = {
-    head: 'Cabeça / Responsável',
+    head: 'Responsável / Cabeça',
     spouse: 'Cônjuge',
     child: 'Filho(a)',
     other: 'Outro membro',
@@ -204,21 +206,21 @@ export default function Families() {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-serif-sacred font-bold text-[#2C3E50] flex items-center gap-2">
             <HomeIcon className="w-6 h-6 text-[#D4AF37]" />
             Núcleos Familiares (Casas)
           </h1>
-          <p className="text-xs text-slate-500 mt-1">
-            Mapeamento de lares e vínculos de parentesco (cabeça, cônjuge, filhos e parentes).
+          <p className="text-xs text-slate-500 mt-0.5">
+            Mapeamento dos lares cristãos, agregando chefes de família, cônjuges, filhos e parentes.
           </p>
         </div>
 
         {canAccessAll && (
           <Button
             onClick={() => setCreateFamOpen(true)}
-            className="bg-[#2C3E50] hover:bg-[#1E2B37] text-white text-xs font-semibold shadow-sm"
+            className="bg-[#2C3E50] hover:bg-[#1E2B37] text-white text-xs font-semibold h-10 px-4 rounded-xl shadow-md self-start sm:self-auto active:scale-95 transition-all"
           >
             <Plus className="w-4 h-4 mr-1.5" />
             Nova Família
@@ -228,56 +230,67 @@ export default function Families() {
 
       {/* Search Toolbar */}
       <div className="relative max-w-md">
-        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+        <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
         <Input
           type="text"
           placeholder="Buscar família por sobrenome ou endereço..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-9 text-xs h-9 bg-white"
+          className="pl-9 pr-8 text-xs h-10 rounded-2xl bg-white border-slate-200/90 shadow-sm"
         />
+        {searchQuery && (
+          <button
+            onClick={() => setSearchQuery('')}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        )}
       </div>
 
-      {/* Families Grid */}
+      {/* Families Grid (Responsive 1 col mobile, 2 col tablet, 3 col desktop) */}
       {loading ? (
         <p className="text-xs text-slate-400 text-center py-12">Carregando famílias...</p>
       ) : filteredFamilies.length === 0 ? (
-        <Card className="border-slate-200 p-8 text-center bg-white">
+        <Card className="border-slate-200 p-8 text-center bg-white rounded-2xl shadow-sm">
           <HomeIcon className="w-10 h-10 text-slate-300 mx-auto mb-2" />
           <p className="text-sm font-semibold text-slate-700">Nenhum núcleo familiar encontrado</p>
           <p className="text-xs text-slate-400 mt-1">
-            Crie uma nova família para agrupar pessoas do mesmo lar.
+            Cadastre um novo lar para organizar pessoas do mesmo convívio.
           </p>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {filteredFamilies.map((fam) => {
             const familyMembers = persons.filter((p) => p.family === fam.id)
-            const head = familyMembers.find((m) => m.family_role === 'head')
 
             return (
               <Card
                 key={fam.id}
-                className="card-subtle-hover border-slate-200/90 bg-white shadow-sm flex flex-col justify-between overflow-hidden"
+                className="border-slate-200/90 bg-white shadow-sm hover:shadow-md transition-all rounded-2xl flex flex-col justify-between overflow-hidden"
               >
                 <div>
-                  <CardHeader className="bg-slate-50/70 border-b border-slate-100 pb-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-amber-50 text-[#D4AF37] flex items-center justify-center font-bold text-xs">
-                          <HomeIcon className="w-4 h-4" />
+                  <CardHeader className="bg-slate-50/80 border-b border-slate-100 p-4 pb-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-9 h-9 rounded-xl bg-amber-50 text-[#D4AF37] flex items-center justify-center font-bold text-xs flex-shrink-0">
+                          <HomeIcon className="w-5 h-5" />
                         </div>
-                        <CardTitle className="text-base font-serif-sacred text-[#2C3E50]">
+                        <CardTitle className="text-base font-serif-sacred text-[#2C3E50] truncate">
                           {fam.name}
                         </CardTitle>
                       </div>
-                      <Badge variant="outline" className="text-[10px] font-semibold bg-white">
+                      <Badge
+                        variant="outline"
+                        className="text-[10px] font-bold bg-white text-slate-700 rounded-full px-2.5 py-0.5 flex-shrink-0"
+                      >
                         {familyMembers.length} {familyMembers.length === 1 ? 'membro' : 'membros'}
                       </Badge>
                     </div>
+
                     {fam.address && (
-                      <CardDescription className="text-xs text-slate-500 flex items-center gap-1 mt-1">
-                        <MapPin className="w-3 h-3 text-slate-400 flex-shrink-0" />
+                      <CardDescription className="text-xs text-slate-500 flex items-center gap-1.5 mt-2 truncate">
+                        <MapPin className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
                         <span className="truncate">{fam.address}</span>
                       </CardDescription>
                     )}
@@ -285,20 +298,20 @@ export default function Families() {
 
                   <CardContent className="p-4 space-y-3">
                     {familyMembers.length === 0 ? (
-                      <p className="text-xs text-slate-400 italic py-2">
-                        Nenhum integrante associado a esta casa ainda.
+                      <p className="text-xs text-slate-400 italic py-3 text-center">
+                        Nenhum integrante vinculado a esta casa ainda.
                       </p>
                     ) : (
                       <div className="space-y-2">
                         {familyMembers.map((member) => (
                           <div
                             key={member.id}
-                            className="p-2.5 rounded-lg bg-slate-50/80 hover:bg-slate-50 flex items-center justify-between text-xs transition-colors"
+                            className="p-3 rounded-xl bg-slate-50/90 hover:bg-slate-100/80 flex items-center justify-between text-xs transition-colors"
                           >
                             <div className="min-w-0 pr-2">
-                              <p className="font-semibold text-slate-800 truncate">{member.name}</p>
-                              <div className="flex items-center gap-1.5 text-[10px] text-slate-500">
-                                <span className="font-medium text-[#2C3E50]">
+                              <p className="font-bold text-slate-800 truncate">{member.name}</p>
+                              <div className="flex items-center gap-1.5 text-[10px] text-slate-500 mt-0.5">
+                                <span className="font-semibold text-[#2C3E50]">
                                   {familyRoleLabels[member.family_role || 'other']}
                                 </span>
                                 <span>&bull;</span>
@@ -310,7 +323,7 @@ export default function Families() {
                               <button
                                 onClick={() => handleRemoveFromFamily(member.id)}
                                 title="Desvincular da família"
-                                className="text-slate-300 hover:text-red-500 transition-colors p-1"
+                                className="text-slate-300 hover:text-red-500 transition-colors p-1.5 rounded-lg hover:bg-red-50"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
@@ -321,7 +334,7 @@ export default function Families() {
                     )}
 
                     {fam.notes && (
-                      <p className="text-[11px] text-slate-500 bg-amber-50/40 p-2 rounded-lg border border-amber-100">
+                      <p className="text-[11px] text-slate-500 bg-amber-50/50 p-2.5 rounded-xl border border-amber-100 leading-relaxed">
                         {fam.notes}
                       </p>
                     )}
@@ -329,7 +342,7 @@ export default function Families() {
                 </div>
 
                 {canAccessAll && (
-                  <div className="p-3 bg-slate-50/50 border-t border-slate-100">
+                  <div className="p-3 bg-slate-50/60 border-t border-slate-100">
                     <Button
                       variant="outline"
                       size="sm"
@@ -337,10 +350,10 @@ export default function Families() {
                         setTargetFamilyId(fam.id)
                         setAddMemberOpen(true)
                       }}
-                      className="w-full text-xs text-[#2C3E50] hover:bg-slate-100 font-medium"
+                      className="w-full text-xs text-[#2C3E50] hover:bg-white h-9 rounded-xl font-semibold border-slate-200"
                     >
-                      <UserPlus className="w-3.5 h-3.5 mr-1 text-[#D4AF37]" />
-                      Adicionar Membro à Família
+                      <UserPlus className="w-3.5 h-3.5 mr-1.5 text-[#D4AF37]" />
+                      Adicionar Membro ao Lar
                     </Button>
                   </div>
                 )}
@@ -352,7 +365,7 @@ export default function Families() {
 
       {/* CREATE FAMILY DIALOG */}
       <Dialog open={createFamOpen} onOpenChange={setCreateFamOpen}>
-        <DialogContent className="sm:max-w-md bg-white">
+        <DialogContent className="sm:max-w-md bg-white rounded-2xl">
           <DialogHeader>
             <DialogTitle className="font-serif-sacred text-xl text-[#2C3E50]">
               Cadastrar Novo Núcleo Familiar
@@ -367,6 +380,7 @@ export default function Families() {
                 value={famName}
                 onChange={(e) => setFamName(e.target.value)}
                 placeholder="Ex: Família Souza"
+                className="h-10 rounded-xl"
               />
             </div>
             <div className="space-y-1">
@@ -376,23 +390,25 @@ export default function Families() {
                 value={famAddress}
                 onChange={(e) => setFamAddress(e.target.value)}
                 placeholder="Rua, número, complemento e bairro"
+                className="h-10 rounded-xl"
               />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="fam-notes">Observações da Família</Label>
+              <Label htmlFor="fam-notes">Observações do Lar</Label>
               <Input
                 id="fam-notes"
                 value={famNotes}
                 onChange={(e) => setFamNotes(e.target.value)}
-                placeholder="Ex: Pequeno grupo em sua casa às quartas"
+                placeholder="Ex: Anfitriões do pequeno grupo às quartas-feiras"
+                className="h-10 rounded-xl"
               />
             </div>
             <Button
               type="submit"
               disabled={isSubmittingFam}
-              className="w-full bg-[#2C3E50] text-white text-xs font-semibold"
+              className="w-full bg-[#2C3E50] hover:bg-[#1E2B37] text-white text-xs h-10 rounded-xl font-semibold shadow-md"
             >
-              {isSubmittingFam ? 'Criando...' : 'Criar Família'}
+              {isSubmittingFam ? 'Criando lar...' : 'Cadastrar Família'}
             </Button>
           </form>
         </DialogContent>
@@ -400,10 +416,10 @@ export default function Families() {
 
       {/* ADD MEMBER TO FAMILY DIALOG */}
       <Dialog open={addMemberOpen} onOpenChange={setAddMemberOpen}>
-        <DialogContent className="sm:max-w-md bg-white">
+        <DialogContent className="sm:max-w-md bg-white rounded-2xl">
           <DialogHeader>
             <DialogTitle className="font-serif-sacred text-xl text-[#2C3E50]">
-              Adicionar Integrante à Família
+              Adicionar Integrante ao Lar
             </DialogTitle>
           </DialogHeader>
 
@@ -411,10 +427,10 @@ export default function Families() {
             <div className="space-y-1">
               <Label htmlFor="sel-type">Origem do Integrante</Label>
               <Select value={selectedPersonId} onValueChange={setSelectedPersonId}>
-                <SelectTrigger id="sel-type">
+                <SelectTrigger id="sel-type" className="h-10 rounded-xl">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-white">
+                <SelectContent className="bg-white rounded-xl">
                   <SelectItem value="new">+ Cadastrar Novo Membro Agora</SelectItem>
                   {unlinkedPersons.map((p) => (
                     <SelectItem key={p.id} value={p.id}>
@@ -426,7 +442,7 @@ export default function Families() {
             </div>
 
             {selectedPersonId === 'new' && (
-              <div className="space-y-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <div className="space-y-3 p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
                 <div className="space-y-1">
                   <Label htmlFor="np-name">Nome do Integrante *</Label>
                   <Input
@@ -435,6 +451,7 @@ export default function Families() {
                     value={newPersonName}
                     onChange={(e) => setNewPersonName(e.target.value)}
                     placeholder="Ex: Maria Souza"
+                    className="h-10 rounded-xl bg-white"
                   />
                 </div>
                 <div className="space-y-1">
@@ -444,6 +461,7 @@ export default function Families() {
                     value={newPersonWhatsapp}
                     onChange={(e) => setNewPersonWhatsapp(e.target.value)}
                     placeholder="(11) 98765-4321"
+                    className="h-10 rounded-xl bg-white"
                   />
                 </div>
               </div>
@@ -452,14 +470,14 @@ export default function Families() {
             <div className="space-y-1">
               <Label htmlFor="fam-role">Papel no Núcleo Familiar *</Label>
               <Select value={memberRole} onValueChange={(val) => setMemberRole(val as FamilyRole)}>
-                <SelectTrigger id="fam-role">
+                <SelectTrigger id="fam-role" className="h-10 rounded-xl">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-white">
+                <SelectContent className="bg-white rounded-xl">
                   <SelectItem value="head">Cabeça / Responsável</SelectItem>
                   <SelectItem value="spouse">Cônjuge</SelectItem>
                   <SelectItem value="child">Filho(a)</SelectItem>
-                  <SelectItem value="other">Outro (avô, sogra, primo)</SelectItem>
+                  <SelectItem value="other">Outro (avô, sogra, irmão)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -467,9 +485,9 @@ export default function Families() {
             <Button
               type="submit"
               disabled={isAddingMember}
-              className="w-full bg-[#2C3E50] text-white text-xs font-semibold"
+              className="w-full bg-[#2C3E50] hover:bg-[#1E2B37] text-white text-xs h-10 rounded-xl font-semibold shadow-md"
             >
-              {isAddingMember ? 'Salvando...' : 'Confirmar Vínculo à Família'}
+              {isAddingMember ? 'Vinculando...' : 'Confirmar Vínculo à Família'}
             </Button>
           </form>
         </DialogContent>

@@ -17,6 +17,12 @@ import {
   FileCheck,
   Send,
   Lock,
+  ChevronRight,
+  Phone,
+  ArrowRight,
+  Check,
+  Activity,
+  Layers,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import {
@@ -75,7 +81,7 @@ export default function Index() {
     } else if (e.action === 'update') {
       setPersons((prev) => prev.map((p) => (p.id === e.record.id ? e.record : p)))
     } else if (e.action === 'delete') {
-      setPersons((prev) => prev.filter((p) => p.id === e.record.id))
+      setPersons((prev) => prev.filter((p) => p.id !== e.record.id))
     }
   })
 
@@ -128,8 +134,8 @@ export default function Index() {
     e.preventDefault()
     try {
       await activitiesService.create({
-        title: `Reunião Relatada: ${meetingGroup}`,
-        description: `Presença de ${meetingAttendance} pessoas. Notas: ${meetingNotes || 'Reunião abençoada com louvor e oração.'}`,
+        title: `Reunião: ${meetingGroup}`,
+        description: `Presença de ${meetingAttendance} pessoas. Notas: ${meetingNotes || 'Reunião abençoada com louvor e palavra.'}`,
         type: 'meeting_report',
         person: currentPerson?.id || undefined,
       })
@@ -149,16 +155,17 @@ export default function Index() {
   const attendersCount = persons.filter((p) => p.status === 'attender').length
   const pendingInvitesCount = invites.filter((i) => !i.used).length
 
-  // Mock Family Growth Chart Data
+  // Family Growth Chart Data
   const chartData = [
-    { month: 'Mar', familias: 1 },
+    { month: 'Jan', familias: 1 },
+    { month: 'Fev', familias: 1 },
+    { month: 'Mar', familias: 2 },
     { month: 'Abr', familias: 2 },
-    { month: 'Mai', familias: 2 },
-    { month: 'Jun', familias: 3 },
-    { month: 'Jul', familias: families.length || 3 },
+    { month: 'Mai', familias: Math.max(2, families.length - 1) },
+    { month: 'Jun', familias: families.length || 3 },
   ]
 
-  // Leader context filter: if leader, filter persons by same family or role
+  // Leader context filter
   const leaderGroupPersons = persons.filter((p) => {
     if (currentPerson?.family) {
       return p.family === currentPerson.family
@@ -167,29 +174,38 @@ export default function Index() {
   })
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      {/* Top Banner / Welcome Hero */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#2C3E50] via-[#34495E] to-[#1E2B37] text-white p-6 md:p-8 shadow-xl border border-slate-700/50">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div className="space-y-6 sm:space-y-8 animate-fade-in">
+      {/* =========================================================================
+          HERO BANNER - Modern Sacred Gradient
+          ========================================================================= */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1C2936] via-[#243444] to-[#2C3E50] text-white p-5 sm:p-7 md:p-8 shadow-xl border border-slate-700/60">
+        {/* Subtle decorative gold glow */}
+        <div className="absolute top-0 right-0 w-72 h-72 bg-[#D4AF37]/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
           <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-amber-300 text-xs font-medium border border-amber-400/20">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Logos Sistema Integrado &bull; Visão do {role.toUpperCase()}</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-amber-300 text-[11px] font-semibold border border-amber-400/20 backdrop-blur-sm">
+              <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
+              <span>Logos &bull; Visão do {role.toUpperCase()}</span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-serif-sacred font-bold tracking-tight text-white">
-              Graça e Paz, {user?.name || currentPerson?.name || 'Comunidade Logos'}
+            <h1 className="text-2xl sm:text-3xl font-serif-sacred font-bold tracking-tight text-white leading-tight">
+              Graça e Paz,{' '}
+              {user?.name?.split(' ')[0] ||
+                currentPerson?.name?.split(' ')[0] ||
+                'Comunidade Logos'}
             </h1>
-            <p className="text-slate-300 text-sm leading-relaxed">
-              Gestão de pessoas, acolhimento de novos visitantes e acompanhamento do crescimento
-              familiar em Cristo.
+            <p className="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl">
+              Cuidado pastoral de pessoas, acolhimento de novos visitantes e acompanhamento do
+              crescimento dos lares em Cristo.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <Link to="/visitante-cadastro">
-              <Button className="bg-[#D4AF37] hover:bg-[#C29D26] text-[#2C3E50] font-semibold text-xs shadow-md">
-                <QrCode className="w-4 h-4 mr-1.5" />
-                Landing do Visitante
+          {/* Quick Actions (Responsive touch-friendly) */}
+          <div className="flex flex-wrap items-center gap-2.5 pt-1 md:pt-0">
+            <Link to="/visitante-cadastro" target="_blank" rel="noopener noreferrer">
+              <Button className="bg-[#D4AF37] hover:bg-[#C59F29] text-[#1E2B37] font-semibold text-xs h-10 px-4 rounded-xl shadow-md transition-all active:scale-95">
+                <QrCode className="w-4 h-4 mr-2" />
+                QR Visitante
               </Button>
             </Link>
 
@@ -197,9 +213,9 @@ export default function Index() {
               <Link to="/secretaria">
                 <Button
                   variant="outline"
-                  className="border-slate-500 bg-white/5 hover:bg-white/10 text-white text-xs"
+                  className="border-white/20 bg-white/10 hover:bg-white/20 text-white text-xs h-10 px-4 rounded-xl backdrop-blur-sm transition-all"
                 >
-                  <Mail className="w-4 h-4 mr-1.5" />
+                  <Mail className="w-4 h-4 mr-2" />
                   Gerar Convite
                 </Button>
               </Link>
@@ -208,12 +224,12 @@ export default function Index() {
             {!user && (
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button className="bg-white text-[#2C3E50] hover:bg-slate-100 text-xs font-semibold">
-                    <Lock className="w-4 h-4 mr-1.5" />
+                  <Button className="bg-white text-[#2C3E50] hover:bg-slate-100 text-xs font-semibold h-10 px-4 rounded-xl shadow-sm">
+                    <Lock className="w-4 h-4 mr-2" />
                     Entrar (Secretaria)
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-md bg-white">
+                <DialogContent className="sm:max-w-md bg-white rounded-2xl">
                   <DialogHeader>
                     <DialogTitle className="font-serif-sacred text-xl text-[#2C3E50]">
                       Entrar no Logos
@@ -229,7 +245,7 @@ export default function Index() {
                         value={authEmail}
                         onChange={(e) => setAuthEmail(e.target.value)}
                         required
-                        className="mt-1 text-xs"
+                        className="mt-1 text-xs h-10 rounded-xl"
                       />
                     </div>
                     <div>
@@ -239,23 +255,18 @@ export default function Index() {
                         value={authPass}
                         onChange={(e) => setAuthPass(e.target.value)}
                         required
-                        className="mt-1 text-xs"
+                        className="mt-1 text-xs h-10 rounded-xl"
                       />
                     </div>
-                    <p className="text-[11px] text-slate-400">
-                      Seed inicial:{' '}
-                      <code className="bg-slate-100 px-1 py-0.5 rounded text-slate-700">
-                        cleristonx.lima@gmail.com
-                      </code>{' '}
-                      /{' '}
-                      <code className="bg-slate-100 px-1 py-0.5 rounded text-slate-700">
-                        Skip@Pass
-                      </code>
+                    <p className="text-[11px] text-slate-500 bg-slate-50 p-2 rounded-lg border border-slate-200">
+                      Seed padrão:{' '}
+                      <code className="font-bold text-slate-700">cleristonx.lima@gmail.com</code> /{' '}
+                      <code className="font-bold text-slate-700">Skip@Pass</code>
                     </p>
                     <Button
                       type="submit"
                       disabled={isLoggingIn}
-                      className="w-full bg-[#2C3E50] text-white text-xs"
+                      className="w-full bg-[#2C3E50] hover:bg-[#1E2B37] text-white text-xs h-10 rounded-xl font-semibold"
                     >
                       {isLoggingIn ? 'Entrando...' : 'Confirmar Acesso'}
                     </Button>
@@ -268,180 +279,272 @@ export default function Index() {
       </div>
 
       {/* =========================================================================
+          MOBILE QUICK ACTIONS ROW (Horizontal Touch Bar)
+          ========================================================================= */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <Link
+          to="/pessoas"
+          className="flex items-center gap-3 p-3 rounded-2xl bg-white border border-slate-200/80 shadow-sm hover:border-[#D4AF37]/50 transition-all group"
+        >
+          <div className="w-10 h-10 rounded-xl bg-amber-50 text-[#D4AF37] flex items-center justify-center group-hover:scale-105 transition-transform">
+            <UserPlus className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs font-bold text-slate-800">Pessoas</p>
+            <p className="text-[10px] text-slate-400">Ver cadastros</p>
+          </div>
+        </Link>
+
+        <Link
+          to="/jornada"
+          className="flex items-center gap-3 p-3 rounded-2xl bg-white border border-slate-200/80 shadow-sm hover:border-[#D4AF37]/50 transition-all group"
+        >
+          <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+            <GitFork className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs font-bold text-slate-800">Jornada</p>
+            <p className="text-[10px] text-slate-400">Pipeline de fé</p>
+          </div>
+        </Link>
+
+        <Link
+          to="/familias"
+          className="flex items-center gap-3 p-3 rounded-2xl bg-white border border-slate-200/80 shadow-sm hover:border-[#D4AF37]/50 transition-all group"
+        >
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+            <HomeIcon className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs font-bold text-slate-800">Famílias</p>
+            <p className="text-[10px] text-slate-400">Casas e lares</p>
+          </div>
+        </Link>
+
+        {canAccessAll ? (
+          <Link
+            to="/secretaria"
+            className="flex items-center gap-3 p-3 rounded-2xl bg-white border border-slate-200/80 shadow-sm hover:border-[#D4AF37]/50 transition-all group"
+          >
+            <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+              <Mail className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-800">Secretaria</p>
+              <p className="text-[10px] text-slate-400">Convites ativos</p>
+            </div>
+          </Link>
+        ) : (
+          <Link
+            to="/visitante-cadastro"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 p-3 rounded-2xl bg-white border border-slate-200/80 shadow-sm hover:border-[#D4AF37]/50 transition-all group"
+          >
+            <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+              <QrCode className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-800">QR Recepção</p>
+              <p className="text-[10px] text-slate-400">Abrir cartão</p>
+            </div>
+          </Link>
+        )}
+      </div>
+
+      {/* =========================================================================
           ROLE-BASED WIDGETS
           ========================================================================= */}
 
-      {/* 1. SECRETARY / PASTOR WIDGETS (Acesso Total) */}
+      {/* 1. SECRETARY / PASTOR WIDGETS (Acesso Total & Desktop Management) */}
       {canAccessAll && (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-serif-sacred font-bold text-[#2C3E50] flex items-center gap-2">
-              <Users className="w-5 h-5 text-[#D4AF37]" />
-              Painel Geral da Secretaria & Pastoral
-            </h2>
+            <div className="flex items-center gap-2">
+              <div className="w-2.5 h-2.5 rounded-full bg-[#D4AF37]" />
+              <h2 className="text-base sm:text-lg font-serif-sacred font-bold text-[#2C3E50]">
+                Indicadores Pastorais & Gestão
+              </h2>
+            </div>
             <Badge
               variant="outline"
-              className="text-xs font-medium bg-amber-50 text-amber-800 border-amber-200"
+              className="text-[11px] font-semibold bg-emerald-50 text-emerald-800 border-emerald-200 px-2.5 py-0.5 rounded-full"
             >
-              Tempo Real Ativo
+              <Activity className="w-3 h-3 mr-1 text-emerald-600 animate-pulse" />
+              Tempo Real
             </Badge>
           </div>
 
-          {/* Metric Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="card-subtle-hover border-slate-200/80 bg-white shadow-sm">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+          {/* KPI Metric Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            {/* Visitors */}
+            <Card className="border-slate-200/90 bg-white shadow-sm hover:shadow-md transition-all rounded-2xl">
+              <CardHeader className="p-4 pb-2 flex flex-row items-center justify-between">
+                <CardTitle className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   Novos Visitantes
                 </CardTitle>
                 <div className="p-2 rounded-xl bg-amber-50 text-[#D4AF37]">
                   <UserPlus className="w-4 h-4" />
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-[#2C3E50]">{visitorsCount}</div>
-                <p className="text-xs text-emerald-600 flex items-center gap-1 mt-1 font-medium">
+              <CardContent className="p-4 pt-0">
+                <div className="text-2xl sm:text-3xl font-bold text-[#2C3E50]">{visitorsCount}</div>
+                <p className="text-[11px] text-emerald-600 flex items-center gap-1 mt-1 font-semibold">
                   <ArrowUpRight className="w-3.5 h-3.5" />
-                  Recebidos recentemente
+                  No acolhimento
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="card-subtle-hover border-slate-200/80 bg-white shadow-sm">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+            {/* Members */}
+            <Card className="border-slate-200/90 bg-white shadow-sm hover:shadow-md transition-all rounded-2xl">
+              <CardHeader className="p-4 pb-2 flex flex-row items-center justify-between">
+                <CardTitle className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   Membros Efetivos
                 </CardTitle>
                 <div className="p-2 rounded-xl bg-blue-50 text-blue-600">
                   <Users className="w-4 h-4" />
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-[#2C3E50]">{membersCount}</div>
-                <p className="text-xs text-slate-500 mt-1">
-                  +{attendersCount} frequentadores em integração
-                </p>
+              <CardContent className="p-4 pt-0">
+                <div className="text-2xl sm:text-3xl font-bold text-[#2C3E50]">{membersCount}</div>
+                <p className="text-[11px] text-slate-500 mt-1">+{attendersCount} frequentadores</p>
               </CardContent>
             </Card>
 
-            <Card className="card-subtle-hover border-slate-200/80 bg-white shadow-sm">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-xs font-medium text-slate-500 uppercase tracking-wider">
-                  Famílias Cadastradas
+            {/* Families */}
+            <Card className="border-slate-200/90 bg-white shadow-sm hover:shadow-md transition-all rounded-2xl">
+              <CardHeader className="p-4 pb-2 flex flex-row items-center justify-between">
+                <CardTitle className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                  Lares & Famílias
                 </CardTitle>
                 <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600">
                   <HomeIcon className="w-4 h-4" />
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-[#2C3E50]">{families.length}</div>
-                <p className="text-xs text-slate-500 mt-1">Núcleos familiares ativos</p>
+              <CardContent className="p-4 pt-0">
+                <div className="text-2xl sm:text-3xl font-bold text-[#2C3E50]">
+                  {families.length}
+                </div>
+                <p className="text-[11px] text-slate-500 mt-1">Núcleos familiares</p>
               </CardContent>
             </Card>
 
-            <Card className="card-subtle-hover border-slate-200/80 bg-white shadow-sm">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-xs font-medium text-slate-500 uppercase tracking-wider">
-                  Convites Pendentes
+            {/* Invites */}
+            <Card className="border-slate-200/90 bg-white shadow-sm hover:shadow-md transition-all rounded-2xl">
+              <CardHeader className="p-4 pb-2 flex flex-row items-center justify-between">
+                <CardTitle className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                  Convites Ativos
                 </CardTitle>
                 <div className="p-2 rounded-xl bg-purple-50 text-purple-600">
                   <Mail className="w-4 h-4" />
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-[#2C3E50]">{pendingInvitesCount}</div>
-                <p className="text-xs text-amber-600 mt-1 font-medium">
-                  Aguardando ativação por WhatsApp
-                </p>
+              <CardContent className="p-4 pt-0">
+                <div className="text-2xl sm:text-3xl font-bold text-[#2C3E50]">
+                  {pendingInvitesCount}
+                </div>
+                <p className="text-[11px] text-amber-600 mt-1 font-semibold">Aguardando ativação</p>
               </CardContent>
             </Card>
           </div>
 
-          {/* Chart & Quick List */}
+          {/* Desktop Rich Management Grid: Chart + Visitor Quick Table */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="lg:col-span-2 border-slate-200/80 bg-white shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-base font-serif-sacred text-[#2C3E50]">
-                  Crescimento de Núcleos Familiares
-                </CardTitle>
-                <CardDescription className="text-xs text-slate-500">
-                  Evolução mensal de lares e famílias vinculadas à comunidade
-                </CardDescription>
+            {/* Chart: Growth */}
+            <Card className="lg:col-span-2 border-slate-200/90 bg-white shadow-sm rounded-2xl">
+              <CardHeader className="p-4 sm:p-6 pb-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-base font-serif-sacred text-[#2C3E50]">
+                      Crescimento de Lares e Famílias
+                    </CardTitle>
+                    <CardDescription className="text-xs text-slate-500 mt-0.5">
+                      Evolução mensal de núcleos familiares conectados ao Logos
+                    </CardDescription>
+                  </div>
+                  <Badge variant="outline" className="text-xs bg-slate-50">
+                    Semestral
+                  </Badge>
+                </div>
               </CardHeader>
-              <CardContent className="h-64">
+              <CardContent className="p-4 sm:p-6 pt-2 h-64">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                  <AreaChart data={chartData} margin={{ top: 10, right: 20, left: -20, bottom: 0 }}>
                     <defs>
-                      <linearGradient id="colorFam" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#D4AF37" stopOpacity={0.6} />
-                        <stop offset="95%" stopColor="#D4AF37" stopOpacity={0.05} />
+                      <linearGradient id="colorFamModern" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#D4AF37" stopOpacity={0.5} />
+                        <stop offset="95%" stopColor="#D4AF37" stopOpacity={0.02} />
                       </linearGradient>
                     </defs>
-                    <XAxis dataKey="month" stroke="#94a3b8" fontSize={11} />
-                    <YAxis stroke="#94a3b8" fontSize={11} allowDecimals={false} />
+                    <XAxis dataKey="month" stroke="#94a3b8" fontSize={11} tickLine={false} />
+                    <YAxis stroke="#94a3b8" fontSize={11} allowDecimals={false} tickLine={false} />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: '#2C3E50',
+                        backgroundColor: '#1E2B37',
                         color: '#fff',
-                        borderRadius: '8px',
+                        borderRadius: '12px',
                         border: 'none',
                         fontSize: '12px',
+                        boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
                       }}
                     />
                     <Area
                       type="monotone"
                       dataKey="familias"
                       stroke="#D4AF37"
-                      strokeWidth={2.5}
+                      strokeWidth={3}
                       fillOpacity={1}
-                      fill="url(#colorFam)"
+                      fill="url(#colorFamModern)"
                     />
                   </AreaChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
 
-            <Card className="border-slate-200/80 bg-white shadow-sm flex flex-col">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base font-serif-sacred text-[#2C3E50] flex items-center justify-between">
-                  <span>Novos Visitantes</span>
+            {/* Quick Visitors List */}
+            <Card className="border-slate-200/90 bg-white shadow-sm rounded-2xl flex flex-col">
+              <CardHeader className="p-4 sm:p-5 pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base font-serif-sacred text-[#2C3E50] flex items-center gap-2">
+                    <UserPlus className="w-4 h-4 text-[#D4AF37]" />
+                    <span>Acolhimento Rápido</span>
+                  </CardTitle>
                   <Link
                     to="/pessoas"
-                    className="text-xs text-[#D4AF37] hover:underline font-normal"
+                    className="text-xs text-[#D4AF37] hover:underline font-semibold"
                   >
                     Ver todos
                   </Link>
-                </CardTitle>
+                </div>
                 <CardDescription className="text-xs text-slate-500">
-                  Chegaram recentemente via QR Code
+                  Visitantes recentes cadastrados via QR Code
                 </CardDescription>
               </CardHeader>
-              <CardContent className="flex-1 space-y-3">
+              <CardContent className="p-4 sm:p-5 pt-0 flex-1 space-y-2.5">
                 {persons
                   .filter((p) => p.status === 'visitor')
                   .slice(0, 4)
                   .map((v) => (
                     <div
                       key={v.id}
-                      className="p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors flex items-center justify-between text-xs"
+                      onClick={() => navigate(`/pessoas?id=${v.id}`)}
+                      className="p-3 rounded-xl bg-slate-50 hover:bg-slate-100/80 transition-colors flex items-center justify-between cursor-pointer border border-slate-100 group"
                     >
-                      <div>
-                        <p className="font-semibold text-slate-800">{v.name}</p>
-                        <p className="text-[11px] text-slate-400">
+                      <div className="min-w-0 pr-2">
+                        <p className="font-semibold text-xs text-slate-800 truncate group-hover:text-[#2C3E50]">
+                          {v.name}
+                        </p>
+                        <p className="text-[11px] text-slate-500 truncate mt-0.5">
                           {v.whatsapp || 'WhatsApp não informado'}
                         </p>
                       </div>
-                      <Badge
-                        variant="outline"
-                        className="bg-amber-50 text-amber-800 border-amber-200 text-[10px]"
-                      >
-                        Visitante
-                      </Badge>
+                      <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#D4AF37] transition-colors flex-shrink-0" />
                     </div>
                   ))}
                 {visitorsCount === 0 && (
-                  <p className="text-xs text-slate-400 text-center py-6">
-                    Nenhum visitante recente.
+                  <p className="text-xs text-slate-400 text-center py-8">
+                    Nenhum visitante recente no momento.
                   </p>
                 )}
               </CardContent>
@@ -453,19 +556,24 @@ export default function Index() {
       {/* 2. LEADER WIDGETS (Restrito ao Contexto) */}
       {isLeader && (
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-serif-sacred font-bold text-[#2C3E50] flex items-center gap-2">
-              <Users className="w-5 h-5 text-blue-600" />
-              Painel do Líder de Grupo / Famílias
-            </h2>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h2 className="text-base sm:text-lg font-serif-sacred font-bold text-[#2C3E50] flex items-center gap-2">
+                <Users className="w-5 h-5 text-blue-600" />
+                Painel do Líder de Grupo
+              </h2>
+              <p className="text-xs text-slate-500">
+                Pessoas e lares sob seu acompanhamento espiritual
+              </p>
+            </div>
             <Dialog open={reportModalOpen} onOpenChange={setReportModalOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-[#2C3E50] hover:bg-[#1E2B37] text-white text-xs font-semibold shadow-sm">
-                  <Send className="w-4 h-4 mr-1.5" />
-                  Relatar Reunião
+                <Button className="bg-[#2C3E50] hover:bg-[#1E2B37] text-white text-xs font-semibold h-9 rounded-xl shadow-sm self-start sm:self-auto">
+                  <Send className="w-3.5 h-3.5 mr-1.5" />
+                  Relatar Reunião do Grupo
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-md bg-white">
+              <DialogContent className="sm:max-w-md bg-white rounded-2xl">
                 <DialogHeader>
                   <DialogTitle className="font-serif-sacred text-xl text-[#2C3E50]">
                     Relatar Encontro do Pequeno Grupo
@@ -478,17 +586,17 @@ export default function Index() {
                       value={meetingGroup}
                       onChange={(e) => setMeetingGroup(e.target.value)}
                       required
-                      className="mt-1 text-xs"
+                      className="mt-1 text-xs h-10 rounded-xl"
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-slate-700">Presentes</label>
+                    <label className="text-xs font-medium text-slate-700">Presentes no Lar</label>
                     <Input
                       type="number"
                       value={meetingAttendance}
                       onChange={(e) => setMeetingAttendance(e.target.value)}
                       required
-                      className="mt-1 text-xs"
+                      className="mt-1 text-xs h-10 rounded-xl"
                     />
                   </div>
                   <div>
@@ -499,11 +607,14 @@ export default function Index() {
                       rows={3}
                       value={meetingNotes}
                       onChange={(e) => setMeetingNotes(e.target.value)}
-                      placeholder="Ex: Tivemos 2 novos visitantes. Oramos pela família Silva..."
-                      className="mt-1 text-xs"
+                      placeholder="Ex: Tivemos 2 novos visitantes. Oramos pela família do Pedro..."
+                      className="mt-1 text-xs rounded-xl"
                     />
                   </div>
-                  <Button type="submit" className="w-full bg-[#2C3E50] text-white text-xs">
+                  <Button
+                    type="submit"
+                    className="w-full bg-[#2C3E50] text-white text-xs h-10 rounded-xl font-semibold"
+                  >
                     Enviar Relatório Pastoral
                   </Button>
                 </form>
@@ -512,29 +623,31 @@ export default function Index() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Group Members List */}
-            <Card className="md:col-span-2 border-slate-200/80 bg-white shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-base font-serif-sacred text-[#2C3E50] flex items-center justify-between">
-                  <span>Membros sob sua Liderança (Contexto)</span>
+            {/* Members List */}
+            <Card className="md:col-span-2 border-slate-200/90 bg-white shadow-sm rounded-2xl">
+              <CardHeader className="p-4 sm:p-5">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base font-serif-sacred text-[#2C3E50]">
+                    Membros sob sua Liderança
+                  </CardTitle>
                   <Badge variant="outline" className="text-xs">
                     {leaderGroupPersons.length} pessoas
                   </Badge>
-                </CardTitle>
+                </div>
                 <CardDescription className="text-xs text-slate-500">
-                  Visibilidade restrita aos integrantes do seu núcleo familiar e pequenos grupos
+                  Visibilidade focada nos integrantes do seu grupo
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="p-4 sm:p-5 pt-0 space-y-2.5">
                 {leaderGroupPersons.map((p) => (
                   <div
                     key={p.id}
-                    className="p-3 rounded-xl bg-slate-50 flex items-center justify-between text-xs"
+                    className="p-3 rounded-xl bg-slate-50 flex items-center justify-between text-xs hover:bg-slate-100/70 transition-colors"
                   >
                     <div>
                       <p className="font-semibold text-slate-800">{p.name}</p>
-                      <p className="text-[11px] text-slate-400">
-                        {p.whatsapp || 'WhatsApp não informado'}
+                      <p className="text-[11px] text-slate-500">
+                        {p.whatsapp || 'WhatsApp não cadastrado'}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
@@ -545,9 +658,9 @@ export default function Index() {
                         size="sm"
                         variant="ghost"
                         onClick={() => navigate(`/pessoas?id=${p.id}`)}
-                        className="text-xs h-7 text-[#2C3E50] hover:text-[#D4AF37]"
+                        className="text-xs h-8 text-[#2C3E50] hover:text-[#D4AF37]"
                       >
-                        Ver Perfil
+                        Perfil &rarr;
                       </Button>
                     </div>
                   </div>
@@ -555,33 +668,29 @@ export default function Index() {
               </CardContent>
             </Card>
 
-            {/* Upcoming Birthdays & Care */}
-            <Card className="border-slate-200/80 bg-white shadow-sm">
-              <CardHeader>
+            {/* Birthdays */}
+            <Card className="border-slate-200/90 bg-white shadow-sm rounded-2xl">
+              <CardHeader className="p-4 sm:p-5">
                 <CardTitle className="text-base font-serif-sacred text-[#2C3E50] flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-[#D4AF37]" />
-                  Próximos Aniversários
+                  Aniversários do Mês
                 </CardTitle>
                 <CardDescription className="text-xs text-slate-500">
-                  Atenção pastoral e felicitações do mês
+                  Atenção e oração pastoral
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="p-2.5 rounded-xl bg-amber-50/60 border border-amber-200/50 flex items-center justify-between text-xs">
-                  <div>
-                    <p className="font-semibold text-slate-800">Ana Carolina Silva</p>
-                    <p className="text-[11px] text-slate-500">18 de Outubro &bull; Família Silva</p>
-                  </div>
-                  <Badge className="bg-[#D4AF37] text-[#2C3E50] text-[10px]">Em breve</Badge>
+              <CardContent className="p-4 sm:p-5 pt-0 space-y-3">
+                <div className="p-3 rounded-xl bg-amber-50/60 border border-amber-200/60 text-xs">
+                  <p className="font-semibold text-slate-800">Ana Carolina Silva</p>
+                  <p className="text-[11px] text-slate-500">18 de Outubro &bull; Família Silva</p>
+                  <Badge className="bg-[#D4AF37] text-[#2C3E50] text-[10px] font-bold mt-1.5">
+                    Em breve
+                  </Badge>
                 </div>
-                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/50 flex items-center justify-between text-xs">
-                  <div>
-                    <p className="font-semibold text-slate-800">Lucas Silva</p>
-                    <p className="text-[11px] text-slate-500">
-                      04 de Novembro &bull; Família Silva
-                    </p>
-                  </div>
-                  <span className="text-[10px] text-slate-400">Próx. mês</span>
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/60 text-xs">
+                  <p className="font-semibold text-slate-800">Lucas Silva</p>
+                  <p className="text-[11px] text-slate-500">04 de Novembro &bull; Família Silva</p>
+                  <span className="text-[10px] text-slate-400 block mt-1">Próximo mês</span>
                 </div>
               </CardContent>
             </Card>
@@ -589,62 +698,69 @@ export default function Index() {
         </div>
       )}
 
-      {/* 3. MEMBER / VISITOR WIDGETS (Visão Mais Restrita) */}
+      {/* 3. MEMBER / VISITOR WIDGETS (Mobile-First Experience) */}
       {isMemberOrVisitor && (
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-serif-sacred font-bold text-[#2C3E50] flex items-center gap-2">
-              <Compass className="w-5 h-5 text-emerald-600" />
-              Minha Jornada & Espaço Comunitário
-            </h2>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h2 className="text-base sm:text-lg font-serif-sacred font-bold text-[#2C3E50] flex items-center gap-2">
+                <Compass className="w-5 h-5 text-emerald-600" />
+                Minha Jornada & Espaço da Igreja
+              </h2>
+              <p className="text-xs text-slate-500">
+                Acompanhe seus passos na fé e comunhão da comunidade
+              </p>
+            </div>
             <Button
               onClick={() => {
                 setCheckedIn(true)
-                toast.success('Check-in realizado com sucesso no culto de hoje!')
+                toast.success('Check-in confirmado no culto de hoje!')
               }}
               disabled={checkedIn}
-              className={`text-xs font-semibold ${
+              className={`text-xs font-semibold h-10 px-4 rounded-xl shadow-md ${
                 checkedIn
                   ? 'bg-emerald-600 text-white'
-                  : 'bg-[#D4AF37] hover:bg-[#C29D26] text-[#2C3E50]'
+                  : 'bg-[#D4AF37] hover:bg-[#C59F29] text-[#1E2B37]'
               }`}
             >
-              <CheckCircle2 className="w-4 h-4 mr-1.5" />
-              {checkedIn ? 'Check-in Confirmado' : 'Fazer Check-in no Culto'}
+              <CheckCircle2 className="w-4 h-4 mr-2" />
+              {checkedIn ? 'Presença Confirmada Hoje' : 'Fazer Check-in no Culto'}
             </Button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Personal Journey Tracker */}
-            <Card className="md:col-span-2 border-slate-200/80 bg-white shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-base font-serif-sacred text-[#2C3E50] flex items-center justify-between">
-                  <span>Progresso na Jornada Logos</span>
-                  <Badge className="bg-[#2C3E50] text-[#D4AF37] text-xs capitalize">
+            <Card className="md:col-span-2 border-slate-200/90 bg-white shadow-sm rounded-2xl">
+              <CardHeader className="p-4 sm:p-5">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base font-serif-sacred text-[#2C3E50]">
+                    Progresso da Minha Jornada
+                  </CardTitle>
+                  <Badge className="bg-[#2C3E50] text-[#D4AF37] text-xs capitalize rounded-full">
                     {currentPerson?.status || 'Visitante'}
                   </Badge>
-                </CardTitle>
+                </div>
                 <CardDescription className="text-xs text-slate-500">
-                  Etapas do seu crescimento e comunhão na igreja
+                  Seus marcos espirituais e de serviço na igreja
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="p-4 sm:p-5 pt-0 space-y-5">
                 <div>
-                  <div className="flex justify-between text-xs font-medium text-slate-700 mb-2">
+                  <div className="flex justify-between text-xs font-semibold text-slate-700 mb-2">
                     <span>
-                      Etapa:{' '}
+                      Estágio:{' '}
                       {currentPerson?.status === 'member'
                         ? 'Membro Confirmado'
                         : currentPerson?.status === 'attender'
                           ? 'Frequentador Assíduo'
                           : 'Novo Visitante'}
                     </span>
-                    <span>
+                    <span className="text-[#D4AF37] font-bold">
                       {currentPerson?.status === 'member'
                         ? '100%'
                         : currentPerson?.status === 'attender'
                           ? '65%'
-                          : '25%'}
+                          : '30%'}
                     </span>
                   </div>
                   <Progress
@@ -653,72 +769,93 @@ export default function Index() {
                         ? 100
                         : currentPerson?.status === 'attender'
                           ? 65
-                          : 25
+                          : 30
                     }
-                    className="h-2.5 bg-slate-100"
+                    className="h-2.5 bg-slate-100 rounded-full"
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                  <div className="flex items-center gap-2 p-2.5 rounded-lg bg-emerald-50 text-emerald-800">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span>Primeira Visita Registrada</span>
+                {/* Steps List */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                  <div className="flex items-center gap-2.5 p-3 rounded-xl bg-emerald-50 text-emerald-900 border border-emerald-100">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                    <span className="font-medium">Primeira Visita Registrada</span>
                   </div>
                   <div
-                    className={`flex items-center gap-2 p-2.5 rounded-lg ${currentPerson?.checklist_welcome_class ? 'bg-emerald-50 text-emerald-800' : 'bg-slate-50 text-slate-500'}`}
+                    className={`flex items-center gap-2.5 p-3 rounded-xl border ${
+                      currentPerson?.checklist_welcome_class
+                        ? 'bg-emerald-50 text-emerald-900 border-emerald-100'
+                        : 'bg-slate-50 text-slate-500 border-slate-100'
+                    }`}
                   >
                     <CheckCircle2
-                      className={`w-4 h-4 ${currentPerson?.checklist_welcome_class ? 'text-emerald-600' : 'text-slate-400'}`}
+                      className={`w-4 h-4 flex-shrink-0 ${
+                        currentPerson?.checklist_welcome_class
+                          ? 'text-emerald-600'
+                          : 'text-slate-300'
+                      }`}
                     />
-                    <span>Classe de Boas-Vindas</span>
+                    <span className="font-medium">Classe de Boas-Vindas</span>
                   </div>
                   <div
-                    className={`flex items-center gap-2 p-2.5 rounded-lg ${currentPerson?.checklist_baptized ? 'bg-emerald-50 text-emerald-800' : 'bg-slate-50 text-slate-500'}`}
+                    className={`flex items-center gap-2.5 p-3 rounded-xl border ${
+                      currentPerson?.checklist_baptized
+                        ? 'bg-emerald-50 text-emerald-900 border-emerald-100'
+                        : 'bg-slate-50 text-slate-500 border-slate-100'
+                    }`}
                   >
                     <CheckCircle2
-                      className={`w-4 h-4 ${currentPerson?.checklist_baptized ? 'text-emerald-600' : 'text-slate-400'}`}
+                      className={`w-4 h-4 flex-shrink-0 ${
+                        currentPerson?.checklist_baptized ? 'text-emerald-600' : 'text-slate-300'
+                      }`}
                     />
-                    <span>Batismo Bíblico</span>
+                    <span className="font-medium">Batismo Bíblico</span>
                   </div>
                   <div
-                    className={`flex items-center gap-2 p-2.5 rounded-lg ${currentPerson?.checklist_small_group ? 'bg-emerald-50 text-emerald-800' : 'bg-slate-50 text-slate-500'}`}
+                    className={`flex items-center gap-2.5 p-3 rounded-xl border ${
+                      currentPerson?.checklist_small_group
+                        ? 'bg-emerald-50 text-emerald-900 border-emerald-100'
+                        : 'bg-slate-50 text-slate-500 border-slate-100'
+                    }`}
                   >
                     <CheckCircle2
-                      className={`w-4 h-4 ${currentPerson?.checklist_small_group ? 'text-emerald-600' : 'text-slate-400'}`}
+                      className={`w-4 h-4 flex-shrink-0 ${
+                        currentPerson?.checklist_small_group ? 'text-emerald-600' : 'text-slate-300'
+                      }`}
                     />
-                    <span>Pequeno Grupo (Comunhão)</span>
+                    <span className="font-medium">Pequeno Grupo (Comunhão)</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* My Family Shortcut */}
-            <Card className="border-slate-200/80 bg-white shadow-sm">
-              <CardHeader>
+            {/* My Family Card */}
+            <Card className="border-slate-200/90 bg-white shadow-sm rounded-2xl">
+              <CardHeader className="p-4 sm:p-5">
                 <CardTitle className="text-base font-serif-sacred text-[#2C3E50] flex items-center gap-2">
                   <HomeIcon className="w-4 h-4 text-[#D4AF37]" />
-                  Meu Núcleo Familiar
+                  Meu Lar / Família
                 </CardTitle>
                 <CardDescription className="text-xs text-slate-500">
-                  Pessoas conectadas à sua casa
+                  Vínculo familiar cadastrado
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/60">
-                  <p className="font-semibold text-xs text-slate-800">
+              <CardContent className="p-4 sm:p-5 pt-0 space-y-3.5">
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70">
+                  <p className="font-bold text-xs text-slate-800">
                     {currentPerson?.expand?.family?.name || 'Família ainda não associada'}
                   </p>
-                  <p className="text-[11px] text-slate-500 mt-0.5">
+                  <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
                     {currentPerson?.expand?.family?.address ||
-                      'Solicite à secretaria o vínculo do seu lar.'}
+                      'Solicite à secretaria o vínculo oficial do seu lar no sistema.'}
                   </p>
                 </div>
-                <Link to="/familias" className="w-full">
+                <Link to="/familias" className="w-full block">
                   <Button
                     variant="outline"
-                    className="w-full text-xs text-[#2C3E50] hover:bg-slate-50"
+                    className="w-full text-xs text-[#2C3E50] hover:bg-slate-50 h-9 rounded-xl"
                   >
-                    Ver Detalhes da Família
+                    Ver Detalhes do Lar
                   </Button>
                 </Link>
               </CardContent>
@@ -728,38 +865,36 @@ export default function Index() {
       )}
 
       {/* =========================================================================
-          ACTIVITY FEED (Jornada & Movimentações)
+          ACTIVITY FEED (Linha do Tempo da Comunidade)
           ========================================================================= */}
-      <Card className="border-slate-200/80 bg-white shadow-sm">
-        <CardHeader className="flex flex-row items-center justify-between pb-3">
+      <Card className="border-slate-200/90 bg-white shadow-sm rounded-2xl">
+        <CardHeader className="p-4 sm:p-6 pb-3 flex flex-row items-center justify-between">
           <div>
             <CardTitle className="text-base font-serif-sacred text-[#2C3E50] flex items-center gap-2">
               <GitFork className="w-4 h-4 text-[#D4AF37]" />
-              Feed de Atividades & Mudanças de Jornada
+              Linha do Tempo & Movimentações
             </CardTitle>
-            <CardDescription className="text-xs text-slate-500">
-              Linha do tempo das integrações e passos na fé da igreja
+            <CardDescription className="text-xs text-slate-500 mt-0.5">
+              Passos na jornada, novos visitantes e celebrações da igreja
             </CardDescription>
           </div>
-          <Badge variant="outline" className="text-xs text-slate-500">
-            Atualizações recentes
+          <Badge variant="outline" className="text-xs text-slate-500 hidden sm:inline-flex">
+            Recentes
           </Badge>
         </CardHeader>
-        <CardContent>
-          <div className="relative pl-6 space-y-6 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
+        <CardContent className="p-4 sm:p-6 pt-2">
+          <div className="relative pl-6 space-y-5 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
             {activities.length === 0 ? (
-              <p className="text-xs text-slate-400 py-4">
-                Nenhuma atividade registrada no momento.
-              </p>
+              <p className="text-xs text-slate-400 py-4">Nenhuma atividade recente.</p>
             ) : (
               activities.map((act) => {
                 const isVisitor = act.type === 'visitor_signup'
                 const isJourney = act.type === 'journey_change'
                 return (
                   <div key={act.id} className="relative group">
-                    {/* Bullet */}
+                    {/* Circle Bullet */}
                     <div
-                      className={`absolute -left-6 top-1 w-5 h-5 rounded-full flex items-center justify-center ring-4 ring-white ${
+                      className={`absolute -left-6 top-1 w-5 h-5 rounded-full flex items-center justify-center ring-4 ring-white shadow-sm ${
                         isVisitor
                           ? 'bg-[#D4AF37] text-white'
                           : isJourney
@@ -775,10 +910,10 @@ export default function Index() {
                         <CheckCircle2 className="w-3 h-3" />
                       )}
                     </div>
-                    {/* Content */}
-                    <div className="p-3.5 rounded-xl bg-slate-50/70 border border-slate-200/60 group-hover:bg-slate-50 transition-colors">
+                    {/* Content Box */}
+                    <div className="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/70 group-hover:bg-slate-100/70 transition-colors">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
-                        <span className="font-semibold text-xs text-slate-800">{act.title}</span>
+                        <span className="font-bold text-xs text-slate-800">{act.title}</span>
                         <span className="text-[10px] text-slate-400 flex items-center gap-1">
                           <Clock className="w-3 h-3" />
                           {new Date(act.created).toLocaleDateString('pt-BR', {
