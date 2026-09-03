@@ -1,0 +1,479 @@
+import React, { useState, useEffect } from 'react'
+import {
+  Home as HomeIcon,
+  Plus,
+  Users,
+  MapPin,
+  UserPlus,
+  Search,
+  ChevronRight,
+  Shield,
+  Heart,
+  Phone,
+  Trash2,
+} from 'lucide-react'
+import { useAuth } from '@/contexts/AuthContext'
+import { familiesService, personsService } from '@/services/church'
+import type { FamilyRecord, PersonRecord, FamilyRole } from '@/types/church'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Label } from '@/components/ui/label'
+import { toast } from 'sonner'
+import { useRealtime } from '@/hooks/use-realtime'
+
+export default function Families() {
+  const { canAccessAll, isLeader, currentPerson } = useAuth()
+
+  const [families, setFamilies] = useState<FamilyRecord[]>([])
+  const [persons, setPersons] = useState<PersonRecord[]>([])
+  const [loading, setLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
+
+  // Create Family Dialog
+  const [createFamOpen, setCreateFamOpen] = useState(false)
+  const [famName, setFamName] = useState('')
+  const [famAddress, setFamAddress] = useState('')
+  const [famNotes, setFamNotes] = useState('')
+  const [isSubmittingFam, setIsSubmittingFam] = useState(false)
+
+  // Add Member to Family Dialog
+  const [addMemberOpen, setAddMemberOpen] = useState(false)
+  const [targetFamilyId, setTargetFamilyId] = useState<string | null>(null)
+  const [selectedPersonId, setSelectedPersonId] = useState<string>('new')
+  const [memberRole, setMemberRole] = useState<FamilyRole>('other')
+
+  // New person fields inside add member modal
+  const [newPersonName, setNewPersonName] = useState('')
+  const [newPersonWhatsapp, setNewPersonWhatsapp] = useState('')
+  const [isAddingMember, setIsAddingMember] = useState(false)
+
+  // Realtime
+  useRealtime<FamilyRecord>('families', (e) => {
+    if (e.action === 'create') {
+      setFamilies((prev) => [...prev, e.record])
+    } else if (e.action === 'update') {
+      setFamilies((prev) => prev.map((f) => (f.id === e.record.id ? e.record : f)))
+    } else if (e.action === 'delete') {
+      setFamilies((prev) => prev.filter((f) => f.id !== e.record.id))
+    }
+  })
+
+  useRealtime<PersonRecord>('persons', (e) => {
+    if (e.action === 'create') {
+      setPersons((prev) => [e.record, ...prev])
+    } else if (e.action === 'update') {
+      setPersons((prev) => prev.map((p) => (p.id === e.record.id ? e.record : p)))
+    } else if (e.action === 'delete') {
+      setPersons((prev) => prev.filter((p) => p.id !== e.record.id))
+    }
+  })
+
+  const loadData = async () => {
+    try {
+      setLoading(true)
+      const [fList, pList] = await Promise.all([familiesService.list(), personsService.list()])
+      setFamilies(fList)
+      setPersons(pList)
+    } catch {
+      toast.error('Erro ao listar famílias.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadData()
+  }, [])
+
+  const handleCreateFamily = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!famName.trim()) {
+      toast.error('Informe o sobrenome ou nome da família.')
+      return
+    }
+
+    try {
+      setIsSubmittingFam(true)
+      const created = await familiesService.create({
+        name: famName.trim(),
+        address: famAddress.trim() || undefined,
+        notes: famNotes.trim() || undefined,
+      })
+      setFamilies((prev) => [...prev, created])
+      toast.success('Família criada com sucesso!')
+      setCreateFamOpen(false)
+      setFamName('')
+      setFamAddress('')
+      setFamNotes('')
+    } catch {
+      toast.error('Erro ao criar família.')
+    } finally {
+      setIsSubmittingFam(false)
+    }
+  }
+
+  const handleAddMemberToFamily = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!targetFamilyId) return
+
+    try {
+      setIsAddingMember(true)
+
+      if (selectedPersonId === 'new') {
+        if (!newPersonName.trim()) {
+          toast.error('Informe o nome do novo integrante.')
+          return
+        }
+        const createdPerson = await personsService.create({
+          name: newPersonName.trim(),
+          whatsapp: newPersonWhatsapp.trim() || undefined,
+          status: 'visitor',
+          family: targetFamilyId,
+          family_role: memberRole,
+        })
+        setPersons((prev) => [createdPerson, ...prev])
+        toast.success(`${createdPerson.name} adicionado à família!`)
+      } else {
+        const updated = await personsService.update(selectedPersonId, {
+          family: targetFamilyId,
+          family_role: memberRole,
+        })
+        setPersons((prev) => prev.map((p) => (p.id === updated.id ? updated : p)))
+        toast.success(`${updated.name} vinculado à família com sucesso!`)
+      }
+
+      setAddMemberOpen(false)
+      setNewPersonName('')
+      setNewPersonWhatsapp('')
+      setSelectedPersonId('new')
+    } catch {
+      toast.error('Erro ao adicionar integrante à família.')
+    } finally {
+      setIsAddingMember(false)
+    }
+  }
+
+  const handleRemoveFromFamily = async (personId: string) => {
+    if (!confirm('Deseja desvincular esta pessoa deste núcleo familiar?')) return
+    try {
+      const updated = await personsService.update(personId, {
+        family: undefined,
+        family_role: undefined,
+      })
+      setPersons((prev) => prev.map((p) => (p.id === updated.id ? updated : p)))
+      toast.success('Pessoa desvinculada da família.')
+    } catch {
+      toast.error('Erro ao desvincular pessoa.')
+    }
+  }
+
+  const familyRoleLabels: Record<FamilyRole, string> = {
+    head: 'Cabeça / Responsável',
+    spouse: 'Cônjuge',
+    child: 'Filho(a)',
+    other: 'Outro membro',
+  }
+
+  // Filter families based on permissions and search
+  const filteredFamilies = families.filter((f) => {
+    if (!canAccessAll && isLeader && currentPerson?.family) {
+      if (f.id !== currentPerson.family) return false
+    }
+    if (searchQuery.trim()) {
+      return (
+        f.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        f.address?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    }
+    return true
+  })
+
+  // Unlinked persons for the add-member dropdown
+  const unlinkedPersons = persons.filter((p) => !p.family)
+
+  return (
+    <div className="space-y-6 animate-fade-in">
+      {/* Top Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-serif-sacred font-bold text-[#2C3E50] flex items-center gap-2">
+            <HomeIcon className="w-6 h-6 text-[#D4AF37]" />
+            Núcleos Familiares (Casas)
+          </h1>
+          <p className="text-xs text-slate-500 mt-1">
+            Mapeamento de lares e vínculos de parentesco (cabeça, cônjuge, filhos e parentes).
+          </p>
+        </div>
+
+        {canAccessAll && (
+          <Button
+            onClick={() => setCreateFamOpen(true)}
+            className="bg-[#2C3E50] hover:bg-[#1E2B37] text-white text-xs font-semibold shadow-sm"
+          >
+            <Plus className="w-4 h-4 mr-1.5" />
+            Nova Família
+          </Button>
+        )}
+      </div>
+
+      {/* Search Toolbar */}
+      <div className="relative max-w-md">
+        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+        <Input
+          type="text"
+          placeholder="Buscar família por sobrenome ou endereço..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-9 text-xs h-9 bg-white"
+        />
+      </div>
+
+      {/* Families Grid */}
+      {loading ? (
+        <p className="text-xs text-slate-400 text-center py-12">Carregando famílias...</p>
+      ) : filteredFamilies.length === 0 ? (
+        <Card className="border-slate-200 p-8 text-center bg-white">
+          <HomeIcon className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+          <p className="text-sm font-semibold text-slate-700">Nenhum núcleo familiar encontrado</p>
+          <p className="text-xs text-slate-400 mt-1">
+            Crie uma nova família para agrupar pessoas do mesmo lar.
+          </p>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredFamilies.map((fam) => {
+            const familyMembers = persons.filter((p) => p.family === fam.id)
+            const head = familyMembers.find((m) => m.family_role === 'head')
+
+            return (
+              <Card
+                key={fam.id}
+                className="card-subtle-hover border-slate-200/90 bg-white shadow-sm flex flex-col justify-between overflow-hidden"
+              >
+                <div>
+                  <CardHeader className="bg-slate-50/70 border-b border-slate-100 pb-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-lg bg-amber-50 text-[#D4AF37] flex items-center justify-center font-bold text-xs">
+                          <HomeIcon className="w-4 h-4" />
+                        </div>
+                        <CardTitle className="text-base font-serif-sacred text-[#2C3E50]">
+                          {fam.name}
+                        </CardTitle>
+                      </div>
+                      <Badge variant="outline" className="text-[10px] font-semibold bg-white">
+                        {familyMembers.length} {familyMembers.length === 1 ? 'membro' : 'membros'}
+                      </Badge>
+                    </div>
+                    {fam.address && (
+                      <CardDescription className="text-xs text-slate-500 flex items-center gap-1 mt-1">
+                        <MapPin className="w-3 h-3 text-slate-400 flex-shrink-0" />
+                        <span className="truncate">{fam.address}</span>
+                      </CardDescription>
+                    )}
+                  </CardHeader>
+
+                  <CardContent className="p-4 space-y-3">
+                    {familyMembers.length === 0 ? (
+                      <p className="text-xs text-slate-400 italic py-2">
+                        Nenhum integrante associado a esta casa ainda.
+                      </p>
+                    ) : (
+                      <div className="space-y-2">
+                        {familyMembers.map((member) => (
+                          <div
+                            key={member.id}
+                            className="p-2.5 rounded-lg bg-slate-50/80 hover:bg-slate-50 flex items-center justify-between text-xs transition-colors"
+                          >
+                            <div className="min-w-0 pr-2">
+                              <p className="font-semibold text-slate-800 truncate">{member.name}</p>
+                              <div className="flex items-center gap-1.5 text-[10px] text-slate-500">
+                                <span className="font-medium text-[#2C3E50]">
+                                  {familyRoleLabels[member.family_role || 'other']}
+                                </span>
+                                <span>&bull;</span>
+                                <span className="capitalize">{member.status}</span>
+                              </div>
+                            </div>
+
+                            {canAccessAll && (
+                              <button
+                                onClick={() => handleRemoveFromFamily(member.id)}
+                                title="Desvincular da família"
+                                className="text-slate-300 hover:text-red-500 transition-colors p-1"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {fam.notes && (
+                      <p className="text-[11px] text-slate-500 bg-amber-50/40 p-2 rounded-lg border border-amber-100">
+                        {fam.notes}
+                      </p>
+                    )}
+                  </CardContent>
+                </div>
+
+                {canAccessAll && (
+                  <div className="p-3 bg-slate-50/50 border-t border-slate-100">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setTargetFamilyId(fam.id)
+                        setAddMemberOpen(true)
+                      }}
+                      className="w-full text-xs text-[#2C3E50] hover:bg-slate-100 font-medium"
+                    >
+                      <UserPlus className="w-3.5 h-3.5 mr-1 text-[#D4AF37]" />
+                      Adicionar Membro à Família
+                    </Button>
+                  </div>
+                )}
+              </Card>
+            )
+          })}
+        </div>
+      )}
+
+      {/* CREATE FAMILY DIALOG */}
+      <Dialog open={createFamOpen} onOpenChange={setCreateFamOpen}>
+        <DialogContent className="sm:max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle className="font-serif-sacred text-xl text-[#2C3E50]">
+              Cadastrar Novo Núcleo Familiar
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleCreateFamily} className="space-y-4 pt-2 text-xs">
+            <div className="space-y-1">
+              <Label htmlFor="fam-name">Sobrenome / Nome da Família *</Label>
+              <Input
+                id="fam-name"
+                required
+                value={famName}
+                onChange={(e) => setFamName(e.target.value)}
+                placeholder="Ex: Família Souza"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="fam-address">Endereço do Lar</Label>
+              <Input
+                id="fam-address"
+                value={famAddress}
+                onChange={(e) => setFamAddress(e.target.value)}
+                placeholder="Rua, número, complemento e bairro"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="fam-notes">Observações da Família</Label>
+              <Input
+                id="fam-notes"
+                value={famNotes}
+                onChange={(e) => setFamNotes(e.target.value)}
+                placeholder="Ex: Pequeno grupo em sua casa às quartas"
+              />
+            </div>
+            <Button
+              type="submit"
+              disabled={isSubmittingFam}
+              className="w-full bg-[#2C3E50] text-white text-xs font-semibold"
+            >
+              {isSubmittingFam ? 'Criando...' : 'Criar Família'}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* ADD MEMBER TO FAMILY DIALOG */}
+      <Dialog open={addMemberOpen} onOpenChange={setAddMemberOpen}>
+        <DialogContent className="sm:max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle className="font-serif-sacred text-xl text-[#2C3E50]">
+              Adicionar Integrante à Família
+            </DialogTitle>
+          </DialogHeader>
+
+          <form onSubmit={handleAddMemberToFamily} className="space-y-4 pt-2 text-xs">
+            <div className="space-y-1">
+              <Label htmlFor="sel-type">Origem do Integrante</Label>
+              <Select value={selectedPersonId} onValueChange={setSelectedPersonId}>
+                <SelectTrigger id="sel-type">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-white">
+                  <SelectItem value="new">+ Cadastrar Novo Membro Agora</SelectItem>
+                  {unlinkedPersons.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.name} ({p.status})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {selectedPersonId === 'new' && (
+              <div className="space-y-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <div className="space-y-1">
+                  <Label htmlFor="np-name">Nome do Integrante *</Label>
+                  <Input
+                    id="np-name"
+                    required
+                    value={newPersonName}
+                    onChange={(e) => setNewPersonName(e.target.value)}
+                    placeholder="Ex: Maria Souza"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="np-phone">WhatsApp</Label>
+                  <Input
+                    id="np-phone"
+                    value={newPersonWhatsapp}
+                    onChange={(e) => setNewPersonWhatsapp(e.target.value)}
+                    placeholder="(11) 98765-4321"
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-1">
+              <Label htmlFor="fam-role">Papel no Núcleo Familiar *</Label>
+              <Select value={memberRole} onValueChange={(val) => setMemberRole(val as FamilyRole)}>
+                <SelectTrigger id="fam-role">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-white">
+                  <SelectItem value="head">Cabeça / Responsável</SelectItem>
+                  <SelectItem value="spouse">Cônjuge</SelectItem>
+                  <SelectItem value="child">Filho(a)</SelectItem>
+                  <SelectItem value="other">Outro (avô, sogra, primo)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Button
+              type="submit"
+              disabled={isAddingMember}
+              className="w-full bg-[#2C3E50] text-white text-xs font-semibold"
+            >
+              {isAddingMember ? 'Salvando...' : 'Confirmar Vínculo à Família'}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </div>
+  )
+}

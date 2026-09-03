@@ -1,0 +1,96 @@
+/* Theme and Sacred Modernism Styling */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Sacred Modernism:
+       Primary: #2C3E50 (Midnight Blue) -> hsl(210 29% 24%)
+       Accent: #D4AF37 (Metallic Gold) -> hsl(46 65% 52%)
+       Background: #F8FAFC -> hsl(210 40% 98%)
+       Surface: #FFFFFF -> hsl(0 0% 100%)
+       Success: #10B981 -> hsl(160 84% 39%)
+    */
+    --background: 210 40% 98%;
+    --foreground: 210 29% 20%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 210 29% 20%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 29% 20%;
+
+    --primary: 210 29% 24%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 20% 95%;
+    --secondary-foreground: 210 29% 24%;
+
+    --muted: 210 20% 94%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 46 65% 52%;
+    --accent-foreground: 210 29% 20%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214 20% 88%;
+    --input: 214 20% 88%;
+    --ring: 46 65% 52%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 210 29% 22%;
+    --sidebar-foreground: 210 20% 95%;
+    --sidebar-primary: 46 65% 52%;
+    --sidebar-primary-foreground: 210 29% 20%;
+    --sidebar-accent: 210 29% 28%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 210 29% 30%;
+    --sidebar-ring: 46 65% 52%;
+  }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* NEVER REMOVE THIS */
+  section[aria-label='Notifications alt+T'] {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}
+
+@layer utilities {
+  .font-serif-sacred {
+    font-family: 'Playfair Display', serif;
+  }
+
+  .gold-gradient {
+    background: linear-gradient(135deg, #d4af37 0%, #f3e5ab 50%, #aa7c11 100%);
+  }
+
+  .midnight-gradient {
+    background: linear-gradient(145deg, #1e2b37 0%, #2c3e50 60%, #34495e 100%);
+  }
+
+  .card-subtle-hover {
+    transition:
+      transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .card-subtle-hover:hover {
+    transform: scale(1.015);
+    box-shadow:
+      0 10px 25px -5px rgba(44, 62, 80, 0.08),
+      0 8px 10px -6px rgba(44, 62, 80, 0.04);
+  }
+}
