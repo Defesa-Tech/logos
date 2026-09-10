@@ -1,238 +1,284 @@
 import React, { useState, useEffect } from 'react'
-import { useSearchParams, useNavigate, Link } from 'react-router-dom'
-import { Check, ShieldCheck, ArrowRight, Lock, UserCheck, AlertCircle } from 'lucide-react'
+import { useParams, useNavigate, Link } from 'react-router-dom'
+import {
+  CheckCircle2,
+  AlertCircle,
+  Sparkles,
+  ArrowRight,
+  Shield,
+  KeyRound,
+  Lock,
+} from 'lucide-react'
 import { invitesService, personsService } from '@/services/church'
-import { useAuth } from '@/contexts/AuthContext'
 import type { InviteRecord, PersonRecord, UserRole } from '@/types/church'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
+import { useAuth } from '@/contexts/AuthContext'
 import { PageTransition } from '@/components/MotionKit'
 
 export default function ClaimInvite() {
-  const [searchParams] = useSearchParams()
+  const { token } = useParams<{ token: string }>()
   const navigate = useNavigate()
-  const { login } = useAuth()
+  const { switchSimulatedRole } = useAuth()
 
-  const token = searchParams.get('token')
-
+  const [loading, setLoading] = useState(true)
   const [invite, setInvite] = useState<InviteRecord | null>(null)
   const [person, setPerson] = useState<PersonRecord | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
-  // Form states
+  // Registration Form state
+  const [name, setName] = useState('')
   const [password, setPassword] = useState('')
   const [passwordConfirm, setPasswordConfirm] = useState('')
-  const [submitting, setSubmitting] = useState(false)
-  const [claimedSuccess, setClaimedSuccess] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [claimed, setClaimed] = useState(false)
 
   useEffect(() => {
-    if (!token) {
-      setError('Token de convite não fornecido.')
-      setLoading(false)
-      return
-    }
+    async function fetchInvite() {
+      if (!token) {
+        setErrorMsg('Token de convite não fornecido na URL.')
+        setLoading(false)
+        return
+      }
 
-    const verifyToken = async () => {
       try {
         setLoading(true)
-        const inv = await invitesService.getByToken(token)
-        if (!inv) {
-          setError('Convite não encontrado ou inválido.')
+        const record = await invitesService.getByToken(token)
+        if (!record) {
+          setErrorMsg('Convite não encontrado ou token inválido.')
           return
         }
-
-        if (inv.used) {
-          setError('Este convite já foi resgatado anteriormente.')
+        if (record.used) {
+          setErrorMsg('Este convite já foi utilizado anteriormente.')
           return
         }
+        setInvite(record)
 
-        setInvite(inv)
-
-        if (inv.person) {
-          try {
-            const p = await personsService.getById(inv.person)
-            setPerson(p)
-          } catch {
-            // person could be deleted or unlinked
-          }
+        if (record.person) {
+          const personRec = await personsService.getById(record.person)
+          setPerson(personRec)
+          setName(personRec.name)
         }
       } catch {
-        setError('Erro ao validar o link de convite.')
+        setErrorMsg('Falha ao validar token do convite.')
       } finally {
         setLoading(false)
       }
     }
 
-    verifyToken()
+    fetchInvite()
   }, [token])
 
   const handleClaim = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!invite) return
 
-    if (password.length < 8) {
-      toast.error('A senha deve conter pelo menos 8 caracteres.')
+    if (password.length < 6) {
+      toast.error('A senha deve conter no mínimo 6 caracteres.')
       return
     }
 
     if (password !== passwordConfirm) {
-      toast.error('As senhas não coincidem.')
+      toast.error('As senhas digitadas não coincidem.')
       return
     }
 
     try {
-      setSubmitting(true)
+      setIsSubmitting(true)
+
+      // 1. Claim invite via service
       await invitesService.claim({
         token: invite.token,
         password,
-        name: person?.name,
+        name: name.trim() || undefined,
         email: invite.email,
       })
-      setClaimedSuccess(true)
-      toast.success('Conta ativada com sucesso!')
 
-      // Auto login
-      try {
-        if (invite.email) {
-          await login(invite.email, password)
-        }
-        setTimeout(() => navigate('/'), 1200)
-      } catch {
-        // If login failed, user will be redirected to home
-        setTimeout(() => navigate('/'), 1200)
+      // 2. If no person was attached, create a person record
+      if (!invite.person) {
+        await personsService.create({
+          name: name.trim() || invite.email.split('@')[0],
+          email: invite.email,
+          status:
+            invite.role === 'pastor' ? 'pastor' : invite.role === 'leader' ? 'leader' : 'member',
+        })
       }
+
+      // 3. Switch role to the invited role
+      switchSimulatedRole(invite.role as UserRole)
+
+      setClaimed(true)
+      toast.success('Convite resgatado com sucesso! Bem-vindo à equipe Logos.')
     } catch {
-      toast.error('Erro ao resgatar convite.')
+      toast.error('Erro ao finalizar o resgate do convite.')
     } finally {
-      setSubmitting(false)
+      setIsSubmitting(false)
     }
   }
 
-  const roleLabels: Record<UserRole, string> = {
-    secretary: 'Secretaria Geral',
-    pastor: 'Pastor',
+  const roleLabels: Record<string, string> = {
+    secretary: 'Secretaria (Acesso Pleno)',
+    pastor: 'Pastoral & Ministérios',
     leader: 'Líder de Pequeno Grupo',
-    member: 'Membro da Igreja',
+    member: 'Membro da Comunidade',
     visitor: 'Visitante',
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] text-[#17212A] flex flex-col justify-center items-center px-4 py-12">
-      <div className="w-full max-w-md space-y-8">
-        {/* Masthead */}
-        <div className="text-center space-y-2">
-          <Link to="/" className="inline-block">
-            <span className="font-serif-sacred text-4xl font-bold tracking-tight text-[#141B22]">
-              Logos
-            </span>
-          </Link>
-          <p className="text-xs font-mono uppercase tracking-widest text-[#C5A046]">
-            Ativação de Credencial Eclesial
-          </p>
-        </div>
+    <PageTransition className="min-h-screen bg-[#FAFAFA] flex flex-col justify-between text-zinc-900 selection:bg-zinc-900 selection:text-white">
+      {/* Header */}
+      <header className="border-b border-zinc-200 bg-white px-6 py-4 flex items-center justify-between">
+        <Link to="/" className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-zinc-900 text-white flex items-center justify-center font-bold text-xs">
+            L
+          </div>
+          <span className="font-semibold text-sm tracking-tight text-zinc-900">Logos</span>
+        </Link>
+        <span className="text-[11px] font-medium text-zinc-500 bg-zinc-50 px-2.5 py-1 rounded-md border border-zinc-200">
+          Ativação de Conta
+        </span>
+      </header>
 
-        {/* Card */}
-        <div className="bg-white border border-[#E6E2D8] p-8 rounded shadow-editorial space-y-6">
+      {/* Main Container */}
+      <main className="flex-1 flex items-center justify-center p-4 sm:p-8">
+        <div className="w-full max-w-md">
           {loading ? (
-            <div className="py-12 text-center text-xs font-mono text-slate-400">
-              Validando autenticidade do convite...
+            <div className="bg-white border border-zinc-200 rounded-2xl p-10 text-center shadow-xs">
+              <p className="text-xs text-zinc-400">Verificando dados do convite institucional...</p>
             </div>
-          ) : error ? (
-            <div className="py-8 text-center space-y-4">
-              <AlertCircle className="w-10 h-10 text-red-600 mx-auto" strokeWidth={1.5} />
-              <h3 className="font-serif-sacred text-xl font-bold text-[#141B22]">
-                Link Não Disponível
-              </h3>
-              <p className="text-xs text-slate-600 leading-relaxed max-w-xs mx-auto">{error}</p>
-              <Link to="/">
-                <Button
-                  variant="outline"
-                  className="mt-4 text-xs font-mono rounded border-[#E6E2D8]"
-                >
-                  Voltar ao Início
-                </Button>
-              </Link>
-            </div>
-          ) : claimedSuccess ? (
-            <div className="py-8 text-center space-y-4">
-              <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto">
-                <Check className="w-6 h-6" />
+          ) : errorMsg ? (
+            <div className="bg-white border border-zinc-200 rounded-2xl p-8 sm:p-10 shadow-xs text-center space-y-4">
+              <div className="w-12 h-12 rounded-full bg-red-50 text-red-600 border border-red-200 flex items-center justify-center mx-auto">
+                <AlertCircle className="w-6 h-6" />
               </div>
-              <h3 className="font-serif-sacred text-2xl font-bold text-[#141B22]">
-                Acesso Ativado!
-              </h3>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Sua credencial foi ativada com sucesso. Redirecionando para o painel pastoral...
-              </p>
+              <h1 className="text-xl font-semibold text-zinc-900">Convite Inválido</h1>
+              <p className="text-xs text-zinc-500 leading-relaxed">{errorMsg}</p>
+              <div className="pt-2">
+                <Link to="/">
+                  <Button
+                    variant="outline"
+                    className="text-xs h-9 rounded-lg border-zinc-200 text-zinc-800"
+                  >
+                    Voltar para o Início
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          ) : claimed ? (
+            <div className="bg-white border border-zinc-200 rounded-2xl p-8 sm:p-10 shadow-xs text-center space-y-6">
+              <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center mx-auto">
+                <CheckCircle2 className="w-6 h-6" />
+              </div>
+              <div className="space-y-2">
+                <span className="text-[10px] uppercase font-semibold tracking-wider text-emerald-600 block">
+                  Acesso Liberado
+                </span>
+                <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">
+                  Conta Ativada com Sucesso!
+                </h1>
+                <p className="text-xs text-zinc-500 leading-relaxed">
+                  Seu perfil foi vinculado e as permissões de{' '}
+                  <strong className="text-zinc-800">{roleLabels[invite?.role || 'member']}</strong>{' '}
+                  foram ativadas.
+                </p>
+              </div>
+              <Button
+                onClick={() => navigate('/')}
+                className="w-full bg-zinc-900 hover:bg-zinc-800 text-white text-xs h-9 rounded-lg font-medium shadow-xs"
+              >
+                Acessar Painel da Igreja
+              </Button>
             </div>
           ) : (
-            <form onSubmit={handleClaim} className="space-y-5 text-xs">
-              <div className="p-4 bg-[#FAF9F6] border border-[#E6E2D8] rounded space-y-1">
-                <span className="text-[10px] font-mono uppercase text-[#C5A046] tracking-wider block">
-                  Perfil Identificado
+            <div className="bg-white border border-zinc-200 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
+              <div className="space-y-1 pb-3 border-b border-zinc-100">
+                <span className="text-[10px] uppercase font-semibold tracking-wider text-zinc-400 block">
+                  Convite Pessoal
                 </span>
-                <p className="font-serif-sacred text-lg font-bold text-[#141B22]">
-                  {person?.name || 'Membro Convidado'}
+                <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">
+                  Ativar seu Acesso
+                </h1>
+                <p className="text-xs text-zinc-500 leading-relaxed">
+                  Você foi convidado para integrar o sistema da Igreja Logos com o papel de{' '}
+                  <strong className="text-zinc-800">{roleLabels[invite?.role || 'member']}</strong>.
                 </p>
-                <p className="text-[11px] font-mono text-slate-500">{invite?.email}</p>
-                <div className="pt-2">
-                  <span className="inline-block text-[10px] font-mono uppercase px-2 py-0.5 rounded border border-[#E6E2D8] bg-white text-slate-700">
-                    Papel: {invite?.role ? roleLabels[invite.role] : 'Membro'}
-                  </span>
+              </div>
+
+              <div className="p-3 bg-zinc-50 rounded-xl border border-zinc-200/80 text-xs space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-zinc-400">E-mail associado:</span>
+                  <span className="font-semibold text-zinc-900">{invite?.email}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-zinc-400">Papel atribuído:</span>
+                  <span className="font-semibold text-zinc-900">{invite?.role}</span>
                 </div>
               </div>
 
-              <div className="space-y-1">
-                <Label htmlFor="pass" className="font-mono uppercase tracking-wider text-slate-600">
-                  Criar Nova Senha *
-                </Label>
-                <Input
-                  id="pass"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Mínimo de 8 caracteres"
-                  className="h-10 rounded bg-[#FAF9F6] border-[#E6E2D8]"
-                />
-              </div>
+              <form onSubmit={handleClaim} className="space-y-4 text-xs">
+                <div className="space-y-1">
+                  <Label htmlFor="c-name" className="font-medium text-zinc-700">
+                    Seu Nome Completo *
+                  </Label>
+                  <Input
+                    id="c-name"
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Seu nome"
+                    className="h-9 rounded-lg bg-zinc-50 border-zinc-200 focus:bg-white"
+                  />
+                </div>
 
-              <div className="space-y-1">
-                <Label
-                  htmlFor="pass-conf"
-                  className="font-mono uppercase tracking-wider text-slate-600"
+                <div className="space-y-1">
+                  <Label htmlFor="c-pass" className="font-medium text-zinc-700">
+                    Definir Senha de Acesso *
+                  </Label>
+                  <Input
+                    id="c-pass"
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Mínimo 6 caracteres"
+                    className="h-9 rounded-lg bg-zinc-50 border-zinc-200 focus:bg-white"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="c-pass2" className="font-medium text-zinc-700">
+                    Confirmar Senha *
+                  </Label>
+                  <Input
+                    id="c-pass2"
+                    type="password"
+                    required
+                    value={passwordConfirm}
+                    onChange={(e) => setPasswordConfirm(e.target.value)}
+                    placeholder="Repita a senha"
+                    className="h-9 rounded-lg bg-zinc-50 border-zinc-200 focus:bg-white"
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-zinc-900 hover:bg-zinc-800 text-white text-xs h-9 rounded-lg font-medium shadow-xs cursor-pointer"
                 >
-                  Confirmar Senha *
-                </Label>
-                <Input
-                  id="pass-conf"
-                  type="password"
-                  required
-                  value={passwordConfirm}
-                  onChange={(e) => setPasswordConfirm(e.target.value)}
-                  placeholder="Repita sua nova senha"
-                  className="h-10 rounded bg-[#FAF9F6] border-[#E6E2D8]"
-                />
-              </div>
-
-              <Button
-                type="submit"
-                disabled={submitting}
-                className="w-full bg-[#141B22] hover:bg-[#1E2732] text-white text-xs h-10 rounded font-mono shadow-none"
-              >
-                {submitting ? 'Ativando credencial...' : 'Ativar e Entrar no Logos'}
-              </Button>
-            </form>
+                  {isSubmitting ? 'Ativando...' : 'Concluir Cadastro & Entrar'}
+                </Button>
+              </form>
+            </div>
           )}
         </div>
+      </main>
 
-        <div className="text-center text-[11px] font-mono text-slate-400">
-          Igreja Logos &bull; Gestão Eclesial & Discipulado
-        </div>
-      </div>
-    </div>
+      {/* Footer */}
+      <footer className="border-t border-zinc-200 bg-white py-4 px-6 text-center text-xs text-zinc-400">
+        Logos Gestão de Igreja &bull; Convite com token seguro
+      </footer>
+    </PageTransition>
   )
 }

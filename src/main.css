@@ -1,5 +1,5 @@
-/* Theme and Sacred Modernism Styling — Editorial Premium Direction */
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+/* Modern SaaS Styling — Clean, crisp Linear/Stripe/Notion design system */
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,50 +7,52 @@
 
 @layer base {
   :root {
-    /* Editorial Sacred Modernism:
-       Fundo quente marfim/off-white: #FAF9F6 / #F6F4EE
-       Azul-meia-noite quase-preto para texto/hero: #141B22 / #1B242E
-       Dourado acento fino: #C5A046 / #B88E28
-       Bordas sutis e rigorosas: #E8E5DD / #E2DED4
+    /* Modern Neutral SaaS Palette:
+       Clean, crisp neutral background: #FAFAFA (zinc-50)
+       Pure white surface cards: #FFFFFF
+       Crisp text: #18181B (zinc-900) and #09090B (zinc-950)
+       Borders: #E4E4E7 (zinc-200)
+       Muted elements: #F4F4F5 (zinc-100), text: #71717A (zinc-500)
+       Accent: subtle gold #C5A046 / warm amber for active pips only
     */
-    --background: 44 24% 97%; /* #FAF9F6 */
-    --foreground: 215 28% 13%; /* #17212A */
+    --background: 0 0% 98%; /* #FAFAFA */
+    --foreground: 240 10% 3.9%; /* #09090B */
 
-    --card: 45 25% 99%; /* #FDFDFB */
-    --card-foreground: 215 28% 13%;
+    --card: 0 0% 100%; /* #FFFFFF */
+    --card-foreground: 240 10% 3.9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 28% 13%;
+    --popover-foreground: 240 10% 3.9%;
 
-    --primary: 215 32% 14%; /* Deep Midnight #18232F */
-    --primary-foreground: 45 25% 98%;
+    --primary: 240 5.9% 10%; /* #18181B */
+    --primary-foreground: 0 0% 98%;
 
-    --secondary: 44 18% 93%; /* #ECE9E1 */
-    --secondary-foreground: 215 28% 15%;
+    --secondary: 240 4.8% 95.9%; /* #F4F4F5 */
+    --secondary-foreground: 240 5.9% 10%;
 
-    --muted: 44 15% 93%;
-    --muted-foreground: 215 12% 44%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%; /* #71717A */
 
-    --accent: 42 60% 48%; /* Refined Gold #C59F30 */
-    --accent-foreground: 215 35% 12%;
+    --accent: 42 60% 48%; /* #C5A046 - fine active accent */
+    --accent-foreground: 240 5.9% 10%;
 
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 44 14% 88%; /* #E5E1D7 */
-    --input: 44 14% 86%;
-    --ring: 42 60% 48%;
+    --border: 240 5.9% 90%; /* #E4E4E7 (zinc-200) */
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
 
-    --radius: 0.5rem; /* Mais contido, menos bolha */
+    --radius: 0.75rem; /* 12px rounded-xl */
 
-    --sidebar-background: 217 33% 11%; /* #131A22 */
-    --sidebar-foreground: 44 18% 93%;
-    --sidebar-primary: 42 60% 50%;
-    --sidebar-primary-foreground: 215 35% 12%;
-    --sidebar-accent: 217 30% 16%;
-    --sidebar-accent-foreground: 45 25% 98%;
-    --sidebar-border: 217 25% 17%;
-    --sidebar-ring: 42 60% 50%;
+    --sidebar-background: 240 5.9% 10%; /* #18181B */
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 42 60% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 240 4.9% 83.9%;
   }
 
   body {
@@ -61,20 +63,27 @@
       'Segoe UI',
       Roboto,
       sans-serif;
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
+    background-color: #fafafa;
+    color: #18181b;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     letter-spacing: -0.011em;
   }
 
-  /* Editorial headings default */
+  /* Headings: Clean sans, tight tracking, crisp weight */
   h1,
   h2,
   h3,
-  .font-serif-sacred {
-    font-family: 'Fraunces', Georgia, serif;
-    letter-spacing: -0.02em;
-    font-feature-settings: 'cv01', 'cv02';
+  h4,
+  h5,
+  h6 {
+    font-family:
+      'Inter',
+      -apple-system,
+      BlinkMacSystemFont,
+      sans-serif;
+    letter-spacing: -0.025em;
+    font-weight: 600;
   }
 
   /* NEVER REMOVE THIS */
@@ -85,79 +94,44 @@
 }
 
 @layer utilities {
-  .font-serif-sacred {
-    font-family: 'Fraunces', Georgia, serif;
+  .font-display {
+    font-family:
+      'Inter',
+      -apple-system,
+      BlinkMacSystemFont,
+      sans-serif;
+    letter-spacing: -0.03em;
   }
 
-  .font-sans-ui {
-    font-family: 'Inter', sans-serif;
-  }
-
-  /* Editorial thin hairline dividers */
-  .border-hairline {
-    border-color: #e6e2d8;
-  }
-
-  .border-hairline-dark {
-    border-color: rgba(255, 255, 255, 0.08);
-  }
-
-  /* Gold subtle accents (fine lines, fine borders, active pips) */
-  .gold-rule {
-    border-bottom: 2px solid #c5a046;
-  }
-
-  .gold-accent-text {
-    color: #b88e28;
-  }
-
-  .gold-accent-bg {
-    background-color: #c5a046;
-  }
-
-  /* Deep Midnight surface — austere, elegant, no AI rainbow */
-  .midnight-hero {
-    background-color: #121820;
-    color: #f8f7f3;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-  }
-
-  .midnight-surface {
-    background-color: #161f2a;
-    color: #f8f7f3;
-  }
-
-  /* Editorial Sheet / Paper Surface */
-  .paper-surface {
-    background-color: #faf9f6;
-    border: 1px solid #e8e5dd;
-  }
-
-  .paper-card {
+  /* SaaS Card Surface */
+  .saas-card {
     background-color: #ffffff;
-    border: 1px solid #e6e2d8;
-  }
-
-  /* Ultra refined, subtle shadows — no blur glow */
-  .shadow-editorial {
-    box-shadow:
-      0 1px 3px rgba(23, 33, 42, 0.04),
-      0 1px 2px rgba(23, 33, 42, 0.02);
-  }
-
-  .shadow-editorial-hover {
+    border: 1px solid #e4e4e7;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
     transition:
-      transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-      box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-      border-color 0.2s ease;
+      border-color 0.15s ease,
+      box-shadow 0.15s ease,
+      transform 0.15s ease;
   }
 
-  .shadow-editorial-hover:hover {
-    transform: translateY(-1px);
-    box-shadow:
-      0 4px 12px -2px rgba(23, 33, 42, 0.06),
-      0 1px 3px rgba(23, 33, 42, 0.03);
-    border-color: #d3cdc0;
+  .saas-card-hover:hover {
+    border-color: #d4d4d8;
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Linear-style table header */
+  .table-header-saas {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #71717a;
+  }
+
+  /* Subtle gold accent */
+  .gold-pip {
+    background-color: #c5a046;
   }
 
   /* Safe area for mobile viewport bottom */

@@ -4,59 +4,25 @@ import {
   ArrowRight,
   CheckCircle2,
   Clock,
-  Phone,
-  UserCheck,
-  ChevronRight,
   Sparkles,
+  ChevronRight,
+  AlertCircle,
+  HelpCircle,
+  Phone,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
-import { personsService, activitiesService } from '@/services/church'
+import { personsService } from '@/services/church'
 import type { PersonRecord, PersonStatus } from '@/types/church'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from 'sonner'
 import { useRealtime } from '@/hooks/use-realtime'
 import { PageTransition } from '@/components/MotionKit'
-
-type Stage = 'visitor' | 'attender' | 'member'
-
-interface StageColumn {
-  id: Stage
-  title: string
-  subtitle: string
-  description: string
-}
-
-const STAGES: StageColumn[] = [
-  {
-    id: 'visitor',
-    title: '1. Acolhimento Inicial',
-    subtitle: 'Novos Visitantes',
-    description: 'Primeiro contato dominical. Acolhimento e convite para a classe de integração.',
-  },
-  {
-    id: 'attender',
-    title: '2. Discipulado nos Lares',
-    subtitle: 'Frequentadores Ativos',
-    description: 'Participação em pequenos grupos, classe bíblica de membros e batismo.',
-  },
-  {
-    id: 'member',
-    title: '3. Comunhão Plena',
-    subtitle: 'Membros em Ministério',
-    description: 'Irmãos integrados ao corpo, com aliança bíblica e serviço ativo.',
-  },
-]
 
 export default function Journey() {
   const { canAccessAll } = useAuth()
   const [persons, setPersons] = useState<PersonRecord[]>([])
   const [loading, setLoading] = useState(true)
 
-  // Mobile selected stage tab
-  const [selectedMobileStage, setSelectedMobileStage] = useState<Stage>('visitor')
-
-  // Realtime hook
   useRealtime<PersonRecord>('persons', (e) => {
     if (e.action === 'create') {
       setPersons((prev) => [e.record, ...prev])
@@ -67,46 +33,34 @@ export default function Journey() {
     }
   })
 
-  const loadData = async () => {
+  const loadPersons = async () => {
     try {
       setLoading(true)
-      const list = await personsService.list()
-      setPersons(list)
+      const data = await personsService.list()
+      setPersons(data)
     } catch {
-      toast.error('Erro ao carregar pipeline da jornada.')
+      toast.error('Erro ao listar pessoas no pipeline.')
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
-    loadData()
+    loadPersons()
   }, [])
 
-  // Transition stage forward
-  const handleAdvanceStage = async (person: PersonRecord, targetStage: Stage) => {
+  const handleAdvanceStatus = async (person: PersonRecord, nextStatus: PersonStatus) => {
     try {
       const updated = await personsService.update(person.id, {
-        status: targetStage,
+        status: nextStatus,
       })
       setPersons((prev) => prev.map((p) => (p.id === updated.id ? updated : p)))
-
-      await activitiesService.create({
-        title: `Avanço na Jornada: ${person.name}`,
-        description: `Promovido para o estágio de ${targetStage === 'attender' ? 'Frequentador' : 'Membro Pleno'}.`,
-        type: 'journey_change',
-        person: person.id,
-      })
-
-      toast.success(
-        `${person.name} avançou para ${targetStage === 'attender' ? 'Frequentador' : 'Membro'}!`,
-      )
+      toast.success(`${person.name} avançou para ${nextStatus.toUpperCase()}`)
     } catch {
-      toast.error('Erro ao atualizar estágio do irmão.')
+      toast.error('Erro ao atualizar estágio da pessoa.')
     }
   }
 
-  // Toggle checklist item
   const handleToggleChecklist = async (
     person: PersonRecord,
     field:
@@ -114,222 +68,176 @@ export default function Journey() {
       | 'checklist_baptized'
       | 'checklist_small_group'
       | 'checklist_ministry',
-    val: boolean,
   ) => {
     try {
       const updated = await personsService.update(person.id, {
-        [field]: val,
+        [field]: !person[field],
       })
       setPersons((prev) => prev.map((p) => (p.id === updated.id ? updated : p)))
-      toast.success('Marcos da jornada atualizados.')
+      toast.success('Marco bíblico atualizado!')
     } catch {
-      toast.error('Erro ao salvar marco.')
+      toast.error('Erro ao atualizar marco.')
     }
   }
 
-  // Filter persons per stage
-  const getPersonsInStage = (stage: Stage) => {
-    return persons.filter((p) => {
-      if (stage === 'visitor') return p.status === 'visitor'
-      if (stage === 'attender') return p.status === 'attender'
-      if (stage === 'member')
-        return p.status === 'member' || p.status === 'leader' || p.status === 'pastor'
-      return false
-    })
-  }
+  // Pipeline stages
+  const columns: { id: PersonStatus; label: string; desc: string; next?: PersonStatus }[] = [
+    {
+      id: 'visitor',
+      label: '1. Visitantes',
+      desc: 'Primeiro contato no culto',
+      next: 'attender',
+    },
+    {
+      id: 'attender',
+      label: '2. Frequentadores',
+      desc: 'Em processo de integração',
+      next: 'member',
+    },
+    {
+      id: 'member',
+      label: '3. Membros Ativos',
+      desc: 'Integrados e batizados',
+      next: 'leader',
+    },
+    {
+      id: 'leader',
+      label: '4. Líderes & Pastores',
+      desc: 'Discipulado e ministério',
+    },
+  ]
 
   return (
     <PageTransition className="space-y-6 sm:space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 border-b border-[#E6E2D8] pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-zinc-200">
         <div>
-          <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-slate-500 mb-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#C5A046]" />
-            <span>Pipeline Pastoral</span>
-            <span className="text-slate-300">/</span>
-            <span>Fluxo de Discipulado</span>
+          <div className="flex items-center gap-2 text-[11px] font-medium text-zinc-500 mb-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-zinc-900" />
+            <span>Fluxo Pastoral</span>
+            <span className="text-zinc-300">/</span>
+            <span>Pipeline Linear de Integração</span>
           </div>
-          <h1 className="font-serif-sacred text-3xl sm:text-4xl font-bold tracking-tight text-[#141B22]">
-            Jornada Logos de Maturidade
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">
+            Jornada Logos
           </h1>
-          <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl font-normal">
-            Acompanhe o caminho de cada pessoa desde o primeiro aperto de mão no domingo até a
-            integração plena nos lares e no ministério eclesial.
+          <p className="text-xs sm:text-sm text-zinc-500 mt-1 max-w-2xl font-normal">
+            Acompanhamento do acolhimento: do primeiro contato como visitante à maturidade e
+            liderança comunitária.
           </p>
         </div>
       </div>
 
-      {/* MOBILE STAGE TABS */}
-      <div className="md:hidden flex border-b border-[#E6E2D8]">
-        {STAGES.map((st) => {
-          const count = getPersonsInStage(st.id).length
-          const active = selectedMobileStage === st.id
-          return (
-            <button
-              key={st.id}
-              onClick={() => setSelectedMobileStage(st.id)}
-              className={`flex-1 py-3 text-center text-xs font-mono transition-colors relative ${
-                active ? 'text-[#141B22] font-semibold' : 'text-slate-400 hover:text-slate-600'
-              }`}
-            >
-              <span>{st.subtitle}</span>
-              <span className="ml-1 text-[10px] text-slate-400">({count})</span>
-              {active && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#C5A046]" />}
-            </button>
+      {/* PIPELINE KANBAN COLUMNS — Modern SaaS Kanban Board */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
+        {columns.map((col) => {
+          const colPersons = persons.filter((p) =>
+            col.id === 'leader'
+              ? p.status === 'leader' || p.status === 'pastor'
+              : p.status === col.id,
           )
-        })}
-      </div>
 
-      {/* THREE-COLUMN EDITORIAL PIPELINE (Desktop) */}
-      <div className="hidden md:grid grid-cols-3 gap-6 items-start">
-        {STAGES.map((col) => {
-          const list = getPersonsInStage(col.id)
           return (
             <div
               key={col.id}
-              className="bg-white border border-[#E6E2D8] rounded p-5 flex flex-col min-h-[550px]"
+              className="bg-zinc-50/70 border border-zinc-200 rounded-xl p-3 sm:p-4 space-y-3 min-h-[500px] flex flex-col"
             >
               {/* Column Header */}
-              <div className="pb-4 border-b border-[#E6E2D8] space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-[#C5A046]">
-                    {col.title}
-                  </span>
-                  <span className="text-xs font-mono font-bold px-2 py-0.5 rounded border border-[#E6E2D8] bg-[#FAF9F6] text-[#141B22]">
-                    {list.length}
-                  </span>
+              <div className="pb-2 border-b border-zinc-200 flex items-center justify-between">
+                <div>
+                  <h2 className="text-xs font-semibold text-zinc-900">{col.label}</h2>
+                  <p className="text-[10px] text-zinc-400 mt-0.5">{col.desc}</p>
                 </div>
-                <h3 className="font-serif-sacred text-lg font-bold text-[#141B22]">
-                  {col.subtitle}
-                </h3>
-                <p className="text-[11px] text-slate-500 leading-snug">{col.description}</p>
+                <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-white border border-zinc-200 text-zinc-700 tabular-nums shadow-xs">
+                  {colPersons.length}
+                </span>
               </div>
 
-              {/* People Cards in this stage */}
-              <div className="space-y-3 pt-4 flex-1">
+              {/* Cards in this column */}
+              <div className="space-y-2.5 flex-1 overflow-y-auto">
                 {loading ? (
-                  <p className="text-center text-xs text-slate-400 font-mono py-8">Carregando...</p>
-                ) : list.length === 0 ? (
-                  <p className="text-center text-xs text-slate-400 font-mono py-8 italic">
-                    Nenhum irmão nesta etapa.
-                  </p>
+                  <p className="text-xs text-zinc-400 text-center py-8">Carregando...</p>
+                ) : colPersons.length === 0 ? (
+                  <div className="text-center py-10 text-xs text-zinc-400 border border-dashed border-zinc-200 rounded-lg">
+                    Nenhum integrante
+                  </div>
                 ) : (
-                  list.map((person) => (
+                  colPersons.map((p) => (
                     <div
-                      key={person.id}
-                      className="p-3.5 bg-[#FAF9F6] border border-[#E6E2D8] rounded space-y-3 hover:border-slate-400 transition-colors"
+                      key={p.id}
+                      className="bg-white border border-zinc-200 rounded-xl p-3.5 space-y-3 hover:border-zinc-300 shadow-xs transition-all"
                     >
-                      <div className="flex items-baseline justify-between gap-2">
-                        <h4 className="font-semibold text-xs text-[#141B22] truncate">
-                          {person.name}
-                        </h4>
-                        <span className="text-[10px] font-mono text-slate-400 flex-shrink-0">
-                          {new Date(person.created).toLocaleDateString('pt-BR', {
-                            day: '2-digit',
-                            month: 'short',
-                          })}
-                        </span>
-                      </div>
-
-                      {/* Contact row */}
-                      {person.whatsapp && (
-                        <p className="text-[11px] font-mono text-slate-600 flex items-center gap-1.5">
-                          <Phone className="w-3 h-3 text-[#C5A046]" strokeWidth={1.75} />
-                          <span>{person.whatsapp}</span>
+                      <div>
+                        <p className="font-semibold text-xs text-zinc-900 truncate">{p.name}</p>
+                        <p className="text-[11px] text-zinc-400 mt-0.5">
+                          {p.whatsapp || p.email || 'Sem contato'}
                         </p>
-                      )}
-
-                      {/* Checklist for this stage */}
-                      <div className="space-y-1.5 pt-1 border-t border-[#E6E2D8] text-[11px]">
-                        {col.id === 'visitor' && (
-                          <label className="flex items-center gap-2 cursor-pointer text-slate-700">
-                            <Checkbox
-                              checked={!!person.checklist_welcome_class}
-                              disabled={!canAccessAll}
-                              onCheckedChange={(checked) =>
-                                handleToggleChecklist(
-                                  person,
-                                  'checklist_welcome_class',
-                                  Boolean(checked),
-                                )
-                              }
-                              className="rounded border-[#C5A046] data-[state=checked]:bg-[#141B22]"
-                            />
-                            <span>Classe de Boas-Vindas</span>
-                          </label>
-                        )}
-
-                        {col.id === 'attender' && (
-                          <>
-                            <label className="flex items-center gap-2 cursor-pointer text-slate-700">
-                              <Checkbox
-                                checked={!!person.checklist_small_group}
-                                disabled={!canAccessAll}
-                                onCheckedChange={(checked) =>
-                                  handleToggleChecklist(
-                                    person,
-                                    'checklist_small_group',
-                                    Boolean(checked),
-                                  )
-                                }
-                                className="rounded border-[#C5A046] data-[state=checked]:bg-[#141B22]"
-                              />
-                              <span>Pequeno Grupo no Lar</span>
-                            </label>
-                            <label className="flex items-center gap-2 cursor-pointer text-slate-700">
-                              <Checkbox
-                                checked={!!person.checklist_baptized}
-                                disabled={!canAccessAll}
-                                onCheckedChange={(checked) =>
-                                  handleToggleChecklist(
-                                    person,
-                                    'checklist_baptized',
-                                    Boolean(checked),
-                                  )
-                                }
-                                className="rounded border-[#C5A046] data-[state=checked]:bg-[#141B22]"
-                              />
-                              <span>Batismo Bíblico</span>
-                            </label>
-                          </>
-                        )}
-
-                        {col.id === 'member' && (
-                          <label className="flex items-center gap-2 cursor-pointer text-slate-700">
-                            <Checkbox
-                              checked={!!person.checklist_ministry}
-                              disabled={!canAccessAll}
-                              onCheckedChange={(checked) =>
-                                handleToggleChecklist(
-                                  person,
-                                  'checklist_ministry',
-                                  Boolean(checked),
-                                )
-                              }
-                              className="rounded border-[#C5A046] data-[state=checked]:bg-[#141B22]"
-                            />
-                            <span>Ministério Ativo</span>
-                          </label>
-                        )}
                       </div>
 
-                      {/* Action forward */}
-                      {canAccessAll && col.id !== 'member' && (
-                        <div className="pt-2 border-t border-[#E6E2D8] flex justify-end">
-                          <button
-                            onClick={() =>
-                              handleAdvanceStage(
-                                person,
-                                col.id === 'visitor' ? 'attender' : 'member',
-                              )
-                            }
-                            className="text-[11px] font-mono text-[#141B22] hover:text-[#C5A046] flex items-center gap-1 font-semibold cursor-pointer"
+                      {/* Checklist micro toggles */}
+                      <div className="pt-2 border-t border-zinc-100 space-y-1.5 text-[11px]">
+                        <button
+                          type="button"
+                          onClick={() => handleToggleChecklist(p, 'checklist_welcome_class')}
+                          className="w-full flex items-center justify-between text-left hover:bg-zinc-50 p-1 rounded transition-colors cursor-pointer"
+                        >
+                          <span className="text-zinc-600">Classe Boas-Vindas</span>
+                          <span
+                            className={`w-2 h-2 rounded-full ${
+                              p.checklist_welcome_class ? 'bg-zinc-900' : 'bg-zinc-200'
+                            }`}
+                          />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleToggleChecklist(p, 'checklist_baptized')}
+                          className="w-full flex items-center justify-between text-left hover:bg-zinc-50 p-1 rounded transition-colors cursor-pointer"
+                        >
+                          <span className="text-zinc-600">Batismo</span>
+                          <span
+                            className={`w-2 h-2 rounded-full ${
+                              p.checklist_baptized ? 'bg-zinc-900' : 'bg-zinc-200'
+                            }`}
+                          />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleToggleChecklist(p, 'checklist_small_group')}
+                          className="w-full flex items-center justify-between text-left hover:bg-zinc-50 p-1 rounded transition-colors cursor-pointer"
+                        >
+                          <span className="text-zinc-600">Pequeno Grupo</span>
+                          <span
+                            className={`w-2 h-2 rounded-full ${
+                              p.checklist_small_group ? 'bg-zinc-900' : 'bg-zinc-200'
+                            }`}
+                          />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleToggleChecklist(p, 'checklist_ministry')}
+                          className="w-full flex items-center justify-between text-left hover:bg-zinc-50 p-1 rounded transition-colors cursor-pointer"
+                        >
+                          <span className="text-zinc-600">Ministério</span>
+                          <span
+                            className={`w-2 h-2 rounded-full ${
+                              p.checklist_ministry ? 'bg-zinc-900' : 'bg-zinc-200'
+                            }`}
+                          />
+                        </button>
+                      </div>
+
+                      {/* Advance Stage button */}
+                      {col.next && canAccessAll && (
+                        <div className="pt-2 border-t border-zinc-100">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleAdvanceStatus(p, col.next!)}
+                            className="w-full h-7 text-[11px] border-zinc-200 text-zinc-800 hover:bg-zinc-50 rounded-lg justify-between font-medium cursor-pointer"
                           >
-                            <span>
-                              Promover a {col.id === 'visitor' ? 'Frequentador' : 'Membro'}
-                            </span>
-                            <ArrowRight className="w-3 h-3" />
-                          </button>
+                            <span>Avançar estágio</span>
+                            <ArrowRight className="w-3 h-3 text-zinc-400" />
+                          </Button>
                         </div>
                       )}
                     </div>
@@ -339,65 +247,6 @@ export default function Journey() {
             </div>
           )
         })}
-      </div>
-
-      {/* MOBILE SINGLE-COLUMN DISPLAY */}
-      <div className="md:hidden bg-white border border-[#E6E2D8] rounded p-4 space-y-4">
-        {(() => {
-          const activeCol = STAGES.find((s) => s.id === selectedMobileStage)!
-          const list = getPersonsInStage(selectedMobileStage)
-
-          return (
-            <>
-              <div className="pb-3 border-b border-[#E6E2D8]">
-                <h3 className="font-serif-sacred text-base font-bold text-[#141B22]">
-                  {activeCol.title}
-                </h3>
-                <p className="text-[11px] text-slate-500">{activeCol.description}</p>
-              </div>
-
-              <div className="space-y-3">
-                {list.length === 0 ? (
-                  <p className="text-center text-xs text-slate-400 py-6 font-mono">
-                    Nenhum irmão nesta etapa.
-                  </p>
-                ) : (
-                  list.map((person) => (
-                    <div
-                      key={person.id}
-                      className="p-3 bg-[#FAF9F6] border border-[#E6E2D8] rounded space-y-2 text-xs"
-                    >
-                      <div className="flex items-baseline justify-between">
-                        <span className="font-bold text-[#141B22]">{person.name}</span>
-                        <span className="text-[10px] font-mono text-slate-400">
-                          {new Date(person.created).toLocaleDateString('pt-BR')}
-                        </span>
-                      </div>
-                      {person.whatsapp && (
-                        <p className="text-[11px] font-mono text-slate-600">{person.whatsapp}</p>
-                      )}
-                      {canAccessAll && selectedMobileStage !== 'member' && (
-                        <Button
-                          size="sm"
-                          onClick={() =>
-                            handleAdvanceStage(
-                              person,
-                              selectedMobileStage === 'visitor' ? 'attender' : 'member',
-                            )
-                          }
-                          className="w-full bg-[#141B22] hover:bg-[#1E2732] text-white text-[11px] h-8 rounded font-mono"
-                        >
-                          Avançar para{' '}
-                          {selectedMobileStage === 'visitor' ? 'Frequentador' : 'Membro'} &rarr;
-                        </Button>
-                      )}
-                    </div>
-                  ))
-                )}
-              </div>
-            </>
-          )
-        })()}
       </div>
     </PageTransition>
   )
