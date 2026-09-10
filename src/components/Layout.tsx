@@ -109,25 +109,25 @@ export default function Layout() {
     secretary: {
       label: 'Secretaria',
       roleType: 'Gestão Plena',
-      badge: 'border-zinc-300 text-zinc-900 bg-zinc-100',
-      dotColor: 'bg-amber-500',
+      badge: 'border-purple-200 text-[#820AD1] bg-[#F7EEFD]',
+      dotColor: 'bg-[#820AD1]',
     },
     pastor: {
       label: 'Pastor',
       roleType: 'Cuidado Pastoral',
-      badge: 'border-zinc-300 text-zinc-900 bg-zinc-100',
-      dotColor: 'bg-zinc-900',
+      badge: 'border-purple-200 text-purple-900 bg-purple-50',
+      dotColor: 'bg-[#820AD1]',
     },
     leader: {
       label: 'Líder',
       roleType: 'Pequenos Grupos',
-      badge: 'border-zinc-300 text-zinc-800 bg-zinc-100',
-      dotColor: 'bg-blue-600',
+      badge: 'border-zinc-200 text-zinc-800 bg-zinc-100',
+      dotColor: 'bg-indigo-600',
     },
     member: {
       label: 'Membro',
       roleType: 'Vida Comunitária',
-      badge: 'border-zinc-300 text-zinc-700 bg-zinc-100',
+      badge: 'border-zinc-200 text-zinc-700 bg-zinc-100',
       dotColor: 'bg-emerald-600',
     },
     visitor: {
@@ -141,73 +141,73 @@ export default function Layout() {
   const currentMeta = roleMeta[role] || roleMeta.secretary
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] flex flex-col md:flex-row text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white">
+    <div className="min-h-screen bg-[#F5F6F8] flex flex-col md:flex-row text-[#191919] antialiased selection:bg-[#820AD1] selection:text-white">
       {/* =========================================================================
-          DESKTOP SIDEBAR — Clean SaaS Monolith (Linear/Notion style)
+          DESKTOP SIDEBAR — Nubank Clean Identity (White rounded cards & purple accents)
           ========================================================================= */}
-      <aside className="hidden md:flex flex-col w-64 lg:w-68 bg-white text-zinc-900 flex-shrink-0 border-r border-zinc-200 z-20 sticky top-0 h-screen select-none">
+      <aside className="hidden md:flex flex-col w-64 lg:w-72 bg-white text-[#191919] flex-shrink-0 border-r border-[#E9ECEF] z-20 sticky top-0 h-screen select-none">
         {/* Brand Header */}
-        <div className="px-5 py-4 border-b border-zinc-100 flex items-center justify-between">
-          <Link to="/" className="group flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-zinc-900 text-white flex items-center justify-center font-bold text-xs tracking-tight shadow-xs group-hover:bg-zinc-800 transition-colors">
+        <div className="px-6 py-5 border-b border-[#F0F1F5] flex items-center justify-between">
+          <Link to="/" className="group flex items-center gap-3">
+            <div className="w-9 h-9 rounded-2xl bg-[#820AD1] text-white flex items-center justify-center font-bold text-sm tracking-tight shadow-sm shadow-[#820AD1]/20 group-hover:scale-105 transition-transform">
               L
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-semibold tracking-tight text-zinc-900">Logos</span>
-              <span className="text-[10px] font-medium text-zinc-400 tracking-tight leading-none">
+              <span className="text-base font-bold tracking-tight text-[#191919]">Logos</span>
+              <span className="text-[11px] font-medium text-gray-500 tracking-tight leading-none">
                 Gestão de Igreja
               </span>
             </div>
           </Link>
-          <span className="text-[10px] font-medium px-2 py-0.5 border border-zinc-200 bg-zinc-50 text-zinc-600 rounded-md">
-            v2.5
+          <span className="text-[11px] font-semibold px-2.5 py-0.5 bg-[#F7EEFD] text-[#820AD1] rounded-full">
+            Nu-Exp
           </span>
         </div>
 
-        {/* Persona quick switch dropdown — compact SaaS team switcher */}
-        <div className="px-4 py-3 border-b border-zinc-100 bg-zinc-50/60">
-          <div className="flex items-center justify-between text-[11px] font-medium text-zinc-500 mb-1.5">
+        {/* Persona quick switch dropdown — Nubank pill selector */}
+        <div className="px-5 py-4 border-b border-[#F0F1F5] bg-[#F8F9FB]">
+          <div className="flex items-center justify-between text-[11px] font-semibold text-gray-500 mb-2">
             <span className="flex items-center gap-1.5">
-              <Shield className="w-3 h-3 text-zinc-400" /> Papel Ativo
+              <Shield className="w-3.5 h-3.5 text-[#820AD1]" /> Papel Ativo
             </span>
-            <span className="text-[10px] text-zinc-400">Simulação</span>
+            <span className="text-[10px] text-gray-400 font-medium">Simulação</span>
           </div>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="w-full text-left px-2.5 py-1.5 rounded-lg bg-white hover:bg-zinc-100 border border-zinc-200 flex items-center justify-between transition-colors text-xs text-zinc-900 group cursor-pointer shadow-xs">
+              <button className="w-full text-left px-3 py-2 rounded-xl bg-white hover:bg-gray-50 border border-[#E9ECEF] flex items-center justify-between transition-all text-xs text-[#191919] group cursor-pointer shadow-xs">
                 <div className="flex items-center gap-2 truncate">
                   <span className={`w-2 h-2 rounded-full ${currentMeta.dotColor}`} />
-                  <span className="font-semibold">{currentMeta.label}</span>
-                  <span className="text-[11px] text-zinc-400">
+                  <span className="font-bold">{currentMeta.label}</span>
+                  <span className="text-[11px] text-gray-400">
                     &bull; {currentMeta.roleType.split(' ')[0]}
                   </span>
                 </div>
-                <ChevronDown className="w-3.5 h-3.5 text-zinc-400 group-hover:text-zinc-700 transition-colors" />
+                <ChevronDown className="w-3.5 h-3.5 text-gray-400 group-hover:text-[#820AD1] transition-colors" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="start"
-              className="w-58 bg-white text-zinc-900 border border-zinc-200 rounded-lg p-1.5 shadow-lg"
+              className="w-60 bg-white text-[#191919] border border-[#E9ECEF] rounded-2xl p-1.5 shadow-xl"
             >
-              <DropdownMenuLabel className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider px-2 py-1">
+              <DropdownMenuLabel className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-2 py-1">
                 Alternar Papel Simulado
               </DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-zinc-100 my-1" />
+              <DropdownMenuSeparator className="bg-gray-100 my-1" />
               {(['secretary', 'pastor', 'leader', 'member', 'visitor'] as UserRole[]).map((r) => (
                 <DropdownMenuItem
                   key={r}
                   onClick={() => switchSimulatedRole(r)}
-                  className={`cursor-pointer rounded-md px-2 py-1.5 text-xs transition-colors ${
+                  className={`cursor-pointer rounded-xl px-2.5 py-2 text-xs transition-colors ${
                     role === r
-                      ? 'bg-zinc-100 text-zinc-900 font-semibold'
-                      : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50'
+                      ? 'bg-[#F7EEFD] text-[#820AD1] font-bold'
+                      : 'text-gray-700 hover:text-[#820AD1] hover:bg-gray-50'
                   }`}
                 >
                   <div className="flex items-center gap-2 w-full">
-                    <span className={`w-1.5 h-1.5 rounded-full ${roleMeta[r].dotColor}`} />
+                    <span className={`w-2 h-2 rounded-full ${roleMeta[r].dotColor}`} />
                     <span>{roleMeta[r].label}</span>
-                    <span className="text-[10px] text-zinc-400 ml-auto">
+                    <span className="text-[10px] text-gray-400 ml-auto">
                       {roleMeta[r].roleType}
                     </span>
                   </div>
@@ -218,9 +218,9 @@ export default function Layout() {
         </div>
 
         {/* Navigation list */}
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 px-3 py-1 mb-1">
-            Módulos
+        <nav className="flex-1 px-3 py-5 space-y-1.5 overflow-y-auto">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 px-3 py-1 mb-1">
+            Menu Principal
           </p>
           {navItems.map((item) => {
             const active = location.pathname === item.path
@@ -229,55 +229,58 @@ export default function Layout() {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`relative flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                className={`relative flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-semibold transition-all ${
                   active
-                    ? 'text-zinc-950 bg-zinc-100 font-semibold shadow-xs'
-                    : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50'
+                    ? 'text-[#820AD1] bg-[#F7EEFD] shadow-xs'
+                    : 'text-gray-600 hover:text-[#191919] hover:bg-gray-50'
                 }`}
               >
-                <Icon
-                  className={`w-4 h-4 transition-colors ${
-                    active ? 'text-zinc-950' : 'text-zinc-400'
+                <div
+                  className={`w-7 h-7 rounded-xl flex items-center justify-center transition-colors ${
+                    active ? 'bg-[#820AD1] text-white' : 'bg-gray-100 text-gray-600'
                   }`}
-                  strokeWidth={active ? 2 : 1.75}
-                />
+                >
+                  <Icon className="w-3.5 h-3.5" strokeWidth={2} />
+                </div>
                 <span className="flex-1 tracking-tight">{item.fullLabel}</span>
-                {active && <span className="w-1.5 h-1.5 rounded-full bg-zinc-900" />}
+                {active && <span className="w-2 h-2 rounded-full bg-[#820AD1]" />}
               </Link>
             )
           })}
 
           {/* Quick link: Reception */}
-          <div className="pt-5">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 px-3 py-1 mb-1">
-              Público
+          <div className="pt-6">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 px-3 py-1 mb-1">
+              Acesso Público
             </p>
             <Link
               to="/visitante-cadastro"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 border border-zinc-200/80 transition-colors group"
+              className="flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs text-gray-700 hover:text-[#820AD1] hover:bg-[#F7EEFD] border border-[#E9ECEF] transition-all group"
             >
-              <div className="flex items-center gap-2">
-                <QrCode className="w-3.5 h-3.5 text-zinc-500" strokeWidth={1.75} />
-                <span className="tracking-tight font-medium">Recepção / QR Culto</span>
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-xl bg-purple-50 text-[#820AD1] flex items-center justify-center">
+                  <QrCode className="w-3.5 h-3.5" strokeWidth={2} />
+                </div>
+                <span className="tracking-tight font-semibold">QR Culto / Boas-Vindas</span>
               </div>
-              <ExternalLink className="w-3 h-3 text-zinc-400 group-hover:text-zinc-700 transition-colors" />
+              <ExternalLink className="w-3 h-3 text-gray-400 group-hover:text-[#820AD1] transition-colors" />
             </Link>
           </div>
         </nav>
 
         {/* User profile footer */}
-        <div className="p-3 border-t border-zinc-100 bg-zinc-50/50 flex items-center justify-between">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-lg border border-zinc-200 bg-white text-zinc-800 text-xs flex items-center justify-center font-bold flex-shrink-0 shadow-xs">
+        <div className="p-4 border-t border-[#F0F1F5] bg-[#F8F9FB] flex items-center justify-between">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-9 h-9 rounded-full bg-[#820AD1] text-white text-xs flex items-center justify-center font-bold flex-shrink-0 shadow-sm shadow-[#820AD1]/20">
               {user?.name ? user.name.slice(0, 2).toUpperCase() : 'LG'}
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-medium text-zinc-900 truncate leading-tight">
+              <p className="text-xs font-bold text-[#191919] truncate leading-tight">
                 {user?.name || 'Visitante Logos'}
               </p>
-              <p className="text-[10px] text-zinc-400 truncate mt-0.5">
+              <p className="text-[11px] text-gray-400 truncate mt-0.5">
                 {user?.email || 'Acesso anônimo'}
               </p>
             </div>
@@ -286,62 +289,65 @@ export default function Layout() {
             <button
               onClick={logout}
               title="Encerrar sessão"
-              className="p-1.5 rounded-md text-zinc-400 hover:text-zinc-900 hover:bg-zinc-200/60 transition-colors cursor-pointer"
+              className="p-2 rounded-xl text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
             >
-              <LogOut className="w-3.5 h-3.5" strokeWidth={1.75} />
+              <LogOut className="w-4 h-4" strokeWidth={1.75} />
             </button>
           )}
         </div>
       </aside>
 
       {/* =========================================================================
-          MAIN CONTAINER (Crisp Neutral Canvas)
+          MAIN CONTAINER (Nubank Canvas: Soft Off-White Background)
           ========================================================================= */}
-      <div className="flex-1 flex flex-col min-w-0 pb-20 md:pb-0">
-        {/* TOP BAR / HEADER — Clean Linear-like header */}
-        <header className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b border-zinc-200 px-4 md:px-8 py-3 flex items-center justify-between gap-3 transition-all">
-          {/* Mobile brand & Persona indicator */}
-          <div className="flex items-center gap-2 md:hidden">
+      <div className="flex-1 flex flex-col min-w-0 pb-24 md:pb-8">
+        {/* TOP BAR / HEADER — Nubank Mobile / Desktop Header */}
+        <header className="sticky top-0 z-20 bg-[#820AD1] md:bg-white/95 md:backdrop-blur-sm border-b md:border-[#E9ECEF] border-transparent px-4 sm:px-6 md:px-8 py-3.5 flex items-center justify-between gap-3 transition-all text-white md:text-[#191919]">
+          {/* Mobile brand & Nubank Avatar */}
+          <div className="flex items-center gap-2.5 md:hidden">
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="p-1.5 -ml-1 rounded-md text-zinc-700 hover:bg-zinc-100 transition-colors"
+              className="p-1.5 -ml-1 rounded-xl text-white hover:bg-white/10 transition-colors"
               aria-label="Abrir menu"
             >
-              <Menu className="w-5 h-5" strokeWidth={1.75} />
+              <Menu className="w-6 h-6" strokeWidth={2} />
             </button>
-            <Link to="/" className="flex items-center gap-1.5">
-              <div className="w-6 h-6 rounded bg-zinc-900 text-white flex items-center justify-center font-bold text-[11px]">
+            <Link to="/" className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-white/20 text-white flex items-center justify-center font-bold text-xs backdrop-blur-xs">
                 L
               </div>
-              <span className="font-semibold text-sm text-zinc-900 tracking-tight">Logos</span>
+              <div className="flex flex-col">
+                <span className="font-bold text-sm tracking-tight leading-tight">Logos</span>
+                <span className="text-[10px] text-purple-200 leading-none">Igreja Viva</span>
+              </div>
             </Link>
 
-            {/* Mobile quick persona badge button */}
+            {/* Mobile quick persona pill */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-1.5 text-[11px] font-medium bg-zinc-100 hover:bg-zinc-200/70 text-zinc-900 px-2 py-0.5 rounded-md border border-zinc-200 ml-1 transition-colors">
-                  <span className={`w-1.5 h-1.5 rounded-full ${currentMeta.dotColor}`} />
+                <button className="flex items-center gap-1.5 text-[11px] font-semibold bg-white/15 text-white px-2.5 py-1 rounded-full border border-white/20 ml-1 transition-all active:scale-95">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                   <span>{currentMeta.label}</span>
-                  <ChevronDown className="w-3 h-3 text-zinc-400" />
+                  <ChevronDown className="w-3 h-3 text-white/70" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="start"
-                className="w-52 bg-white shadow-lg border border-zinc-200 rounded-lg p-1 text-xs"
+                className="w-56 bg-white text-[#191919] shadow-xl border border-gray-100 rounded-2xl p-1.5 text-xs"
               >
-                <DropdownMenuLabel className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider px-2 py-1">
+                <DropdownMenuLabel className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-2 py-1">
                   Persona Ativa
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-zinc-100" />
+                <DropdownMenuSeparator className="bg-gray-100" />
                 {(['secretary', 'pastor', 'leader', 'member', 'visitor'] as UserRole[]).map((r) => (
                   <DropdownMenuItem
                     key={r}
                     onClick={() => switchSimulatedRole(r)}
-                    className="cursor-pointer font-medium rounded-md py-1.5 px-2 hover:bg-zinc-50"
+                    className="cursor-pointer font-medium rounded-xl py-2 px-2.5 hover:bg-[#F7EEFD] hover:text-[#820AD1]"
                   >
-                    <span className={`w-1.5 h-1.5 rounded-full mr-2 ${roleMeta[r].dotColor}`} />
+                    <span className={`w-2 h-2 rounded-full mr-2 ${roleMeta[r].dotColor}`} />
                     <span>{roleMeta[r].label}</span>
-                    <span className="text-[10px] text-zinc-400 ml-auto">
+                    <span className="text-[10px] text-gray-400 ml-auto">
                       {roleMeta[r].roleType.split(' ')[0]}
                     </span>
                   </DropdownMenuItem>
@@ -351,12 +357,12 @@ export default function Layout() {
           </div>
 
           {/* Desktop Section indicator (breadcrumb) */}
-          <div className="hidden md:flex items-center gap-2 text-xs">
-            <span className="text-zinc-900 font-semibold text-xs tracking-tight">Logos</span>
-            <span className="text-zinc-300">/</span>
-            <span className="font-medium text-zinc-600">
+          <div className="hidden md:flex items-center gap-2.5 text-xs">
+            <span className="text-[#820AD1] font-bold text-xs tracking-tight">Logos</span>
+            <span className="text-gray-300">/</span>
+            <span className="font-semibold text-gray-700">
               {location.pathname === '/'
-                ? 'Visão Geral & Indicadores'
+                ? 'Painel Geral'
                 : location.pathname === '/pessoas'
                   ? 'Pessoas & Membros'
                   : location.pathname === '/familias'
@@ -374,15 +380,15 @@ export default function Layout() {
             {/* Desktop Search Bar */}
             <div className="relative hidden sm:block w-full max-w-xs lg:max-w-sm">
               <Search
-                className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
-                strokeWidth={1.75}
+                className="w-3.5 h-3.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
+                strokeWidth={2}
               />
               <Input
                 type="text"
                 placeholder="Buscar por nome ou contato..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-8 pr-3 h-8 text-xs rounded-lg bg-zinc-50 border-zinc-200 hover:border-zinc-300 focus:bg-white focus:border-zinc-900 focus:ring-0 transition-all shadow-none placeholder:text-zinc-400"
+                className="pl-9 pr-3 h-9 text-xs rounded-full bg-[#F0F1F5] md:bg-[#F5F6F8] border-transparent focus:bg-white focus:border-[#820AD1] focus:ring-1 focus:ring-[#820AD1] transition-all shadow-none placeholder:text-gray-400"
               />
 
               {/* Desktop Search Dropdown */}
@@ -393,12 +399,12 @@ export default function Layout() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -2 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-lg border border-zinc-200 p-1.5 z-50 divide-y divide-zinc-100"
+                    className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 p-2 z-50 divide-y divide-gray-100"
                   >
                     {isSearching ? (
-                      <p className="text-xs text-zinc-400 p-3 text-center">Buscando...</p>
+                      <p className="text-xs text-gray-400 p-4 text-center">Buscando...</p>
                     ) : searchResults.length > 0 ? (
-                      <div className="space-y-0.5">
+                      <div className="space-y-1">
                         {searchResults.map((p) => (
                           <button
                             key={p.id}
@@ -406,22 +412,24 @@ export default function Layout() {
                               setSearchQuery('')
                               navigate(`/pessoas?id=${p.id}`)
                             }}
-                            className="w-full text-left px-2.5 py-2 rounded-md hover:bg-zinc-50 flex items-center justify-between text-xs cursor-pointer"
+                            className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-[#F7EEFD] flex items-center justify-between text-xs cursor-pointer group"
                           >
                             <div className="min-w-0 pr-2">
-                              <p className="font-semibold text-zinc-900 truncate">{p.name}</p>
-                              <p className="text-[11px] text-zinc-400">
-                                {p.whatsapp || p.email || 'Sem contato cadastrado'}
+                              <p className="font-bold text-[#191919] group-hover:text-[#820AD1] truncate">
+                                {p.name}
+                              </p>
+                              <p className="text-[11px] text-gray-400">
+                                {p.whatsapp || p.email || 'Sem contato'}
                               </p>
                             </div>
-                            <span className="text-[10px] font-medium uppercase px-1.5 py-0.5 rounded border border-zinc-200 bg-zinc-50 text-zinc-600 flex-shrink-0">
+                            <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 flex-shrink-0">
                               {p.status}
                             </span>
                           </button>
                         ))}
                       </div>
                     ) : (
-                      <p className="text-xs text-zinc-400 p-3 text-center">
+                      <p className="text-xs text-gray-400 p-4 text-center">
                         Nenhum registro encontrado.
                       </p>
                     )}
@@ -433,21 +441,21 @@ export default function Layout() {
             {/* Mobile search toggle button */}
             <button
               onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
-              className="sm:hidden p-2 rounded-lg text-zinc-600 hover:bg-zinc-100 transition-colors"
+              className="sm:hidden p-2 rounded-full text-white md:text-gray-600 hover:bg-white/10 md:hover:bg-gray-100 transition-colors"
               title="Buscar"
             >
-              <Search className="w-4 h-4" strokeWidth={1.75} />
+              <Search className="w-5 h-5" strokeWidth={2} />
             </button>
 
             {/* Notifications Button */}
             <button
               onClick={() => setNotificationsOpen(true)}
-              className="relative p-2 rounded-lg text-zinc-600 hover:bg-zinc-100 transition-colors cursor-pointer"
+              className="relative p-2 rounded-full text-white md:text-gray-600 hover:bg-white/10 md:hover:bg-gray-100 transition-colors cursor-pointer"
               title="Atividades Recentes"
             >
-              <Bell className="w-4 h-4" strokeWidth={1.75} />
+              <Bell className="w-5 h-5 md:w-4 md:h-4" strokeWidth={2} />
               {activities.length > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-zinc-900 ring-2 ring-white" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-400 md:bg-[#820AD1] ring-2 ring-white" />
               )}
             </button>
 
@@ -456,80 +464,80 @@ export default function Layout() {
               to="/visitante-cadastro"
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden lg:flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded-lg bg-zinc-50 hover:bg-zinc-100 text-zinc-800 border border-zinc-200 transition-colors"
+              className="hidden lg:flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-[#F7EEFD] text-[#820AD1] hover:bg-[#ebdcfc] transition-colors"
             >
-              <QrCode className="w-3.5 h-3.5 text-zinc-600" strokeWidth={1.75} />
-              <span>QR Culto</span>
+              <QrCode className="w-3.5 h-3.5 text-[#820AD1]" strokeWidth={2} />
+              <span>QR Recepção</span>
             </Link>
 
             {/* Profile Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 p-0.5 rounded-full hover:ring-2 hover:ring-zinc-200 transition-all cursor-pointer">
-                  <div className="w-7 h-7 rounded-full border border-zinc-200 bg-zinc-900 text-white font-semibold text-xs flex items-center justify-center">
+                <button className="flex items-center gap-2 p-0.5 rounded-full hover:ring-2 hover:ring-[#820AD1]/30 transition-all cursor-pointer">
+                  <div className="w-8 h-8 rounded-full border-2 border-white md:border-[#820AD1] bg-white text-[#820AD1] md:bg-[#820AD1] md:text-white font-bold text-xs flex items-center justify-center shadow-xs">
                     {user?.name ? user.name.slice(0, 2).toUpperCase() : 'LG'}
                   </div>
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
-                className="w-58 bg-white shadow-xl border border-zinc-200 rounded-lg p-1.5 text-xs"
+                className="w-60 bg-white text-[#191919] shadow-xl border border-gray-100 rounded-2xl p-2 text-xs"
               >
-                <DropdownMenuLabel className="p-2">
-                  <p className="font-semibold text-zinc-900 text-xs">{user?.name || 'Visitante'}</p>
-                  <p className="text-[11px] text-zinc-400 truncate mt-0.5">
+                <DropdownMenuLabel className="p-2.5">
+                  <p className="font-bold text-[#191919] text-xs">{user?.name || 'Visitante'}</p>
+                  <p className="text-[11px] text-gray-400 truncate mt-0.5">
                     {user?.email || 'Acesso anônimo'}
                   </p>
                   <div className="mt-2">
-                    <span className="inline-block text-[10px] font-medium uppercase px-2 py-0.5 rounded border border-zinc-200 bg-zinc-50 text-zinc-700">
+                    <span className="inline-block text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-[#F7EEFD] text-[#820AD1]">
                       {currentMeta.label} &bull; {currentMeta.roleType}
                     </span>
                   </div>
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-zinc-100" />
+                <DropdownMenuSeparator className="bg-gray-100" />
                 <DropdownMenuItem
                   onClick={() => navigate('/pessoas')}
-                  className="cursor-pointer py-1.5 rounded-md hover:bg-zinc-50"
+                  className="cursor-pointer py-2 rounded-xl hover:bg-[#F7EEFD] hover:text-[#820AD1]"
                 >
-                  <Users className="w-3.5 h-3.5 mr-2 text-zinc-500" strokeWidth={1.75} />
-                  <span>Pessoas & Membros</span>
+                  <Users className="w-4 h-4 mr-2.5 text-gray-500" strokeWidth={1.75} />
+                  <span className="font-medium">Pessoas & Membros</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => navigate('/familias')}
-                  className="cursor-pointer py-1.5 rounded-md hover:bg-zinc-50"
+                  className="cursor-pointer py-2 rounded-xl hover:bg-[#F7EEFD] hover:text-[#820AD1]"
                 >
-                  <HomeIcon className="w-3.5 h-3.5 mr-2 text-zinc-500" strokeWidth={1.75} />
-                  <span>Núcleos Familiares</span>
+                  <HomeIcon className="w-4 h-4 mr-2.5 text-gray-500" strokeWidth={1.75} />
+                  <span className="font-medium">Núcleos Familiares</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => navigate('/jornada')}
-                  className="cursor-pointer py-1.5 rounded-md hover:bg-zinc-50"
+                  className="cursor-pointer py-2 rounded-xl hover:bg-[#F7EEFD] hover:text-[#820AD1]"
                 >
-                  <GitFork className="w-3.5 h-3.5 mr-2 text-zinc-500" strokeWidth={1.75} />
-                  <span>Jornada & Pipeline</span>
+                  <GitFork className="w-4 h-4 mr-2.5 text-gray-500" strokeWidth={1.75} />
+                  <span className="font-medium">Jornada & Pipeline</span>
                 </DropdownMenuItem>
                 {canAccessAll && (
                   <DropdownMenuItem
                     onClick={() => navigate('/secretaria')}
-                    className="cursor-pointer py-1.5 rounded-md hover:bg-zinc-50"
+                    className="cursor-pointer py-2 rounded-xl hover:bg-[#F7EEFD] hover:text-[#820AD1]"
                   >
-                    <Mail className="w-3.5 h-3.5 mr-2 text-zinc-500" strokeWidth={1.75} />
-                    <span>Secretaria & Convites</span>
+                    <Mail className="w-4 h-4 mr-2.5 text-gray-500" strokeWidth={1.75} />
+                    <span className="font-medium">Secretaria & Convites</span>
                   </DropdownMenuItem>
                 )}
-                <DropdownMenuSeparator className="bg-zinc-100" />
+                <DropdownMenuSeparator className="bg-gray-100" />
                 {user ? (
                   <DropdownMenuItem
                     onClick={logout}
-                    className="text-red-600 font-medium cursor-pointer py-1.5 rounded-md hover:bg-red-50"
+                    className="text-red-600 font-medium cursor-pointer py-2 rounded-xl hover:bg-red-50"
                   >
-                    <LogOut className="w-3.5 h-3.5 mr-2" strokeWidth={1.75} />
+                    <LogOut className="w-4 h-4 mr-2 text-red-500" strokeWidth={1.75} />
                     <span>Encerrar sessão</span>
                   </DropdownMenuItem>
                 ) : (
                   <DropdownMenuItem
                     onClick={() => navigate('/')}
-                    className="text-zinc-800 font-medium cursor-pointer py-1.5 rounded-md hover:bg-zinc-50"
+                    className="text-[#820AD1] font-semibold cursor-pointer py-2 rounded-xl hover:bg-[#F7EEFD]"
                   >
                     <span>Entrar no sistema</span>
                   </DropdownMenuItem>
@@ -546,12 +554,12 @@ export default function Layout() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="sm:hidden px-4 py-2.5 bg-white border-b border-zinc-200 shadow-xs overflow-hidden"
+              className="sm:hidden px-4 py-3 bg-white border-b border-gray-200 shadow-xs overflow-hidden"
             >
               <div className="relative">
                 <Search
-                  className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
-                  strokeWidth={1.75}
+                  className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
+                  strokeWidth={2}
                 />
                 <Input
                   type="text"
@@ -559,22 +567,22 @@ export default function Layout() {
                   placeholder="Buscar por nome ou contato..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-8 pr-8 text-xs h-9 rounded-lg bg-zinc-50 border-zinc-200"
+                  className="pl-9 pr-9 text-xs h-10 rounded-full bg-[#F0F1F5] border-transparent"
                 />
                 <button
                   onClick={() => {
                     setSearchQuery('')
                     setMobileSearchOpen(false)
                   }}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 p-1"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 p-1"
                 >
-                  <X className="w-3.5 h-3.5" strokeWidth={1.75} />
+                  <X className="w-4 h-4" strokeWidth={2} />
                 </button>
               </div>
               {searchQuery.trim().length > 0 && (
-                <div className="mt-2 bg-white rounded-lg border border-zinc-200 divide-y divide-zinc-100 max-h-56 overflow-y-auto">
+                <div className="mt-2 bg-white rounded-2xl border border-gray-100 divide-y divide-gray-100 max-h-56 overflow-y-auto shadow-lg">
                   {isSearching ? (
-                    <p className="text-xs text-zinc-400 p-3 text-center">Buscando...</p>
+                    <p className="text-xs text-gray-400 p-3 text-center">Buscando...</p>
                   ) : searchResults.length > 0 ? (
                     searchResults.map((p) => (
                       <button
@@ -584,19 +592,19 @@ export default function Layout() {
                           setMobileSearchOpen(false)
                           navigate(`/pessoas?id=${p.id}`)
                         }}
-                        className="w-full text-left p-2.5 flex items-center justify-between text-xs hover:bg-zinc-50"
+                        className="w-full text-left p-3 flex items-center justify-between text-xs hover:bg-[#F7EEFD]"
                       >
                         <div>
-                          <p className="font-semibold text-zinc-900">{p.name}</p>
-                          <p className="text-[11px] text-zinc-400">{p.whatsapp || p.email}</p>
+                          <p className="font-bold text-[#191919]">{p.name}</p>
+                          <p className="text-[11px] text-gray-400">{p.whatsapp || p.email}</p>
                         </div>
-                        <span className="text-[10px] uppercase font-medium px-1.5 py-0.5 rounded border border-zinc-200 bg-zinc-50 text-zinc-600">
+                        <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
                           {p.status}
                         </span>
                       </button>
                     ))
                   ) : (
-                    <p className="text-xs text-zinc-400 p-3 text-center">Nenhum resultado.</p>
+                    <p className="text-xs text-gray-400 p-3 text-center">Nenhum resultado.</p>
                   )}
                 </div>
               )}
@@ -611,38 +619,38 @@ export default function Layout() {
       </div>
 
       {/* =========================================================================
-          NOTIFICATIONS SLIDE-OVER — Clean SaaS Drawer
+          NOTIFICATIONS SLIDE-OVER — Nubank Style Drawer
           ========================================================================= */}
       <Sheet open={notificationsOpen} onOpenChange={setNotificationsOpen}>
-        <SheetContent className="w-full sm:max-w-md bg-white p-6 overflow-y-auto border-l border-zinc-200">
-          <SheetHeader className="mb-4 pb-3 border-b border-zinc-100">
-            <SheetTitle className="text-lg font-semibold text-zinc-900 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-zinc-900" />
+        <SheetContent className="w-full sm:max-w-md bg-white p-6 overflow-y-auto border-l border-gray-100 rounded-l-3xl">
+          <SheetHeader className="mb-4 pb-3 border-b border-gray-100">
+            <SheetTitle className="text-lg font-bold text-[#191919] flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#820AD1]" />
               Atividades Recentes
             </SheetTitle>
           </SheetHeader>
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             {activities.length === 0 ? (
-              <p className="text-xs text-zinc-400 text-center py-8">
+              <p className="text-xs text-gray-400 text-center py-8">
                 Nenhum registro de atividade recente.
               </p>
             ) : (
               activities.map((act) => (
                 <div
                   key={act.id}
-                  className="p-3 bg-zinc-50 hover:bg-zinc-100/70 border border-zinc-200/80 rounded-lg text-xs space-y-1 transition-colors"
+                  className="p-3.5 bg-[#F8F9FB] hover:bg-[#F7EEFD] rounded-2xl text-xs space-y-1 transition-colors"
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-semibold text-zinc-900 truncate">{act.title}</span>
-                    <span className="text-[10px] text-zinc-400 flex items-center gap-1 flex-shrink-0">
-                      <Clock className="w-2.5 h-2.5" strokeWidth={1.75} />
+                    <span className="font-bold text-[#191919] truncate">{act.title}</span>
+                    <span className="text-[10px] text-gray-400 flex items-center gap-1 flex-shrink-0">
+                      <Clock className="w-3 h-3 text-[#820AD1]" strokeWidth={1.75} />
                       {new Date(act.created).toLocaleDateString('pt-BR', {
                         hour: '2-digit',
                         minute: '2-digit',
                       })}
                     </span>
                   </div>
-                  <p className="text-zinc-600 text-[11px] leading-relaxed">{act.description}</p>
+                  <p className="text-gray-600 text-[11px] leading-relaxed">{act.description}</p>
                 </div>
               ))
             )}
@@ -651,35 +659,38 @@ export default function Layout() {
       </Sheet>
 
       {/* =========================================================================
-          MOBILE DRAWER / HAMBURGER MENU
+          MOBILE DRAWER / HAMBURGER MENU — Nubank Purple Canvas
           ========================================================================= */}
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetContent
           side="left"
-          className="w-80 max-w-[85vw] bg-white text-zinc-900 p-0 flex flex-col border-r border-zinc-200"
+          className="w-80 max-w-[85vw] bg-white text-[#191919] p-0 flex flex-col border-r border-gray-100 rounded-r-3xl"
         >
           {/* Header */}
-          <div className="p-4 border-b border-zinc-100 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-zinc-900 text-white flex items-center justify-center font-bold text-xs">
+          <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-[#820AD1] text-white">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-white/20 text-white flex items-center justify-center font-bold text-sm">
                 L
               </div>
-              <span className="font-semibold text-base text-zinc-900">Logos</span>
+              <div className="flex flex-col">
+                <span className="font-bold text-base">Logos</span>
+                <span className="text-[11px] text-purple-200">Gestão de Igreja</span>
+              </div>
             </div>
             <button
               onClick={() => setMobileMenuOpen(false)}
-              className="p-1 rounded-md text-zinc-400 hover:text-zinc-700 transition-colors"
+              className="p-1 rounded-full text-white/80 hover:text-white transition-colors"
             >
-              <X className="w-5 h-5" strokeWidth={1.75} />
+              <X className="w-5 h-5" strokeWidth={2} />
             </button>
           </div>
 
           {/* Persona selector mobile */}
-          <div className="p-4 border-b border-zinc-100 bg-zinc-50">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mb-2">
+          <div className="p-4 border-b border-gray-100 bg-[#F8F9FB]">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2">
               Persona Ativa:
             </p>
-            <div className="grid grid-cols-2 gap-1.5">
+            <div className="grid grid-cols-2 gap-2">
               {(['secretary', 'pastor', 'leader', 'member', 'visitor'] as UserRole[]).map((r) => (
                 <button
                   key={r}
@@ -687,10 +698,10 @@ export default function Layout() {
                     switchSimulatedRole(r)
                     setMobileMenuOpen(false)
                   }}
-                  className={`text-xs px-2.5 py-1.5 rounded-lg text-center transition-colors cursor-pointer ${
+                  className={`text-xs px-3 py-2 rounded-xl text-center font-medium transition-all cursor-pointer ${
                     role === r
-                      ? 'bg-zinc-900 text-white font-semibold shadow-xs'
-                      : 'bg-white text-zinc-700 hover:bg-zinc-100 border border-zinc-200'
+                      ? 'bg-[#820AD1] text-white font-bold shadow-sm'
+                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
                   }`}
                 >
                   {roleMeta[r].label}
@@ -700,7 +711,7 @@ export default function Layout() {
           </div>
 
           {/* Links */}
-          <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+          <nav className="flex-1 p-3 space-y-1.5 overflow-y-auto">
             {navItems.map((item) => {
               const active = location.pathname === item.path
               const Icon = item.icon
@@ -709,42 +720,48 @@ export default function Layout() {
                   key={item.path}
                   to={item.path}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                  className={`flex items-center gap-3 px-3.5 py-3 rounded-2xl text-xs font-semibold transition-all ${
                     active
-                      ? 'bg-zinc-100 text-zinc-950 font-semibold'
-                      : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50'
+                      ? 'bg-[#F7EEFD] text-[#820AD1]'
+                      : 'text-gray-700 hover:text-[#820AD1] hover:bg-gray-50'
                   }`}
                 >
-                  <Icon className="w-4 h-4 text-zinc-700" strokeWidth={1.75} />
+                  <div
+                    className={`w-7 h-7 rounded-xl flex items-center justify-center ${
+                      active ? 'bg-[#820AD1] text-white' : 'bg-gray-100 text-gray-600'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" strokeWidth={2} />
+                  </div>
                   <span>{item.fullLabel}</span>
                 </Link>
               )
             })}
 
-            <div className="pt-4 mt-2 border-t border-zinc-100">
+            <div className="pt-4 mt-2 border-t border-gray-100">
               <Link
                 to="/visitante-cadastro"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-between px-3 py-2 rounded-lg text-xs text-zinc-700 bg-zinc-50 border border-zinc-200"
+                className="flex items-center justify-between px-3.5 py-3 rounded-2xl text-xs font-semibold text-[#820AD1] bg-[#F7EEFD]"
               >
-                <span className="flex items-center gap-2">
-                  <QrCode className="w-3.5 h-3.5 text-zinc-600" strokeWidth={1.75} />
-                  QR Culto (Recepção)
+                <span className="flex items-center gap-2.5">
+                  <QrCode className="w-4 h-4" strokeWidth={2} />
+                  QR Recepção / Culto
                 </span>
-                <ExternalLink className="w-3 h-3 text-zinc-400" />
+                <ExternalLink className="w-3.5 h-3.5" />
               </Link>
             </div>
           </nav>
 
           {/* Footer */}
-          <div className="p-4 border-t border-zinc-100 bg-zinc-50 flex items-center justify-between">
+          <div className="p-4 border-t border-gray-100 bg-[#F8F9FB] flex items-center justify-between">
             <div className="min-w-0">
-              <p className="text-xs font-semibold text-zinc-900 truncate">
+              <p className="text-xs font-bold text-[#191919] truncate">
                 {user?.name || 'Visitante'}
               </p>
-              <p className="text-[10px] text-zinc-400 truncate">{currentMeta.roleType}</p>
+              <p className="text-[10px] text-gray-400 truncate">{currentMeta.roleType}</p>
             </div>
             {user && (
               <button
@@ -752,10 +769,10 @@ export default function Layout() {
                   logout()
                   setMobileMenuOpen(false)
                 }}
-                className="p-1.5 rounded-md text-zinc-400 hover:text-zinc-900 transition-colors"
+                className="p-2 rounded-xl text-gray-400 hover:text-red-600 transition-colors"
                 title="Sair"
               >
-                <LogOut className="w-4 h-4" strokeWidth={1.75} />
+                <LogOut className="w-4 h-4" strokeWidth={2} />
               </button>
             )}
           </div>
@@ -763,9 +780,10 @@ export default function Layout() {
       </Sheet>
 
       {/* =========================================================================
-          MOBILE BOTTOM NAVIGATION — Modern SaaS Tab Bar
+          MOBILE BOTTOM NAVIGATION — Nubank App Style Bottom Bar
+          Clean floating-like bar with rounded icons and active purple accent
           ========================================================================= */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-zinc-200 py-1 px-2 z-30 flex items-center justify-around safe-bottom shadow-lg">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-100 py-1.5 px-3 z-30 flex items-center justify-around safe-bottom shadow-lg shadow-black/5">
         {navItems.map((item) => {
           const active = location.pathname === item.path
           const Icon = item.icon
@@ -773,23 +791,22 @@ export default function Layout() {
             <Link
               key={item.path}
               to={item.path}
-              className="relative flex flex-col items-center justify-center py-1.5 px-2 min-w-[56px] select-none text-center"
+              className="relative flex flex-col items-center justify-center py-1 px-2 min-w-[58px] select-none text-center active:scale-95 transition-transform"
             >
               <div
-                className={`relative w-6 h-6 flex items-center justify-center transition-colors ${
-                  active ? 'text-zinc-900' : 'text-zinc-400'
+                className={`w-7 h-7 rounded-full flex items-center justify-center transition-all ${
+                  active ? 'bg-[#F7EEFD] text-[#820AD1]' : 'text-gray-400'
                 }`}
               >
-                <Icon className="w-4 h-4" strokeWidth={active ? 2.2 : 1.75} />
+                <Icon className="w-4 h-4" strokeWidth={active ? 2.4 : 1.75} />
               </div>
               <span
                 className={`text-[10px] tracking-tight transition-colors mt-0.5 ${
-                  active ? 'text-zinc-900 font-semibold' : 'text-zinc-500 font-normal'
+                  active ? 'text-[#820AD1] font-bold' : 'text-gray-500 font-medium'
                 }`}
               >
                 {item.label}
               </span>
-              {active && <span className="w-3.5 h-0.5 bg-zinc-900 mt-0.5 rounded-full" />}
             </Link>
           )
         })}

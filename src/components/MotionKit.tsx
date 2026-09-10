@@ -193,8 +193,43 @@ export function MotionCard({
 
   return (
     <motion.div
-      whileHover={{ y: -1, transition: { duration: 0.15 } }}
-      whileTap={{ scale: 0.99 }}
+      whileHover={{ y: -2, transition: { duration: 0.18, ease: 'easeOut' } }}
+      whileTap={{ scale: 0.985 }}
+      onClick={onClick}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  )
+}
+
+/**
+ * Tactile pill button wrapper with Nubank-style scale feedback
+ */
+export function TactilePill({
+  children,
+  className = '',
+  onClick,
+}: {
+  children: React.ReactNode
+  className?: string
+  onClick?: () => void
+}) {
+  const shouldReduceMotion = useReducedMotion()
+
+  if (shouldReduceMotion) {
+    return (
+      <div onClick={onClick} className={className}>
+        {children}
+      </div>
+    )
+  }
+
+  return (
+    <motion.div
+      whileTap={{ scale: 0.94 }}
+      whileHover={{ scale: 1.02 }}
+      transition={{ duration: 0.12 }}
       onClick={onClick}
       className={className}
     >

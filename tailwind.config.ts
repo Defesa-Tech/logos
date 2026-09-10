@@ -31,6 +31,15 @@ export default {
         display: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
       },
       colors: {
+        nubank: {
+          DEFAULT: '#820AD1',
+          hover: '#7008B7',
+          dark: '#1A1A2E',
+          purpleDark: '#190326',
+          light: '#F7EEFD',
+          surface: '#F5F6F8',
+          gray: '#F0F1F5',
+        },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
@@ -76,7 +85,9 @@ export default {
         },
       },
       borderRadius: {
-        xl: '0.75rem',
+        '3xl': '1.75rem',
+        '2xl': '1.25rem',
+        xl: '1rem',
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
@@ -84,8 +95,10 @@ export default {
       boxShadow: {
         xs: '0 1px 2px 0 rgba(0, 0, 0, 0.04)',
         subtle: '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03)',
-        card: '0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.02)',
-        'card-hover': '0 4px 14px -2px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.03)',
+        card: '0 2px 8px -2px rgba(26, 26, 46, 0.04), 0 1px 3px 0 rgba(26, 26, 46, 0.02)',
+        'card-hover':
+          '0 10px 28px -6px rgba(130, 10, 209, 0.1), 0 4px 10px -2px rgba(0, 0, 0, 0.04)',
+        nu: '0 4px 20px -4px rgba(130, 10, 209, 0.12)',
       },
     },
   },

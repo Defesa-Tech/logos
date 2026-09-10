@@ -7,52 +7,53 @@
 
 @layer base {
   :root {
-    /* Modern Neutral SaaS Palette:
-       Clean, crisp neutral background: #FAFAFA (zinc-50)
-       Pure white surface cards: #FFFFFF
-       Crisp text: #18181B (zinc-900) and #09090B (zinc-950)
-       Borders: #E4E4E7 (zinc-200)
-       Muted elements: #F4F4F5 (zinc-100), text: #71717A (zinc-500)
-       Accent: subtle gold #C5A046 / warm amber for active pips only
+    /* Nubank-inspired Palette:
+       Vibrant iconic Nubank purple: #820AD1 (hsl 276, 91%, 43%)
+       Deep dark purple hero: #1A1A2E / #190326
+       Warm soft off-white background: #F5F6F8 / #F4F5F7
+       Pure white surface cards with soft shadow: #FFFFFF
+       Crisp text: #111111 (gray-900) and muted #6B7280 (gray-500)
+       Borders: #E9ECEF / #E5E7EB
+       Pill buttons & rounded-2xl / rounded-3xl cards
     */
-    --background: 0 0% 98%; /* #FAFAFA */
-    --foreground: 240 10% 3.9%; /* #09090B */
+    --background: 220 14% 97%; /* #F5F6F8 warm soft gray */
+    --foreground: 0 0% 10%; /* #191919 */
 
     --card: 0 0% 100%; /* #FFFFFF */
-    --card-foreground: 240 10% 3.9%;
+    --card-foreground: 0 0% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
+    --popover-foreground: 0 0% 10%;
 
-    --primary: 240 5.9% 10%; /* #18181B */
-    --primary-foreground: 0 0% 98%;
+    --primary: 276 91% 43%; /* #820AD1 Iconic Nubank Purple */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 4.8% 95.9%; /* #F4F4F5 */
-    --secondary-foreground: 240 5.9% 10%;
+    --secondary: 276 35% 96%; /* #F7EEFD Soft lilac tint */
+    --secondary-foreground: 276 80% 36%; /* #7A08C6 */
 
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%; /* #71717A */
+    --muted: 220 13% 94%; /* #EDEFF2 */
+    --muted-foreground: 220 9% 46%; /* #71767E */
 
-    --accent: 42 60% 48%; /* #C5A046 - fine active accent */
-    --accent-foreground: 240 5.9% 10%;
+    --accent: 276 91% 43%; /* #820AD1 */
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 240 5.9% 90%; /* #E4E4E7 (zinc-200) */
-    --input: 240 5.9% 90%;
-    --ring: 240 5.9% 10%;
+    --border: 220 13% 91%; /* #E4E7EC */
+    --input: 220 13% 91%;
+    --ring: 276 91% 43%;
 
-    --radius: 0.75rem; /* 12px rounded-xl */
+    --radius: 1rem; /* 16px default base for cards/pills */
 
-    --sidebar-background: 240 5.9% 10%; /* #18181B */
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 42 60% 48%;
+    --sidebar-background: 0 0% 100%; /* Crisp white desktop sidebar */
+    --sidebar-foreground: 0 0% 12%;
+    --sidebar-primary: 276 91% 43%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 240 4.9% 83.9%;
+    --sidebar-accent: 276 40% 97%;
+    --sidebar-accent-foreground: 276 91% 40%;
+    --sidebar-border: 220 13% 92%;
+    --sidebar-ring: 276 91% 43%;
   }
 
   body {
@@ -63,8 +64,8 @@
       'Segoe UI',
       Roboto,
       sans-serif;
-    background-color: #fafafa;
-    color: #18181b;
+    background-color: #f5f6f8;
+    color: #191919;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     letter-spacing: -0.011em;
@@ -103,35 +104,80 @@
     letter-spacing: -0.03em;
   }
 
-  /* SaaS Card Surface */
-  .saas-card {
+  /* Nubank Card Surface */
+  .nu-card {
     background-color: #ffffff;
-    border: 1px solid #e4e4e7;
-    border-radius: 0.75rem;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    border-radius: 1.25rem; /* rounded-2xl */
+    box-shadow:
+      0 2px 8px -2px rgba(26, 26, 46, 0.04),
+      0 1px 3px 0 rgba(26, 26, 46, 0.02);
     transition:
-      border-color 0.15s ease,
-      box-shadow 0.15s ease,
-      transform 0.15s ease;
+      box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .saas-card-hover:hover {
-    border-color: #d4d4d8;
-    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.06);
+  .nu-card-hover:hover {
+    box-shadow:
+      0 8px 24px -4px rgba(130, 10, 209, 0.08),
+      0 2px 6px -1px rgba(0, 0, 0, 0.04);
   }
 
-  /* Linear-style table header */
-  .table-header-saas {
-    font-size: 11px;
+  /* Nubank circular action button (Pix / Transferir style) */
+  .nu-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    text-decoration: none;
+    user-select: none;
+  }
+
+  .nu-action-circle {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 9999px;
+    background-color: #f0f1f5;
+    color: #191919;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .nu-action-btn:hover .nu-action-circle,
+  .nu-action-btn:active .nu-action-circle {
+    background-color: #e2e4eb;
+    transform: scale(0.96);
+  }
+
+  .nu-action-label {
+    font-size: 0.75rem;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #71717a;
+    color: #191919;
+    text-align: center;
+    letter-spacing: -0.01em;
   }
 
-  /* Subtle gold accent */
-  .gold-pip {
-    background-color: #c5a046;
+  /* Nubank list item (extrato style) */
+  .nu-list-item {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 0.875rem 1rem;
+    border-radius: 1rem;
+    transition:
+      background-color 0.15s ease,
+      transform 0.15s ease;
+    cursor: pointer;
+  }
+
+  .nu-list-item:hover {
+    background-color: #f8f9fb;
+  }
+
+  .nu-list-item:active {
+    transform: scale(0.99);
   }
 
   /* Safe area for mobile viewport bottom */

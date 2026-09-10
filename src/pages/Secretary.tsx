@@ -148,56 +148,56 @@ export default function Secretary() {
   }
 
   return (
-    <PageTransition className="space-y-6 sm:space-y-8">
+    <PageTransition className="space-y-6 sm:space-y-8 max-w-6xl mx-auto">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-zinc-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
         <div>
-          <div className="flex items-center gap-2 text-[11px] font-medium text-zinc-500 mb-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-zinc-900" />
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#820AD1] mb-1">
+            <span className="w-2 h-2 rounded-full bg-[#820AD1]" />
             <span>Gestão Institucional</span>
-            <span className="text-zinc-300">/</span>
+            <span className="text-gray-300">/</span>
             <span>{invites.filter((i) => !i.used).length} convites pendentes</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191919]">
             Secretaria & Acessos
           </h1>
-          <p className="text-xs sm:text-sm text-zinc-500 mt-1 max-w-2xl font-normal">
+          <p className="text-xs sm:text-sm text-gray-500 mt-1 max-w-2xl font-normal">
             Geração de links de convite por e-mail com vinculação direta de papéis ministeriais.
           </p>
         </div>
 
         <Button
           onClick={() => setDialogOpen(true)}
-          className="bg-zinc-900 hover:bg-zinc-800 text-white text-xs h-9 px-4 rounded-lg font-medium shadow-xs cursor-pointer self-start sm:self-auto"
+          className="bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-10 px-5 rounded-full font-bold shadow-md shadow-[#820AD1]/20 cursor-pointer self-start sm:self-auto active:scale-95 transition-all"
         >
-          <Plus className="w-3.5 h-3.5 mr-1.5" strokeWidth={2} />
+          <Plus className="w-4 h-4 mr-1.5" strokeWidth={2.5} />
           Gerar Novo Convite
         </Button>
       </div>
 
-      {/* Modern SaaS Table Container */}
-      <div className="bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-xs">
+      {/* Nubank Rounded Table Container */}
+      <div className="bg-white border border-gray-100 rounded-3xl overflow-hidden shadow-sm">
         <table className="w-full text-left text-xs">
-          <thead className="bg-zinc-50/70 border-b border-zinc-200 text-zinc-500 uppercase text-[11px] font-semibold tracking-wider">
+          <thead className="bg-[#F8F9FB] border-b border-gray-100 text-gray-400 uppercase text-[10px] font-bold tracking-wider">
             <tr>
-              <th className="py-3 px-4">E-mail / Destinatário</th>
-              <th className="py-3 px-4">Papel Atribuído</th>
-              <th className="py-3 px-4">Pessoa Vinculada</th>
-              <th className="py-3 px-4">Status</th>
-              <th className="py-3 px-4">Criado em</th>
-              <th className="py-3 px-4 text-right">Ação</th>
+              <th className="py-3.5 px-5">E-mail / Destinatário</th>
+              <th className="py-3.5 px-4">Papel Atribuído</th>
+              <th className="py-3.5 px-4">Pessoa Vinculada</th>
+              <th className="py-3.5 px-4">Status</th>
+              <th className="py-3.5 px-4">Criado em</th>
+              <th className="py-3.5 px-5 text-right">Ação</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-100">
+          <tbody className="divide-y divide-gray-100">
             {loading ? (
               <tr>
-                <td colSpan={6} className="text-center py-10 text-zinc-400">
+                <td colSpan={6} className="text-center py-10 text-gray-400">
                   Carregando convites...
                 </td>
               </tr>
             ) : invites.length === 0 ? (
               <tr>
-                <td colSpan={6} className="text-center py-12 text-zinc-400">
+                <td colSpan={6} className="text-center py-12 text-gray-400">
                   Nenhum convite emitido até o momento.
                 </td>
               </tr>
@@ -206,40 +206,40 @@ export default function Secretary() {
                 const linkedPerson = persons.find((p) => p.id === inv.person)
 
                 return (
-                  <tr key={inv.id} className="hover:bg-zinc-50/80 transition-colors">
+                  <tr key={inv.id} className="hover:bg-[#F8F9FB] transition-colors">
                     {/* Email */}
-                    <td className="py-3 px-4">
-                      <p className="font-semibold text-zinc-900">{inv.email}</p>
-                      <p className="text-[11px] text-zinc-400 font-mono mt-0.5">
+                    <td className="py-3.5 px-5">
+                      <p className="font-bold text-[#191919]">{inv.email}</p>
+                      <p className="text-[11px] text-gray-400 font-mono mt-0.5">
                         Token: {inv.token}
                       </p>
                     </td>
 
                     {/* Role */}
-                    <td className="py-3 px-4">
-                      <span className="text-[10px] font-medium uppercase px-2 py-0.5 rounded-md border border-zinc-200 bg-zinc-50 text-zinc-700">
+                    <td className="py-3.5 px-4">
+                      <span className="text-[10px] font-bold uppercase px-2.5 py-1 rounded-full bg-[#F7EEFD] text-[#820AD1]">
                         {roleLabels[inv.role] || inv.role}
                       </span>
                     </td>
 
                     {/* Person */}
-                    <td className="py-3 px-4 text-zinc-600">
+                    <td className="py-3.5 px-4 text-gray-600">
                       {linkedPerson ? (
-                        <span className="font-medium text-zinc-900">{linkedPerson.name}</span>
+                        <span className="font-semibold text-[#191919]">{linkedPerson.name}</span>
                       ) : (
-                        <span className="text-zinc-400 italic">Livre (sem cadastro prévio)</span>
+                        <span className="text-gray-400 italic">Livre (sem cadastro prévio)</span>
                       )}
                     </td>
 
                     {/* Status */}
-                    <td className="py-3 px-4">
+                    <td className="py-3.5 px-4">
                       {inv.used ? (
-                        <span className="inline-flex items-center gap-1 text-[11px] text-zinc-400 font-medium">
+                        <span className="inline-flex items-center gap-1 text-[11px] text-emerald-600 font-bold bg-emerald-50 px-2.5 py-0.5 rounded-full">
                           <Check className="w-3 h-3 text-emerald-600" />
                           Resgatado
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 text-[11px] text-amber-600 font-medium">
+                        <span className="inline-flex items-center gap-1 text-[11px] text-amber-700 font-bold bg-amber-50 px-2.5 py-0.5 rounded-full">
                           <Clock className="w-3 h-3" />
                           Pendente
                         </span>
@@ -247,27 +247,27 @@ export default function Secretary() {
                     </td>
 
                     {/* Created */}
-                    <td className="py-3 px-4 text-zinc-400 text-[11px]">
+                    <td className="py-3.5 px-4 text-gray-400 text-[11px]">
                       {new Date(inv.created).toLocaleDateString('pt-BR')}
                     </td>
 
                     {/* Actions */}
-                    <td className="py-3 px-4 text-right">
-                      <div className="flex items-center justify-end gap-1">
+                    <td className="py-3.5 px-5 text-right">
+                      <div className="flex items-center justify-end gap-1.5">
                         {!inv.used && (
                           <Button
                             size="sm"
                             variant="ghost"
                             onClick={() => handleCopyLink(inv.token, inv.id)}
-                            className="h-7 px-2 text-xs text-zinc-700 hover:text-zinc-900 hover:bg-zinc-100"
+                            className="h-8 px-3 text-xs text-[#820AD1] hover:bg-[#F7EEFD] rounded-full font-bold active:scale-95"
                           >
                             {copiedId === inv.id ? (
                               <span className="text-emerald-600 flex items-center gap-1">
-                                <Check className="w-3 h-3" /> Copiado
+                                <Check className="w-3.5 h-3.5" /> Copiado
                               </span>
                             ) : (
                               <span className="flex items-center gap-1">
-                                <Copy className="w-3 h-3 text-zinc-400" /> Copiar link
+                                <Copy className="w-3.5 h-3.5 text-[#820AD1]" /> Copiar link
                               </span>
                             )}
                           </Button>
@@ -276,7 +276,7 @@ export default function Secretary() {
                           size="sm"
                           variant="ghost"
                           onClick={() => handleRevokeInvite(inv.id)}
-                          className="h-7 px-2 text-xs text-zinc-400 hover:text-red-600 hover:bg-red-50"
+                          className="h-8 px-2.5 text-xs text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full font-bold"
                         >
                           Revogar
                         </Button>
@@ -292,16 +292,19 @@ export default function Secretary() {
 
       {/* CREATE INVITE DIALOG */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-md bg-white rounded-xl border-zinc-200 shadow-xl">
-          <DialogHeader className="border-b border-zinc-100 pb-3">
-            <DialogTitle className="text-xl font-semibold text-zinc-900">
+        <DialogContent className="sm:max-w-md bg-white rounded-3xl border-gray-100 shadow-2xl p-6 sm:p-8">
+          <DialogHeader className="border-b border-gray-100 pb-3">
+            <div className="w-10 h-10 rounded-2xl bg-[#820AD1] text-white flex items-center justify-center font-bold mb-1">
+              L
+            </div>
+            <DialogTitle className="text-xl font-bold text-[#191919]">
               Gerar Convite de Acesso
             </DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleCreateInvite} className="space-y-4 pt-2 text-xs">
             <div className="space-y-1">
-              <Label htmlFor="inv-email" className="font-medium text-zinc-700">
+              <Label htmlFor="inv-email" className="font-semibold text-gray-700">
                 E-mail do Convidado *
               </Label>
               <Input
@@ -311,12 +314,12 @@ export default function Secretary() {
                 value={inviteEmail}
                 onChange={(e) => setInviteEmail(e.target.value)}
                 placeholder="convidado@exemplo.com"
-                className="h-9 rounded-lg bg-zinc-50 border-zinc-200 focus:bg-white"
+                className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
               />
             </div>
 
             <div className="space-y-1">
-              <Label htmlFor="inv-role" className="font-medium text-zinc-700">
+              <Label htmlFor="inv-role" className="font-semibold text-gray-700">
                 Papel a Conceder
               </Label>
               <Select
@@ -327,11 +330,11 @@ export default function Secretary() {
               >
                 <SelectTrigger
                   id="inv-role"
-                  className="h-9 rounded-lg bg-zinc-50 border-zinc-200 focus:bg-white"
+                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
                 >
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-white rounded-lg shadow-lg">
+                <SelectContent className="bg-white rounded-2xl shadow-xl border-gray-100">
                   <SelectItem value="member">Membro</SelectItem>
                   <SelectItem value="leader">Líder de Grupo</SelectItem>
                   <SelectItem value="pastor">Pastor</SelectItem>
@@ -341,17 +344,17 @@ export default function Secretary() {
             </div>
 
             <div className="space-y-1">
-              <Label htmlFor="inv-person" className="font-medium text-zinc-700">
+              <Label htmlFor="inv-person" className="font-semibold text-gray-700">
                 Vincular a Cadastro Existente (Opcional)
               </Label>
               <Select value={invitePersonId} onValueChange={setInvitePersonId}>
                 <SelectTrigger
                   id="inv-person"
-                  className="h-9 rounded-lg bg-zinc-50 border-zinc-200 focus:bg-white"
+                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
                 >
                   <SelectValue placeholder="Selecione se já houver registro" />
                 </SelectTrigger>
-                <SelectContent className="bg-white rounded-lg max-h-56 shadow-lg">
+                <SelectContent className="bg-white rounded-2xl shadow-xl border-gray-100 max-h-56">
                   <SelectItem value="none">Criar/vincular posteriormente</SelectItem>
                   {persons.map((p) => (
                     <SelectItem key={p.id} value={p.id}>
@@ -365,7 +368,7 @@ export default function Secretary() {
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-zinc-900 hover:bg-zinc-800 text-white text-xs h-9 rounded-lg font-medium shadow-xs"
+              className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all"
             >
               {isSubmitting ? 'Gerando...' : 'Criar Link de Convite'}
             </Button>

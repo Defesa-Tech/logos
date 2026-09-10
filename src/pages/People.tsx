@@ -239,11 +239,11 @@ export default function People() {
   }
 
   const statusBadgeStyle: Record<PersonStatus, string> = {
-    visitor: 'bg-zinc-100 text-zinc-700 border-zinc-200',
-    attender: 'bg-blue-50 text-blue-700 border-blue-200',
-    member: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    leader: 'bg-purple-50 text-purple-700 border-purple-200',
-    pastor: 'bg-zinc-900 text-white border-zinc-900',
+    visitor: 'bg-purple-50 text-[#820AD1] border-purple-100',
+    attender: 'bg-blue-50 text-blue-700 border-blue-100',
+    member: 'bg-emerald-50 text-emerald-700 border-emerald-100',
+    leader: 'bg-[#F7EEFD] text-[#820AD1] font-bold border-purple-200',
+    pastor: 'bg-[#190326] text-white border-transparent',
   }
 
   const familyRoleLabels: Record<FamilyRole, string> = {
@@ -260,22 +260,22 @@ export default function People() {
   }
 
   return (
-    <PageTransition className="space-y-6 sm:space-y-8">
+    <PageTransition className="space-y-6 sm:space-y-8 max-w-6xl mx-auto">
       {/* =========================================================================
-          TOP HEADER — Modern SaaS Style
+          TOP HEADER — Nubank Style Header
           ========================================================================= */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-zinc-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
         <div>
-          <div className="flex items-center gap-2 text-[11px] font-medium text-zinc-500 mb-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-zinc-900" />
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#820AD1] mb-1">
+            <span className="w-2 h-2 rounded-full bg-[#820AD1]" />
             <span>Membros & Visitantes</span>
-            <span className="text-zinc-300">/</span>
+            <span className="text-gray-300">/</span>
             <span>{visiblePersons.length} cadastros</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191919]">
             Pessoas & Membresia
           </h1>
-          <p className="text-xs sm:text-sm text-zinc-500 mt-1 max-w-2xl font-normal">
+          <p className="text-xs sm:text-sm text-gray-500 mt-1 max-w-2xl font-normal">
             {canAccessAll
               ? 'Diretório completo de membros, líderes, frequentadores e novos visitantes acolhidos.'
               : isLeader
@@ -287,43 +287,43 @@ export default function People() {
         {canAccessAll && (
           <Button
             onClick={openCreateDialog}
-            className="bg-zinc-900 hover:bg-zinc-800 text-white text-xs h-9 px-4 rounded-lg font-medium shadow-xs self-start sm:self-auto cursor-pointer"
+            className="bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-10 px-5 rounded-full font-bold shadow-md shadow-[#820AD1]/20 self-start sm:self-auto cursor-pointer active:scale-95 transition-all"
           >
-            <Plus className="w-3.5 h-3.5 mr-1.5" strokeWidth={2} />
+            <Plus className="w-4 h-4 mr-1.5" strokeWidth={2.5} />
             Cadastrar Pessoa
           </Button>
         )}
       </div>
 
       {/* =========================================================================
-          FILTER TOOLBAR — Modern Linear / Notion search and pill filters
+          FILTER TOOLBAR — Nubank Rounded Search and Pill Filters
           ========================================================================= */}
       <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
         {/* Search Input */}
         <div className="relative w-full sm:max-w-xs">
           <Search
-            className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
-            strokeWidth={1.75}
+            className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
+            strokeWidth={2}
           />
           <Input
             type="text"
             placeholder="Buscar por nome, telefone ou e-mail..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-8 pr-7 text-xs h-9 rounded-lg bg-white border-zinc-200 focus:border-zinc-900 focus:ring-0 placeholder:text-zinc-400 shadow-xs"
+            className="pl-9 pr-8 text-xs h-10 rounded-full bg-white border-gray-200 focus:border-[#820AD1] focus:ring-1 focus:ring-[#820AD1] placeholder:text-gray-400 shadow-xs"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 cursor-pointer"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 cursor-pointer"
             >
-              <X className="w-3.5 h-3.5" strokeWidth={1.75} />
+              <X className="w-4 h-4" strokeWidth={2} />
             </button>
           )}
         </div>
 
-        {/* Status Filter Underline Tabs */}
-        <div className="flex items-center gap-1 overflow-x-auto pb-1 no-scrollbar border-b sm:border-b-0 border-zinc-200">
+        {/* Status Filter Pill Tabs */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
           {[
             { id: 'all', label: 'Todos' },
             { id: 'visitor', label: 'Visitantes' },
@@ -337,10 +337,10 @@ export default function People() {
               <button
                 key={st.id}
                 onClick={() => setStatusFilter(st.id)}
-                className={`text-xs px-3 py-1.5 font-medium whitespace-nowrap transition-colors cursor-pointer rounded-lg ${
+                className={`text-xs px-3.5 py-1.5 font-bold whitespace-nowrap transition-all cursor-pointer rounded-full active:scale-95 ${
                   active
-                    ? 'bg-zinc-900 text-white font-semibold shadow-xs'
-                    : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100'
+                    ? 'bg-[#820AD1] text-white shadow-sm shadow-[#820AD1]/25'
+                    : 'bg-white text-gray-600 hover:text-[#820AD1] hover:bg-[#F7EEFD] border border-gray-200'
                 }`}
               >
                 {st.label}
@@ -351,31 +351,30 @@ export default function People() {
       </div>
 
       {/* =========================================================================
-          MODERN SAAS TABLE (Desktop & Tablet)
-          Linear-style: 11px uppercase header, subtle hover row, rounded-xl container
+          NUBANK DESKTOP LIST / TABLE (Rounded 3xl Container, Circular Avatars)
           ========================================================================= */}
-      <div className="hidden md:block bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-xs">
+      <div className="hidden md:block bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100">
         <table className="w-full text-left text-xs">
-          <thead className="bg-zinc-50/70 border-b border-zinc-200 text-zinc-500 uppercase text-[11px] font-semibold tracking-wider">
+          <thead className="bg-[#F8F9FB] border-b border-gray-100 text-gray-400 uppercase text-[10px] font-bold tracking-wider">
             <tr>
-              <th className="py-3 px-4">Nome Completo</th>
-              <th className="py-3 px-4">Papel / Estágio</th>
-              <th className="py-3 px-4">Contato</th>
-              <th className="py-3 px-4">Núcleo Familiar</th>
-              <th className="py-3 px-4">Jornada Logos</th>
-              <th className="py-3 px-4 text-right">Ação</th>
+              <th className="py-3.5 px-5">Pessoa</th>
+              <th className="py-3.5 px-4">Papel / Estágio</th>
+              <th className="py-3.5 px-4">Contato</th>
+              <th className="py-3.5 px-4">Núcleo Familiar</th>
+              <th className="py-3.5 px-4">Marcos na Igreja</th>
+              <th className="py-3.5 px-5 text-right">Ação</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-100">
+          <tbody className="divide-y divide-gray-100">
             {loading ? (
               <tr>
-                <td colSpan={6} className="text-center py-10 text-zinc-400">
+                <td colSpan={6} className="text-center py-10 text-gray-400">
                   Carregando registros...
                 </td>
               </tr>
             ) : visiblePersons.length === 0 ? (
               <tr>
-                <td colSpan={6} className="text-center py-12 text-zinc-400">
+                <td colSpan={6} className="text-center py-12 text-gray-400">
                   Nenhum registro encontrado com os critérios selecionados.
                 </td>
               </tr>
@@ -386,28 +385,35 @@ export default function People() {
                 return (
                   <tr
                     key={person.id}
-                    className="hover:bg-zinc-50/80 transition-colors cursor-pointer group"
+                    className="hover:bg-[#F8F9FB] transition-colors cursor-pointer group"
                     onClick={() => {
                       setSelectedPerson(person)
                       setSheetOpen(true)
                     }}
                   >
-                    {/* Name */}
-                    <td className="py-3 px-4">
-                      <p className="font-semibold text-zinc-900 group-hover:text-zinc-950 transition-colors">
-                        {person.name}
-                      </p>
-                      <p className="text-[11px] text-zinc-400 mt-0.5">
-                        Cadastrado em {new Date(person.created).toLocaleDateString('pt-BR')}
-                      </p>
+                    {/* Name + Avatar */}
+                    <td className="py-3.5 px-5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-[#F7EEFD] text-[#820AD1] font-bold text-xs flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                          {person.name.slice(0, 2).toUpperCase()}
+                        </div>
+                        <div>
+                          <p className="font-bold text-[#191919] group-hover:text-[#820AD1] transition-colors">
+                            {person.name}
+                          </p>
+                          <p className="text-[11px] text-gray-400 mt-0.5">
+                            Desde {new Date(person.created).toLocaleDateString('pt-BR')}
+                          </p>
+                        </div>
+                      </div>
                     </td>
 
-                    {/* Status */}
-                    <td className="py-3 px-4">
+                    {/* Status Pill */}
+                    <td className="py-3.5 px-4">
                       <span
-                        className={`text-[10px] font-medium uppercase tracking-wider px-2 py-0.5 rounded-md border ${
+                        className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${
                           statusBadgeStyle[person.status] ||
-                          'bg-zinc-100 text-zinc-700 border-zinc-200'
+                          'bg-gray-100 text-gray-700 border-gray-200'
                         }`}
                       >
                         {statusLabel[person.status] || person.status}
@@ -415,72 +421,72 @@ export default function People() {
                     </td>
 
                     {/* Contact */}
-                    <td className="py-3 px-4 text-zinc-600 text-[11px]">
+                    <td className="py-3.5 px-4 text-gray-600 text-[11px]">
                       {person.whatsapp ? (
                         <div
                           onClick={(e) => {
                             e.stopPropagation()
                             handleOpenWhatsApp(person.whatsapp)
                           }}
-                          className="text-zinc-900 hover:underline cursor-pointer flex items-center gap-1 font-medium"
+                          className="text-[#820AD1] hover:underline cursor-pointer flex items-center gap-1 font-semibold"
                         >
-                          <Phone className="w-3 h-3 text-zinc-400" strokeWidth={1.75} />
+                          <Phone className="w-3 h-3 text-[#820AD1]" strokeWidth={2} />
                           <span>{person.whatsapp}</span>
                         </div>
                       ) : (
-                        <span className="text-zinc-400">Sem telefone</span>
+                        <span className="text-gray-400">Sem telefone</span>
                       )}
                       {person.email && (
-                        <p className="text-[11px] text-zinc-400 truncate max-w-[160px]">
+                        <p className="text-[11px] text-gray-400 truncate max-w-[160px]">
                           {person.email}
                         </p>
                       )}
                     </td>
 
                     {/* Family */}
-                    <td className="py-3 px-4">
+                    <td className="py-3.5 px-4">
                       {fam ? (
-                        <div className="flex items-baseline gap-1 text-zinc-700">
-                          <span className="font-medium text-zinc-900">{fam.name}</span>
+                        <div className="flex items-baseline gap-1 text-gray-700">
+                          <span className="font-semibold text-[#191919]">{fam.name}</span>
                           {person.family_role && (
-                            <span className="text-[11px] text-zinc-400">
+                            <span className="text-[11px] text-gray-400">
                               ({familyRoleLabels[person.family_role] || person.family_role})
                             </span>
                           )}
                         </div>
                       ) : (
-                        <span className="text-zinc-400 text-[11px]">—</span>
+                        <span className="text-gray-400 text-[11px]">—</span>
                       )}
                     </td>
 
                     {/* Journey Checklist Status */}
-                    <td className="py-3 px-4 text-[11px]">
+                    <td className="py-3.5 px-4 text-[11px]">
                       <div className="flex items-center gap-1.5">
                         <span
                           title="Classe Boas-Vindas"
-                          className={`w-2 h-2 rounded-full ${
-                            person.checklist_welcome_class ? 'bg-zinc-900' : 'bg-zinc-200'
+                          className={`w-2.5 h-2.5 rounded-full ${
+                            person.checklist_welcome_class ? 'bg-[#820AD1]' : 'bg-gray-200'
                           }`}
                         />
                         <span
                           title="Batismo"
-                          className={`w-2 h-2 rounded-full ${
-                            person.checklist_baptized ? 'bg-zinc-900' : 'bg-zinc-200'
+                          className={`w-2.5 h-2.5 rounded-full ${
+                            person.checklist_baptized ? 'bg-[#820AD1]' : 'bg-gray-200'
                           }`}
                         />
                         <span
                           title="Pequeno Grupo"
-                          className={`w-2 h-2 rounded-full ${
-                            person.checklist_small_group ? 'bg-zinc-900' : 'bg-zinc-200'
+                          className={`w-2.5 h-2.5 rounded-full ${
+                            person.checklist_small_group ? 'bg-[#820AD1]' : 'bg-gray-200'
                           }`}
                         />
                         <span
                           title="Ministério"
-                          className={`w-2 h-2 rounded-full ${
-                            person.checklist_ministry ? 'bg-zinc-900' : 'bg-zinc-200'
+                          className={`w-2.5 h-2.5 rounded-full ${
+                            person.checklist_ministry ? 'bg-[#820AD1]' : 'bg-gray-200'
                           }`}
                         />
-                        <span className="text-[11px] text-zinc-400 ml-1">
+                        <span className="text-[11px] font-bold text-[#820AD1] ml-1">
                           {
                             [
                               person.checklist_welcome_class,
@@ -495,7 +501,7 @@ export default function People() {
                     </td>
 
                     {/* Actions */}
-                    <td className="py-3 px-4 text-right" onClick={(e) => e.stopPropagation()}>
+                    <td className="py-3.5 px-5 text-right" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center justify-end gap-1">
                         <Button
                           size="sm"
@@ -504,7 +510,7 @@ export default function People() {
                             setSelectedPerson(person)
                             setSheetOpen(true)
                           }}
-                          className="h-7 px-2 text-xs text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100"
+                          className="h-8 px-3 rounded-full text-xs text-[#820AD1] hover:bg-[#F7EEFD] font-bold"
                         >
                           Ver perfil &rarr;
                         </Button>
@@ -513,9 +519,9 @@ export default function People() {
                             size="sm"
                             variant="ghost"
                             onClick={() => openEditDialog(person)}
-                            className="h-7 w-7 p-0 text-zinc-400 hover:text-zinc-900"
+                            className="h-8 w-8 rounded-full p-0 text-gray-400 hover:text-[#820AD1] hover:bg-[#F7EEFD]"
                           >
-                            <Edit className="w-3.5 h-3.5" strokeWidth={1.75} />
+                            <Edit className="w-3.5 h-3.5" strokeWidth={2} />
                           </Button>
                         )}
                       </div>
@@ -529,13 +535,13 @@ export default function People() {
       </div>
 
       {/* =========================================================================
-          MOBILE VIEW: CLEAN SAAS LIST
+          MOBILE VIEW: NUBANK EXTRATO LIST
           ========================================================================= */}
-      <div className="md:hidden bg-white border border-zinc-200 rounded-xl divide-y divide-zinc-100 shadow-xs overflow-hidden">
+      <div className="md:hidden bg-white rounded-3xl divide-y divide-gray-100 shadow-sm border border-gray-100 overflow-hidden">
         {loading ? (
-          <p className="text-xs text-zinc-400 text-center py-8">Carregando...</p>
+          <p className="text-xs text-gray-400 text-center py-8">Carregando...</p>
         ) : visiblePersons.length === 0 ? (
-          <div className="p-8 text-center text-xs text-zinc-400">
+          <div className="p-8 text-center text-xs text-gray-400">
             Nenhuma pessoa cadastrada com os filtros vigentes.
           </div>
         ) : (
@@ -549,35 +555,30 @@ export default function People() {
                   setSelectedPerson(p)
                   setSheetOpen(true)
                 }}
-                className="p-3.5 space-y-1.5 hover:bg-zinc-50 transition-colors cursor-pointer"
+                className="nu-list-item"
               >
-                <div className="flex items-baseline justify-between gap-2">
-                  <div className="min-w-0">
-                    <h3 className="font-semibold text-xs text-zinc-900 truncate">{p.name}</h3>
-                    <p className="text-[11px] text-zinc-400 mt-0.5">
-                      {p.birth_date
-                        ? `Nasc: ${new Date(p.birth_date).toLocaleDateString('pt-BR')}`
-                        : 'Nascimento não inf.'}
-                    </p>
-                  </div>
-                  <span
-                    className={`text-[10px] font-medium uppercase px-2 py-0.5 rounded-md border flex-shrink-0 ${
-                      statusBadgeStyle[p.status] || 'bg-zinc-100 text-zinc-700 border-zinc-200'
-                    }`}
-                  >
-                    {statusLabel[p.status]}
-                  </span>
+                {/* Nubank Avatar Circle */}
+                <div className="w-10 h-10 rounded-full bg-[#F7EEFD] text-[#820AD1] flex items-center justify-center font-bold text-xs flex-shrink-0">
+                  {p.name.slice(0, 2).toUpperCase()}
                 </div>
 
-                <div className="flex items-center justify-between text-xs text-zinc-600 pt-0.5">
-                  {p.whatsapp ? (
-                    <span className="text-zinc-800 font-medium">{p.whatsapp}</span>
-                  ) : (
-                    <span className="text-zinc-400 text-[11px]">Sem telefone</span>
-                  )}
-                  {fam && <span className="text-zinc-500 text-[11px]">{fam.name}</span>}
-                  <ChevronRight className="w-3.5 h-3.5 text-zinc-400 ml-auto" />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-1">
+                    <h3 className="font-bold text-xs text-[#191919] truncate">{p.name}</h3>
+                    <span
+                      className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full flex-shrink-0 ${
+                        statusBadgeStyle[p.status] || 'bg-gray-100 text-gray-700'
+                      }`}
+                    >
+                      {statusLabel[p.status]}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-gray-400 mt-0.5">
+                    {p.whatsapp || p.email || 'Sem contato'} {fam ? `• ${fam.name}` : ''}
+                  </p>
                 </div>
+
+                <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
               </div>
             )
           })
@@ -585,31 +586,33 @@ export default function People() {
       </div>
 
       {/* =========================================================================
-          PERSON PROFILE SHEET — Clean SaaS Drawer
+          PERSON PROFILE SHEET — Nubank Style Drawer
           ========================================================================= */}
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-        <SheetContent className="w-full sm:max-w-md bg-white p-6 overflow-y-auto space-y-5 border-l border-zinc-200">
+        <SheetContent className="w-full sm:max-w-md bg-white p-6 sm:p-7 overflow-y-auto space-y-5 border-l border-gray-100 rounded-l-3xl">
           {selectedPerson && (
             <>
-              <SheetHeader className="border-b border-zinc-100 pb-4 text-left">
-                <div className="space-y-1">
-                  <span className="text-[10px] uppercase font-semibold tracking-wider text-zinc-400">
-                    Prontuário Comunitário
-                  </span>
-                  <SheetTitle className="text-xl font-semibold text-zinc-900">
-                    {selectedPerson.name}
-                  </SheetTitle>
-                  <div className="flex items-center gap-2 pt-1 text-xs text-zinc-600">
-                    <span
-                      className={`px-2 py-0.5 rounded-md border text-[11px] font-medium ${
-                        statusBadgeStyle[selectedPerson.status]
-                      }`}
-                    >
-                      {statusLabel[selectedPerson.status]}
-                    </span>
-                    <span className="text-[11px] text-zinc-400">
-                      ID: {selectedPerson.id.slice(0, 8)}
-                    </span>
+              <SheetHeader className="border-b border-gray-100 pb-4 text-left">
+                <div className="space-y-2">
+                  <div className="w-14 h-14 rounded-full bg-[#820AD1] text-white flex items-center justify-center font-bold text-lg shadow-md shadow-[#820AD1]/20">
+                    {selectedPerson.name.slice(0, 2).toUpperCase()}
+                  </div>
+                  <div>
+                    <SheetTitle className="text-xl font-bold text-[#191919]">
+                      {selectedPerson.name}
+                    </SheetTitle>
+                    <div className="flex items-center gap-2 pt-1 text-xs">
+                      <span
+                        className={`px-2.5 py-0.5 rounded-full border text-[11px] font-bold ${
+                          statusBadgeStyle[selectedPerson.status]
+                        }`}
+                      >
+                        {statusLabel[selectedPerson.status]}
+                      </span>
+                      <span className="text-[11px] text-gray-400">
+                        ID: {selectedPerson.id.slice(0, 8)}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </SheetHeader>
@@ -618,126 +621,126 @@ export default function People() {
               {selectedPerson.whatsapp && (
                 <Button
                   onClick={() => handleOpenWhatsApp(selectedPerson.whatsapp)}
-                  className="w-full bg-zinc-900 hover:bg-zinc-800 text-white font-medium text-xs h-9 rounded-lg shadow-xs"
+                  className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white font-bold text-xs h-10 rounded-full shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all"
                 >
-                  <MessageSquare className="w-3.5 h-3.5 mr-2 text-zinc-300" strokeWidth={1.75} />
+                  <MessageSquare className="w-4 h-4 mr-2" strokeWidth={2} />
                   Conversar no WhatsApp
                 </Button>
               )}
 
               {/* Data Section */}
               <div className="space-y-4 text-xs">
-                <h4 className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+                <h4 className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
                   Dados de Contato
                 </h4>
-                <div className="grid grid-cols-2 gap-3 bg-zinc-50 p-4 rounded-xl border border-zinc-200/80">
+                <div className="grid grid-cols-2 gap-3 bg-[#F8F9FB] p-4 rounded-2xl border border-gray-100">
                   <div>
-                    <span className="text-zinc-400 block text-[10px] uppercase font-medium">
+                    <span className="text-gray-400 block text-[10px] uppercase font-bold">
                       WhatsApp
                     </span>
-                    <span className="font-medium text-zinc-900 mt-1 block">
+                    <span className="font-bold text-[#191919] mt-1 block">
                       {selectedPerson.whatsapp || 'Não informado'}
                     </span>
                   </div>
                   <div>
-                    <span className="text-zinc-400 block text-[10px] uppercase font-medium">
+                    <span className="text-gray-400 block text-[10px] uppercase font-bold">
                       E-mail
                     </span>
-                    <span className="font-medium text-zinc-900 mt-1 block truncate">
+                    <span className="font-bold text-[#191919] mt-1 block truncate">
                       {selectedPerson.email || 'Não informado'}
                     </span>
                   </div>
                   <div>
-                    <span className="text-zinc-400 block text-[10px] uppercase font-medium">
+                    <span className="text-gray-400 block text-[10px] uppercase font-bold">
                       Nascimento
                     </span>
-                    <span className="font-medium text-zinc-900 mt-1 block">
+                    <span className="font-bold text-[#191919] mt-1 block">
                       {selectedPerson.birth_date
                         ? new Date(selectedPerson.birth_date).toLocaleDateString('pt-BR')
                         : 'Não informada'}
                     </span>
                   </div>
                   <div>
-                    <span className="text-zinc-400 block text-[10px] uppercase font-medium">
+                    <span className="text-gray-400 block text-[10px] uppercase font-bold">
                       Origem
                     </span>
-                    <span className="font-medium text-zinc-900 mt-1 block truncate">
+                    <span className="font-bold text-[#191919] mt-1 block truncate">
                       {selectedPerson.how_met || 'Culto de Domingo'}
                     </span>
                   </div>
                 </div>
 
                 {/* Family Relationship */}
-                <h4 className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 pt-1">
+                <h4 className="text-[10px] font-bold uppercase tracking-wider text-gray-400 pt-1">
                   Núcleo Familiar
                 </h4>
-                <div className="p-4 bg-zinc-50 rounded-xl border border-zinc-200/80">
+                <div className="p-4 bg-[#F8F9FB] rounded-2xl border border-gray-100">
                   {selectedPerson.family ? (
                     <div className="space-y-1">
                       <div className="flex items-center justify-between">
-                        <span className="font-semibold text-zinc-900">
+                        <span className="font-bold text-[#191919]">
                           {families.find((f) => f.id === selectedPerson.family)?.name ||
                             selectedPerson.expand?.family?.name ||
                             'Família Cadastrada'}
                         </span>
-                        <span className="text-[10px] font-medium uppercase px-2 py-0.5 rounded-md border border-zinc-200 bg-white text-zinc-600">
+                        <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-white border border-gray-200 text-gray-700">
                           {familyRoleLabels[selectedPerson.family_role || 'other']}
                         </span>
                       </div>
-                      <p className="text-[11px] text-zinc-500">
+                      <p className="text-[11px] text-gray-500">
                         {families.find((f) => f.id === selectedPerson.family)?.address ||
                           'Endereço não cadastrado'}
                       </p>
                     </div>
                   ) : (
-                    <p className="text-zinc-400 text-xs italic">
+                    <p className="text-gray-400 text-xs italic">
                       Nenhum núcleo familiar associado ainda.
                     </p>
                   )}
                 </div>
 
                 {/* Journey Checklist */}
-                <h4 className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 pt-1">
+                <h4 className="text-[10px] font-bold uppercase tracking-wider text-gray-400 pt-1">
                   Jornada Logos (Marcos Bíblicos)
                 </h4>
-                <div className="space-y-2 bg-zinc-50 p-4 rounded-xl border border-zinc-200/80 text-xs">
-                  <div className="flex items-center justify-between py-1 border-b border-zinc-200/60">
-                    <span className="font-medium text-zinc-800">Classe de Boas-Vindas</span>
-                    <span className="text-[11px] font-medium">
+                <div className="space-y-2.5 bg-[#F8F9FB] p-4 rounded-2xl border border-gray-100 text-xs">
+                  <div className="flex items-center justify-between py-1 border-b border-gray-200/60">
+                    <span className="font-semibold text-gray-800">Classe de Boas-Vindas</span>
+                    <span>
                       {selectedPerson.checklist_welcome_class ? (
-                        <span className="text-emerald-600 font-semibold">● Concluído</span>
+                        <span className="text-emerald-600 font-bold">● Concluído</span>
                       ) : (
-                        <span className="text-zinc-400">○ Pendente</span>
+                        <span className="text-gray-400 font-medium">○ Pendente</span>
                       )}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between py-1 border-b border-zinc-200/60">
-                    <span className="font-medium text-zinc-800">Batismo Bíblico</span>
-                    <span className="text-[11px] font-medium">
+                  <div className="flex items-center justify-between py-1 border-b border-gray-200/60">
+                    <span className="font-semibold text-gray-800">Batismo Bíblico</span>
+                    <span>
                       {selectedPerson.checklist_baptized ? (
-                        <span className="text-emerald-600 font-semibold">● Concluído</span>
+                        <span className="text-emerald-600 font-bold">● Concluído</span>
                       ) : (
-                        <span className="text-zinc-400">○ Pendente</span>
+                        <span className="text-gray-400 font-medium">○ Pendente</span>
                       )}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between py-1 border-b border-zinc-200/60">
-                    <span className="font-medium text-zinc-800">Pequeno Grupo nos Lares</span>
-                    <span className="text-[11px] font-medium">
+                  <div className="flex items-center justify-between py-1 border-b border-gray-200/60">
+                    <span className="font-semibold text-gray-800">Pequeno Grupo nos Lares</span>
+                    <span>
                       {selectedPerson.checklist_small_group ? (
-                        <span className="text-emerald-600 font-semibold">● Concluído</span>
+                        <span className="text-emerald-600 font-bold">● Concluído</span>
                       ) : (
-                        <span className="text-zinc-400">○ Pendente</span>
+                        <span className="text-gray-400 font-medium">○ Pendente</span>
                       )}
                     </span>
                   </div>
                   <div className="flex items-center justify-between py-1">
-                    <span className="font-medium text-zinc-800">Ministério Ativo</span>
-                    <span className="text-[11px] font-medium">
+                    <span className="font-semibold text-gray-800">Ministério Ativo</span>
+                    <span>
                       {selectedPerson.checklist_ministry ? (
-                        <span className="text-emerald-600 font-semibold">● Concluído</span>
+                        <span className="text-emerald-600 font-bold">● Concluído</span>
                       ) : (
-                        <span className="text-zinc-400">○ Pendente</span>
+                        <span className="text-gray-400 font-medium">○ Pendente</span>
                       )}
                     </span>
                   </div>
@@ -746,10 +749,10 @@ export default function People() {
                 {/* Notes */}
                 {selectedPerson.notes && (
                   <>
-                    <h4 className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 pt-1">
+                    <h4 className="text-[10px] font-bold uppercase tracking-wider text-gray-400 pt-1">
                       Anotações Pastorais
                     </h4>
-                    <p className="p-3 bg-zinc-50 border border-zinc-200/80 rounded-xl text-zinc-700 text-xs leading-relaxed">
+                    <p className="p-3.5 bg-[#F8F9FB] border border-gray-100 rounded-2xl text-gray-700 text-xs leading-relaxed">
                       {selectedPerson.notes}
                     </p>
                   </>
@@ -757,23 +760,23 @@ export default function People() {
 
                 {/* Admin actions */}
                 {canAccessAll && (
-                  <div className="flex items-center justify-between pt-4 border-t border-zinc-100">
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => openEditDialog(selectedPerson)}
-                      className="text-xs h-8 rounded-lg border-zinc-200 text-zinc-800 font-medium"
+                      className="text-xs h-9 rounded-full border-gray-200 text-gray-800 font-bold"
                     >
-                      <Edit className="w-3.5 h-3.5 mr-1.5" strokeWidth={1.75} />
+                      <Edit className="w-3.5 h-3.5 mr-1.5" strokeWidth={2} />
                       Editar Registro
                     </Button>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDeletePerson(selectedPerson.id)}
-                      className="text-xs h-8 text-red-600 hover:text-red-700 hover:bg-red-50 font-medium"
+                      className="text-xs h-9 rounded-full text-red-600 hover:text-red-700 hover:bg-red-50 font-bold"
                     >
-                      <Trash2 className="w-3.5 h-3.5 mr-1.5" strokeWidth={1.75} />
+                      <Trash2 className="w-3.5 h-3.5 mr-1.5" strokeWidth={2} />
                       Excluir
                     </Button>
                   </div>
@@ -785,19 +788,22 @@ export default function People() {
       </Sheet>
 
       {/* =========================================================================
-          CREATE / EDIT DIALOG — Clean SaaS Modal
+          CREATE / EDIT DIALOG — Nubank Modal
           ========================================================================= */}
       <Dialog open={formDialogOpen} onOpenChange={setFormDialogOpen}>
-        <DialogContent className="sm:max-w-lg bg-white rounded-xl border-zinc-200 shadow-xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader className="border-b border-zinc-100 pb-3">
-            <DialogTitle className="text-xl font-semibold text-zinc-900">
+        <DialogContent className="sm:max-w-lg bg-white rounded-3xl border-gray-100 shadow-2xl max-h-[90vh] overflow-y-auto p-6 sm:p-8">
+          <DialogHeader className="border-b border-gray-100 pb-3">
+            <div className="w-10 h-10 rounded-2xl bg-[#820AD1] text-white flex items-center justify-center font-bold mb-1">
+              L
+            </div>
+            <DialogTitle className="text-xl font-bold text-[#191919]">
               {editingPersonId ? 'Editar Cadastro' : 'Novo Cadastro de Pessoa'}
             </DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleSavePerson} className="space-y-4 pt-2 text-xs">
             <div className="space-y-1">
-              <Label htmlFor="p-name" className="font-medium text-zinc-700">
+              <Label htmlFor="p-name" className="font-semibold text-gray-700">
                 Nome Completo *
               </Label>
               <Input
@@ -806,13 +812,13 @@ export default function People() {
                 value={formName}
                 onChange={(e) => setFormName(e.target.value)}
                 placeholder="Ex: Gabriel Martins"
-                className="h-9 rounded-lg bg-zinc-50 border-zinc-200 focus:bg-white"
+                className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
-                <Label htmlFor="p-whatsapp" className="font-medium text-zinc-700">
+                <Label htmlFor="p-whatsapp" className="font-semibold text-gray-700">
                   WhatsApp com DDD
                 </Label>
                 <Input
@@ -820,11 +826,11 @@ export default function People() {
                   value={formWhatsapp}
                   onChange={(e) => setFormWhatsapp(e.target.value)}
                   placeholder="(11) 98765-4321"
-                  className="h-9 rounded-lg bg-zinc-50 border-zinc-200 focus:bg-white"
+                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
                 />
               </div>
               <div className="space-y-1">
-                <Label htmlFor="p-birth" className="font-medium text-zinc-700">
+                <Label htmlFor="p-birth" className="font-semibold text-gray-700">
                   Data de Nascimento
                 </Label>
                 <Input
@@ -832,14 +838,14 @@ export default function People() {
                   type="date"
                   value={formBirthDate}
                   onChange={(e) => setFormBirthDate(e.target.value)}
-                  className="h-9 rounded-lg bg-zinc-50 border-zinc-200 focus:bg-white"
+                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
-                <Label htmlFor="p-email" className="font-medium text-zinc-700">
+                <Label htmlFor="p-email" className="font-semibold text-gray-700">
                   E-mail
                 </Label>
                 <Input
@@ -848,11 +854,11 @@ export default function People() {
                   value={formEmail}
                   onChange={(e) => setFormEmail(e.target.value)}
                   placeholder="gabriel@exemplo.com"
-                  className="h-9 rounded-lg bg-zinc-50 border-zinc-200 focus:bg-white"
+                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
                 />
               </div>
               <div className="space-y-1">
-                <Label htmlFor="p-status" className="font-medium text-zinc-700">
+                <Label htmlFor="p-status" className="font-semibold text-gray-700">
                   Estágio na Jornada
                 </Label>
                 <Select
@@ -861,11 +867,11 @@ export default function People() {
                 >
                   <SelectTrigger
                     id="p-status"
-                    className="h-9 rounded-lg bg-zinc-50 border-zinc-200 focus:bg-white"
+                    className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
                   >
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-white rounded-lg shadow-lg">
+                  <SelectContent className="bg-white rounded-2xl shadow-xl border-gray-100">
                     <SelectItem value="visitor">Visitante</SelectItem>
                     <SelectItem value="attender">Frequentador</SelectItem>
                     <SelectItem value="member">Membro</SelectItem>
@@ -877,19 +883,19 @@ export default function People() {
             </div>
 
             {/* Family Selection */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-zinc-100">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-gray-100">
               <div className="space-y-1">
-                <Label htmlFor="p-family" className="font-medium text-zinc-700">
+                <Label htmlFor="p-family" className="font-semibold text-gray-700">
                   Núcleo Familiar
                 </Label>
                 <Select value={formFamily} onValueChange={setFormFamily}>
                   <SelectTrigger
                     id="p-family"
-                    className="h-9 rounded-lg bg-zinc-50 border-zinc-200 focus:bg-white"
+                    className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
                   >
                     <SelectValue placeholder="Selecione a família" />
                   </SelectTrigger>
-                  <SelectContent className="bg-white rounded-lg shadow-lg">
+                  <SelectContent className="bg-white rounded-2xl shadow-xl border-gray-100">
                     <SelectItem value="none">Nenhum vínculo familiar</SelectItem>
                     {families.map((f) => (
                       <SelectItem key={f.id} value={f.id}>
@@ -900,7 +906,7 @@ export default function People() {
                 </Select>
               </div>
               <div className="space-y-1">
-                <Label htmlFor="p-role" className="font-medium text-zinc-700">
+                <Label htmlFor="p-role" className="font-semibold text-gray-700">
                   Papel no Lar
                 </Label>
                 <Select
@@ -910,11 +916,11 @@ export default function People() {
                 >
                   <SelectTrigger
                     id="p-role"
-                    className="h-9 rounded-lg bg-zinc-50 border-zinc-200 focus:bg-white"
+                    className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
                   >
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-white rounded-lg shadow-lg">
+                  <SelectContent className="bg-white rounded-2xl shadow-xl border-gray-100">
                     <SelectItem value="head">Cabeça / Responsável</SelectItem>
                     <SelectItem value="spouse">Cônjuge</SelectItem>
                     <SelectItem value="child">Filho(a)</SelectItem>
@@ -925,7 +931,7 @@ export default function People() {
             </div>
 
             <div className="space-y-1">
-              <Label htmlFor="p-notes" className="font-medium text-zinc-700">
+              <Label htmlFor="p-notes" className="font-semibold text-gray-700">
                 Histórico & Observações
               </Label>
               <Textarea
@@ -934,14 +940,14 @@ export default function People() {
                 value={formNotes}
                 onChange={(e) => setFormNotes(e.target.value)}
                 placeholder="Ex: Conheceu a igreja pelo culto de domingo, deseja participar da próxima classe..."
-                className="rounded-lg bg-zinc-50 border-zinc-200 focus:bg-white"
+                className="rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
               />
             </div>
 
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-zinc-900 hover:bg-zinc-800 text-white text-xs h-9 rounded-lg font-medium shadow-xs"
+              className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all"
             >
               {isSubmitting
                 ? 'Gravando...'
