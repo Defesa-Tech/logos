@@ -168,11 +168,11 @@ export default function Secretary() {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-serif-sacred font-bold text-[#2C3E50] flex items-center gap-2">
+          <h1 className="text-2xl font-serif-sacred font-bold text-[#1F2D3A] flex items-center gap-2">
             <Mail className="w-6 h-6 text-[#D4AF37]" />
             Secretaria & Emissão de Convites
           </h1>
@@ -184,17 +184,17 @@ export default function Secretary() {
 
         <Button
           onClick={() => setCreateOpen(true)}
-          className="bg-[#2C3E50] hover:bg-[#1E2B37] text-white text-xs font-semibold h-10 px-4 rounded-xl shadow-md self-start sm:self-auto active:scale-95 transition-all"
+          className="bg-[#1F2D3A] hover:bg-[#15202B] text-white text-xs font-semibold h-10 px-4 rounded-xl shadow-md self-start sm:self-auto active:scale-95 transition-all"
         >
           <Plus className="w-4 h-4 mr-1.5" />
           Gerar Novo Convite
         </Button>
       </div>
 
-      {/* Quick Info Banner */}
+      {/* Quick Info Banner with Modern Elevation */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <Card className="border-slate-200/90 bg-white shadow-sm rounded-2xl p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-50 text-[#D4AF37] flex items-center justify-center font-bold">
+        <Card className="border-slate-200/80 bg-white shadow-soft hover:shadow-elevated rounded-3xl p-4.5 flex items-center gap-3 transition-all duration-200">
+          <div className="w-11 h-11 rounded-2xl bg-amber-50 text-[#D4AF37] flex items-center justify-center font-bold shadow-sm">
             <Mail className="w-5 h-5" />
           </div>
           <div>
@@ -203,8 +203,8 @@ export default function Secretary() {
           </div>
         </Card>
 
-        <Card className="border-slate-200/90 bg-white shadow-sm rounded-2xl p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+        <Card className="border-slate-200/80 bg-white shadow-soft hover:shadow-elevated rounded-3xl p-4.5 flex items-center gap-3 transition-all duration-200">
+          <div className="w-11 h-11 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold shadow-sm">
             <Clock className="w-5 h-5" />
           </div>
           <div>
@@ -215,8 +215,8 @@ export default function Secretary() {
           </div>
         </Card>
 
-        <Card className="border-slate-200/90 bg-white shadow-sm rounded-2xl p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+        <Card className="border-slate-200/80 bg-white shadow-soft hover:shadow-elevated rounded-3xl p-4.5 flex items-center gap-3 transition-all duration-200">
+          <div className="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold shadow-sm">
             <UserCheck className="w-5 h-5" />
           </div>
           <div>
@@ -312,7 +312,7 @@ export default function Secretary() {
       {/* =========================================================================
           DESKTOP VIEW: RICH MANAGEMENT TABLE (Visible on >= md)
           ========================================================================= */}
-      <Card className="hidden md:block border-slate-200/90 bg-white shadow-sm rounded-2xl overflow-hidden">
+      <Card className="hidden md:block border-slate-200/90 bg-white shadow-soft rounded-3xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[10px]">

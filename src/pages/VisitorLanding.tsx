@@ -155,16 +155,16 @@ export default function VisitorLanding() {
 
   // Registration Landing Form
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col justify-between">
+    <div className="min-h-screen bg-[#F8FAFC] flex flex-col justify-between selection:bg-[#D4AF37]/30 selection:text-[#1F2D3A]">
       {/* Top Bar */}
-      <header className="px-6 py-4 bg-white/80 backdrop-blur border-b border-slate-200 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-[#D4AF37] to-[#F3E5AB] flex items-center justify-center text-[#2C3E50] shadow-sm">
-            <Compass className="w-5 h-5 stroke-[2.2]" />
+      <header className="px-6 py-4 bg-white/90 backdrop-blur-md border-b border-slate-200/80 flex items-center justify-between shadow-sm">
+        <Link to="/" className="flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#D4AF37] via-[#F7E7A9] to-[#C49E2C] flex items-center justify-center text-[#1F2D3A] shadow-md shadow-[#D4AF37]/20">
+            <Compass className="w-5 h-5 stroke-[2.3]" />
           </div>
-          <span className="font-serif-sacred text-xl font-bold text-[#2C3E50]">Logos</span>
+          <span className="font-serif-sacred text-2xl font-bold text-[#1F2D3A]">Logos</span>
         </Link>
-        <div className="flex items-center gap-1.5 text-xs text-slate-500">
+        <div className="flex items-center gap-1.5 text-xs text-slate-600 font-semibold bg-amber-50 px-3 py-1.5 rounded-full border border-amber-200">
           <QrCode className="w-4 h-4 text-[#D4AF37]" />
           <span>Cadastro de Visitante</span>
         </div>
@@ -227,7 +227,6 @@ export default function VisitorLanding() {
                   pastoral.
                 </p>
               </div>
-
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-1.5">
                   <Label htmlFor="v-name" className="text-xs font-semibold text-slate-700">
@@ -311,18 +310,18 @@ export default function VisitorLanding() {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-[#2C3E50] hover:bg-[#1E2B37] text-white font-semibold text-xs h-11 rounded-xl shadow-md transition-transform active:scale-[0.99]"
+                  className="w-full bg-[#1F2D3A] hover:bg-[#15202B] text-white text-xs h-11 rounded-2xl font-semibold shadow-lg shadow-slate-900/15 active:scale-[0.98] transition-all cursor-pointer"
                 >
                   {loading ? (
-                    'Enviando cadastro...'
+                    'Registrando...'
                   ) : (
                     <>
-                      <Send className="w-4 h-4 mr-2" />
-                      Enviar Cartão de Visitante
+                      <Send className="w-4 h-4 mr-2 text-[#D4AF37]" />
+                      Confirmar Presença e Boas-Vindas
                     </>
                   )}
                 </Button>
-              </form>
+              </form>{' '}
             </CardContent>
           </Card>
         </div>

@@ -109,13 +109,13 @@ export default function ClaimInvite() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col justify-between items-center px-4 py-8 md:py-16">
+    <div className="min-h-screen bg-[#F8FAFC] flex flex-col justify-between items-center px-4 py-8 md:py-16 selection:bg-[#D4AF37]/30 selection:text-[#1F2D3A]">
       {/* Top Header Logo */}
-      <div className="flex items-center gap-2 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#D4AF37] to-[#F3E5AB] flex items-center justify-center text-[#2C3E50] shadow-md">
-          <Compass className="w-6 h-6 stroke-[2.2]" />
+      <div className="flex items-center gap-2.5 mb-6">
+        <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#D4AF37] via-[#F7E7A9] to-[#C49E2C] flex items-center justify-center text-[#1F2D3A] shadow-md shadow-[#D4AF37]/25">
+          <Compass className="w-6 h-6 stroke-[2.3]" />
         </div>
-        <span className="font-serif-sacred text-2xl font-bold text-[#2C3E50]">Logos</span>
+        <span className="font-serif-sacred text-2xl font-bold text-[#1F2D3A]">Logos</span>
       </div>
 
       {/* Main Content */}
@@ -185,7 +185,6 @@ export default function ClaimInvite() {
                     required
                   />
                 </div>
-
                 <div className="space-y-1">
                   <Label htmlFor="c-email">E-mail de Acesso</Label>
                   <Input
@@ -197,7 +196,6 @@ export default function ClaimInvite() {
                     required
                   />
                 </div>
-
                 <div className="space-y-1">
                   <Label htmlFor="c-password">Defina sua Senha (mínimo 8 dígitos)</Label>
                   <Input
@@ -210,7 +208,6 @@ export default function ClaimInvite() {
                     minLength={8}
                   />
                 </div>
-
                 <div className="space-y-1">
                   <Label htmlFor="c-confirm">Confirme sua Senha</Label>
                   <Input
@@ -223,14 +220,13 @@ export default function ClaimInvite() {
                     minLength={8}
                   />
                 </div>
-
                 <Button
                   type="submit"
                   disabled={submitting}
-                  className="w-full bg-[#2C3E50] hover:bg-[#1E2B37] text-white font-semibold text-xs h-10 rounded-xl shadow-md transition-all mt-2"
+                  className="w-full bg-[#1F2D3A] hover:bg-[#15202B] text-white text-xs h-11 rounded-xl font-semibold shadow-md active:scale-95 transition-all cursor-pointer"
                 >
-                  {submitting ? 'Ativando sua conta...' : 'Ativar Minha Conta'}
-                </Button>
+                  {submitting ? 'Ativando credenciais...' : 'Concluir Cadastro e Acessar Logos'}
+                </Button>{' '}
               </form>
             </CardContent>
           </Card>

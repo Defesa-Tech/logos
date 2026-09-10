@@ -284,13 +284,13 @@ export default function People() {
   }
 
   return (
-    <div className="space-y-5 animate-fade-in">
+    <div className="space-y-6">
       {/* =========================================================================
           TOP HEADER
           ========================================================================= */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-serif-sacred font-bold text-[#2C3E50] flex items-center gap-2">
+          <h1 className="text-2xl font-serif-sacred font-bold text-[#1F2D3A] flex items-center gap-2">
             <Users className="w-6 h-6 text-[#D4AF37]" />
             Gestão de Pessoas
           </h1>
@@ -306,7 +306,7 @@ export default function People() {
         {canAccessAll && (
           <Button
             onClick={openCreateDialog}
-            className="bg-[#2C3E50] hover:bg-[#1E2B37] text-white text-xs font-semibold h-10 px-4 rounded-xl shadow-md self-start sm:self-auto active:scale-95 transition-all"
+            className="bg-[#1F2D3A] hover:bg-[#15202B] text-white text-xs font-semibold h-10 px-4 rounded-xl shadow-md self-start sm:self-auto active:scale-95 transition-all"
           >
             <Plus className="w-4 h-4 mr-1.5" />
             Cadastrar Pessoa
@@ -326,12 +326,12 @@ export default function People() {
             placeholder="Buscar por nome, fone ou e-mail..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 text-xs h-10 rounded-2xl bg-white border-slate-200/90 shadow-sm"
+            className="pl-9 text-xs h-10 rounded-2xl bg-white border-slate-200/90 shadow-soft focus:ring-2 focus:ring-[#D4AF37]/20"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 p-0.5"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 p-0.5 cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -351,10 +351,10 @@ export default function People() {
             <button
               key={st.id}
               onClick={() => setStatusFilter(st.id)}
-              className={`text-xs px-3.5 py-1.5 rounded-full font-semibold transition-all whitespace-nowrap flex-shrink-0 ${
+              className={`text-xs px-3.5 py-1.5 rounded-full font-semibold transition-all whitespace-nowrap flex-shrink-0 cursor-pointer ${
                 statusFilter === st.id
-                  ? 'bg-[#2C3E50] text-[#D4AF37] shadow-sm'
-                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200/80'
+                  ? 'bg-[#1F2D3A] text-[#D4AF37] shadow-sm font-bold ring-2 ring-[#D4AF37]/30'
+                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200/80 shadow-soft'
               }`}
             >
               {st.label}
@@ -389,7 +389,7 @@ export default function People() {
                   setSelectedPerson(p)
                   setSheetOpen(true)
                 }}
-                className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-md transition-all active:scale-[0.99] cursor-pointer space-y-3"
+                className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-soft hover:shadow-elevated transition-all active:scale-[0.99] cursor-pointer space-y-3"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3 min-w-0">
@@ -467,7 +467,7 @@ export default function People() {
       {/* =========================================================================
           DESKTOP VIEW: RICH MANAGEMENT TABLE (Visible on >= md)
           ========================================================================= */}
-      <Card className="hidden md:block border-slate-200/90 bg-white shadow-sm rounded-2xl overflow-hidden">
+      <Card className="hidden md:block border-slate-200/90 bg-white shadow-soft rounded-3xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[10px]">
@@ -653,13 +653,13 @@ export default function People() {
           {selectedPerson && (
             <>
               {/* Drawer Header */}
-              <SheetHeader className="border-b border-slate-100 pb-4">
+              <SheetHeader className="border-b border-slate-100 pb-4 text-left">
                 <div className="flex items-center gap-3">
-                  <div className="w-14 h-14 rounded-2xl bg-[#2C3E50] text-[#D4AF37] font-bold text-xl flex items-center justify-center shadow-lg flex-shrink-0">
+                  <div className="w-14 h-14 rounded-2xl bg-[#1F2D3A] text-[#D4AF37] font-bold text-xl flex items-center justify-center shadow-lg flex-shrink-0 ring-4 ring-[#D4AF37]/15">
                     {selectedPerson.name.slice(0, 2).toUpperCase()}
                   </div>
                   <div>
-                    <SheetTitle className="font-serif-sacred text-xl text-[#2C3E50]">
+                    <SheetTitle className="font-serif-sacred text-xl text-[#1F2D3A]">
                       {selectedPerson.name}
                     </SheetTitle>
                     <div className="flex items-center gap-2 mt-1">

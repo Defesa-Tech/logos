@@ -204,11 +204,11 @@ export default function Families() {
   const unlinkedPersons = persons.filter((p) => !p.family)
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-serif-sacred font-bold text-[#2C3E50] flex items-center gap-2">
+          <h1 className="text-2xl font-serif-sacred font-bold text-[#1F2D3A] flex items-center gap-2">
             <HomeIcon className="w-6 h-6 text-[#D4AF37]" />
             Núcleos Familiares (Casas)
           </h1>
@@ -220,7 +220,7 @@ export default function Families() {
         {canAccessAll && (
           <Button
             onClick={() => setCreateFamOpen(true)}
-            className="bg-[#2C3E50] hover:bg-[#1E2B37] text-white text-xs font-semibold h-10 px-4 rounded-xl shadow-md self-start sm:self-auto active:scale-95 transition-all"
+            className="bg-[#1F2D3A] hover:bg-[#15202B] text-white text-xs font-semibold h-10 px-4 rounded-xl shadow-md self-start sm:self-auto active:scale-95 transition-all"
           >
             <Plus className="w-4 h-4 mr-1.5" />
             Nova Família
@@ -236,12 +236,12 @@ export default function Families() {
           placeholder="Buscar família por sobrenome ou endereço..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-9 pr-8 text-xs h-10 rounded-2xl bg-white border-slate-200/90 shadow-sm"
+          className="pl-9 pr-8 text-xs h-10 rounded-2xl bg-white border-slate-200/90 shadow-soft focus:ring-2 focus:ring-[#D4AF37]/20"
         />
         {searchQuery && (
           <button
             onClick={() => setSearchQuery('')}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 cursor-pointer"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -252,7 +252,7 @@ export default function Families() {
       {loading ? (
         <p className="text-xs text-slate-400 text-center py-12">Carregando famílias...</p>
       ) : filteredFamilies.length === 0 ? (
-        <Card className="border-slate-200 p-8 text-center bg-white rounded-2xl shadow-sm">
+        <Card className="border-slate-200 p-8 text-center bg-white rounded-3xl shadow-soft">
           <HomeIcon className="w-10 h-10 text-slate-300 mx-auto mb-2" />
           <p className="text-sm font-semibold text-slate-700">Nenhum núcleo familiar encontrado</p>
           <p className="text-xs text-slate-400 mt-1">
@@ -267,7 +267,7 @@ export default function Families() {
             return (
               <Card
                 key={fam.id}
-                className="border-slate-200/90 bg-white shadow-sm hover:shadow-md transition-all rounded-2xl flex flex-col justify-between overflow-hidden"
+                className="border-slate-200/80 bg-white shadow-soft hover:shadow-elevated hover:border-amber-300/50 transition-all duration-200 rounded-3xl flex flex-col justify-between overflow-hidden"
               >
                 <div>
                   <CardHeader className="bg-slate-50/80 border-b border-slate-100 p-4 pb-3">

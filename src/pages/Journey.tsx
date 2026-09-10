@@ -1,34 +1,30 @@
 import React, { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   GitFork,
   CheckCircle2,
-  ChevronRight,
   ArrowRight,
-  Users,
-  Compass,
-  Sparkles,
   Phone,
   Home as HomeIcon,
   Check,
-  UserPlus,
-  ArrowUpRight,
-  Filter,
+  Sparkles,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { personsService, activitiesService } from '@/services/church'
 import type { PersonRecord, PersonStatus } from '@/types/church'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from 'sonner'
 import { useRealtime } from '@/hooks/use-realtime'
+import { PageTransition } from '@/components/MotionKit'
 
 export default function Journey() {
   const { canAccessAll } = useAuth()
   const [persons, setPersons] = useState<PersonRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [activeDragId, setActiveDragId] = useState<string | null>(null)
+  const [dragOverStage, setDragOverStage] = useState<PersonStatus | null>(null)
 
   // Mobile active tab view ('visitor' | 'attender' | 'member')
   const [activeMobileStage, setActiveMobileStage] = useState<PersonStatus>('visitor')
@@ -66,12 +62,20 @@ export default function Journey() {
     setActiveDragId(id)
   }
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragOver = (e: React.DragEvent, stageStatus: PersonStatus) => {
     e.preventDefault()
+    if (dragOverStage !== stageStatus) {
+      setDragOverStage(stageStatus)
+    }
+  }
+
+  const handleDragLeave = () => {
+    setDragOverStage(null)
   }
 
   const handleDrop = async (e: React.DragEvent, targetStatus: PersonStatus) => {
     e.preventDefault()
+    setDragOverStage(null)
     const id = e.dataTransfer.getData('text/plain') || activeDragId
     setActiveDragId(null)
     if (!id) return
@@ -169,6 +173,7 @@ export default function Journey() {
     title: string
     shortTitle: string
     subtitle: string
+    headerBg: string
     color: string
     badgeColor: string
     activeBorder: string
@@ -180,9 +185,10 @@ export default function Journey() {
       title: '1. Novos Visitantes',
       shortTitle: 'Visitantes',
       subtitle: 'Primeiro contato (QR Code / Culto)',
-      color: 'bg-amber-50/50 border-amber-200/80',
+      headerBg: 'bg-amber-500/10 text-amber-900',
+      color: 'bg-gradient-to-b from-amber-50/40 via-white to-slate-50/30 border-amber-200/80',
       badgeColor: 'bg-amber-100 text-amber-900 border-amber-300',
-      activeBorder: 'border-[#D4AF37]',
+      activeBorder: 'ring-2 ring-amber-400 bg-amber-50/50',
       requirements: ['Cartão de Boas-Vindas preenchido', 'Primeiro contato pastoral'],
     },
     {
@@ -191,9 +197,10 @@ export default function Journey() {
       title: '2. Frequentadores',
       shortTitle: 'Frequentadores',
       subtitle: 'Retorno assíduo & Pequenos Grupos',
-      color: 'bg-blue-50/50 border-blue-200/80',
+      headerBg: 'bg-blue-500/10 text-blue-900',
+      color: 'bg-gradient-to-b from-blue-50/40 via-white to-slate-50/30 border-blue-200/80',
       badgeColor: 'bg-blue-100 text-blue-900 border-blue-300',
-      activeBorder: 'border-blue-500',
+      activeBorder: 'ring-2 ring-blue-400 bg-blue-50/50',
       requirements: ['Classe de Boas-Vindas concluída', 'Inserido em Pequeno Grupo'],
     },
     {
@@ -202,9 +209,10 @@ export default function Journey() {
       title: '3. Membros Efetivos',
       shortTitle: 'Membros',
       subtitle: 'Aliança, Batismo & Compromisso',
-      color: 'bg-emerald-50/50 border-emerald-200/80',
+      headerBg: 'bg-emerald-500/10 text-emerald-900',
+      color: 'bg-gradient-to-b from-emerald-50/40 via-white to-slate-50/30 border-emerald-200/80',
       badgeColor: 'bg-emerald-100 text-emerald-900 border-emerald-300',
-      activeBorder: 'border-emerald-500',
+      activeBorder: 'ring-2 ring-emerald-400 bg-emerald-50/50',
       requirements: [
         'Batismo Bíblico confirmado',
         'Vínculo familiar cadastrado',
@@ -216,30 +224,38 @@ export default function Journey() {
   // Render Person Card Helper
   const renderCard = (person: PersonRecord, stageStatus: PersonStatus) => {
     return (
-      <div
+      <motion.div
         key={person.id}
+        layout
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        whileHover={{ y: -2, transition: { duration: 0.15 } }}
+        whileTap={{ scale: 0.98 }}
         draggable={canAccessAll}
-        onDragStart={(e) => handleDragStart(e, person.id)}
-        className="p-4 bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-md transition-all space-y-3 cursor-grab active:cursor-grabbing"
+        onDragStart={(e) => handleDragStart(e as unknown as React.DragEvent, person.id)}
+        className="p-4 bg-white rounded-2xl border border-slate-200/80 shadow-soft hover:shadow-elevated transition-all space-y-3 cursor-grab active:cursor-grabbing group select-none"
       >
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 pr-2">
-            <h4 className="font-bold text-xs text-slate-800 truncate">{person.name}</h4>
+            <h4 className="font-bold text-xs text-slate-800 truncate group-hover:text-[#1F2D3A]">
+              {person.name}
+            </h4>
             {person.whatsapp && (
               <p className="text-[10px] text-emerald-700 flex items-center gap-1 mt-0.5">
-                <Phone className="w-3 h-3" />
-                {person.whatsapp}
+                <Phone className="w-3 h-3 flex-shrink-0" />
+                <span>{person.whatsapp}</span>
               </p>
             )}
           </div>
-          <div className="w-7 h-7 rounded-xl bg-slate-100 text-[#2C3E50] text-[10px] font-bold flex items-center justify-center flex-shrink-0 border border-slate-200">
+          <div className="w-8 h-8 rounded-xl bg-slate-100 text-[#1F2D3A] text-[10px] font-bold flex items-center justify-center flex-shrink-0 border border-slate-200/70 shadow-sm">
             {person.name.slice(0, 2).toUpperCase()}
           </div>
         </div>
 
         {/* Family tag */}
         {person.expand?.family && (
-          <div className="flex items-center gap-1.5 text-[10px] text-slate-600 bg-slate-50 px-2.5 py-1 rounded-lg">
+          <div className="flex items-center gap-1.5 text-[10px] text-slate-600 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100">
             <HomeIcon className="w-3 h-3 text-[#D4AF37]" />
             <span className="truncate">{person.expand.family.name}</span>
           </div>
@@ -247,7 +263,7 @@ export default function Journey() {
 
         {/* Interactive Checklist */}
         <div className="pt-2 border-t border-slate-100 space-y-2 text-[11px]">
-          <label className="flex items-center gap-2 cursor-pointer text-slate-700 select-none">
+          <label className="flex items-center gap-2 cursor-pointer text-slate-700 select-none group/chk">
             <Checkbox
               checked={!!person.checklist_welcome_class}
               onCheckedChange={() =>
@@ -264,14 +280,14 @@ export default function Journey() {
               className={
                 person.checklist_welcome_class
                   ? 'line-through text-slate-400 font-normal'
-                  : 'font-medium'
+                  : 'font-medium group-hover/chk:text-slate-900'
               }
             >
               Classe Boas-Vindas
             </span>
           </label>
 
-          <label className="flex items-center gap-2 cursor-pointer text-slate-700 select-none">
+          <label className="flex items-center gap-2 cursor-pointer text-slate-700 select-none group/chk">
             <Checkbox
               checked={!!person.checklist_small_group}
               onCheckedChange={() =>
@@ -288,14 +304,14 @@ export default function Journey() {
               className={
                 person.checklist_small_group
                   ? 'line-through text-slate-400 font-normal'
-                  : 'font-medium'
+                  : 'font-medium group-hover/chk:text-slate-900'
               }
             >
               Pequeno Grupo
             </span>
           </label>
 
-          <label className="flex items-center gap-2 cursor-pointer text-slate-700 select-none">
+          <label className="flex items-center gap-2 cursor-pointer text-slate-700 select-none group/chk">
             <Checkbox
               checked={!!person.checklist_baptized}
               onCheckedChange={() =>
@@ -308,7 +324,7 @@ export default function Journey() {
               className={
                 person.checklist_baptized
                   ? 'line-through text-slate-400 font-normal'
-                  : 'font-medium'
+                  : 'font-medium group-hover/chk:text-slate-900'
               }
             >
               Batismo Bíblico
@@ -318,12 +334,13 @@ export default function Journey() {
 
         {/* Mobile / Fast Promotion Action */}
         {canAccessAll && (
-          <div className="pt-2 flex justify-end border-t border-slate-50">
+          <div className="pt-2 flex justify-end border-t border-slate-100">
             {stageStatus === 'visitor' && (
               <Button
                 size="sm"
+                variant="outline"
                 onClick={() => handlePromote(person, 'attender')}
-                className="text-[10px] h-7 px-3 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg font-semibold"
+                className="text-[10px] h-7 px-3 bg-blue-50/70 hover:bg-blue-100 text-blue-700 border-blue-200 rounded-lg font-semibold"
               >
                 Promover a Frequentador &rarr;
               </Button>
@@ -331,24 +348,25 @@ export default function Journey() {
             {stageStatus === 'attender' && (
               <Button
                 size="sm"
+                variant="outline"
                 onClick={() => handlePromote(person, 'member')}
-                className="text-[10px] h-7 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg font-semibold"
+                className="text-[10px] h-7 px-3 bg-emerald-50/70 hover:bg-emerald-100 text-emerald-700 border-emerald-200 rounded-lg font-semibold"
               >
                 Promover a Membro &rarr;
               </Button>
             )}
           </div>
         )}
-      </div>
+      </motion.div>
     )
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <PageTransition className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-serif-sacred font-bold text-[#2C3E50] flex items-center gap-2">
+          <h1 className="text-2xl font-serif-sacred font-bold text-[#1F2D3A] flex items-center gap-2">
             <GitFork className="w-6 h-6 text-[#D4AF37]" />
             Jornada Logos (Pipeline de Integração)
           </h1>
@@ -360,30 +378,30 @@ export default function Journey() {
 
         <Badge
           variant="outline"
-          className="text-xs bg-white text-slate-700 rounded-full px-3 py-1 self-start sm:self-auto shadow-sm"
+          className="text-xs bg-white text-slate-700 rounded-full px-3 py-1 self-start sm:self-auto shadow-soft border-slate-200"
         >
           {persons.length} Pessoas na Comunidade
         </Badge>
       </div>
 
       {/* Progress Path Steps Banner */}
-      <div className="grid grid-cols-3 gap-2 bg-white p-3 rounded-2xl border border-slate-200/90 shadow-sm text-xs">
+      <div className="grid grid-cols-3 gap-2 bg-white p-3 rounded-2xl border border-slate-200/80 shadow-soft text-xs">
         <div className="flex items-center gap-2 text-amber-900 font-bold p-1">
-          <div className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center text-xs flex-shrink-0">
+          <div className="w-6 h-6 rounded-full bg-amber-100 text-[#D4AF37] flex items-center justify-center text-xs flex-shrink-0 font-bold">
             1
           </div>
           <span className="truncate">Visitante</span>
           <ArrowRight className="w-3.5 h-3.5 text-slate-300 ml-auto hidden sm:block" />
         </div>
         <div className="flex items-center gap-2 text-blue-900 font-bold p-1">
-          <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs flex-shrink-0">
+          <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs flex-shrink-0 font-bold">
             2
           </div>
           <span className="truncate">Frequentador</span>
           <ArrowRight className="w-3.5 h-3.5 text-slate-300 ml-auto hidden sm:block" />
         </div>
         <div className="flex items-center gap-2 text-emerald-900 font-bold p-1">
-          <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-xs flex-shrink-0">
+          <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs flex-shrink-0 font-bold">
             3
           </div>
           <span className="truncate">Membro Efetivo</span>
@@ -391,11 +409,11 @@ export default function Journey() {
       </div>
 
       {/* =========================================================================
-          MOBILE VIEW: TABS SWITCHER (Responsive touch experience for small screens)
+          MOBILE VIEW: TABS SWITCHER WITH SPRING INDICATOR
           ========================================================================= */}
       <div className="md:hidden space-y-4">
         {/* Mobile Tabs */}
-        <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-200/60 rounded-2xl">
+        <div className="grid grid-cols-3 gap-1.5 p-1.5 bg-slate-200/60 rounded-2xl relative">
           {stages.map((st) => {
             const count = persons.filter((p) => p.status === st.status).length
             const active = activeMobileStage === st.status
@@ -403,68 +421,93 @@ export default function Journey() {
               <button
                 key={st.status}
                 onClick={() => setActiveMobileStage(st.status)}
-                className={`py-2 px-1 text-xs font-bold rounded-xl transition-all flex flex-col items-center justify-center ${
-                  active
-                    ? 'bg-white text-[#2C3E50] shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
+                className="relative py-2.5 px-1 text-xs font-bold rounded-xl transition-all flex flex-col items-center justify-center select-none cursor-pointer"
               >
-                <span>{st.shortTitle}</span>
-                <span className="text-[10px] text-slate-400 font-normal">({count})</span>
+                {active && (
+                  <motion.div
+                    layoutId="mobile-journey-tab"
+                    className="absolute inset-0 bg-white rounded-xl shadow-md"
+                    transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+                  />
+                )}
+                <span
+                  className={`relative z-10 ${active ? 'text-[#1F2D3A] font-bold' : 'text-slate-600'}`}
+                >
+                  {st.shortTitle}
+                </span>
+                <span
+                  className={`relative z-10 text-[10px] font-normal ${
+                    active ? 'text-amber-700 font-semibold' : 'text-slate-400'
+                  }`}
+                >
+                  ({count})
+                </span>
               </button>
             )
           })}
         </div>
 
-        {/* Mobile Active Column Content */}
-        {(() => {
-          const currentStage = stages.find((s) => s.status === activeMobileStage)!
-          const currentPersons = persons.filter((p) => p.status === currentStage.status)
+        {/* Mobile Active Column Content with AnimatePresence */}
+        <AnimatePresence mode="wait">
+          {(() => {
+            const currentStage = stages.find((s) => s.status === activeMobileStage)!
+            const currentPersons = persons.filter((p) => p.status === currentStage.status)
 
-          return (
-            <div className={`rounded-2xl border ${currentStage.color} p-4 space-y-3`}>
-              <div className="flex items-center justify-between pb-2 border-b border-slate-200/60">
-                <div>
-                  <h3 className="font-serif-sacred font-bold text-slate-800 text-base">
-                    {currentStage.title}
-                  </h3>
-                  <p className="text-[11px] text-slate-500">{currentStage.subtitle}</p>
+            return (
+              <motion.div
+                key={currentStage.status}
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.2 }}
+                className={`rounded-3xl border ${currentStage.color} p-4 space-y-3 shadow-soft`}
+              >
+                <div className="flex items-center justify-between pb-2 border-b border-slate-200/60">
+                  <div>
+                    <h3 className="font-serif-sacred font-bold text-slate-800 text-base">
+                      {currentStage.title}
+                    </h3>
+                    <p className="text-[11px] text-slate-500">{currentStage.subtitle}</p>
+                  </div>
+                  <Badge
+                    variant="outline"
+                    className={`text-xs font-bold ${currentStage.badgeColor}`}
+                  >
+                    {currentPersons.length}
+                  </Badge>
                 </div>
-                <Badge variant="outline" className={`text-xs font-bold ${currentStage.badgeColor}`}>
-                  {currentPersons.length}
-                </Badge>
-              </div>
 
-              {/* Requirements hint */}
-              <div className="bg-white/80 p-3 rounded-xl border border-slate-200/60 text-[11px] space-y-1">
-                <p className="font-bold text-slate-700 text-[10px] uppercase tracking-wider">
-                  Requisitos desta etapa:
-                </p>
-                {currentStage.requirements.map((req, i) => (
-                  <div key={i} className="flex items-center gap-1.5 text-slate-600">
-                    <Check className="w-3 h-3 text-[#D4AF37] flex-shrink-0" />
-                    <span>{req}</span>
-                  </div>
-                ))}
-              </div>
+                {/* Requirements hint */}
+                <div className="bg-white/80 p-3 rounded-2xl border border-slate-200/60 text-[11px] space-y-1">
+                  <p className="font-bold text-slate-700 text-[10px] uppercase tracking-wider">
+                    Requisitos desta etapa:
+                  </p>
+                  {currentStage.requirements.map((req, i) => (
+                    <div key={i} className="flex items-center gap-1.5 text-slate-600">
+                      <Check className="w-3 h-3 text-[#D4AF37] flex-shrink-0" />
+                      <span>{req}</span>
+                    </div>
+                  ))}
+                </div>
 
-              {/* Cards List Mobile */}
-              <div className="space-y-3 pt-1">
-                {currentPersons.length === 0 ? (
-                  <div className="p-8 text-center text-xs text-slate-400 border border-dashed border-slate-300 rounded-2xl bg-white/50">
-                    Nenhuma pessoa nesta etapa da jornada.
-                  </div>
-                ) : (
-                  currentPersons.map((p) => renderCard(p, currentStage.status))
-                )}
-              </div>
-            </div>
-          )
-        })()}
+                {/* Cards List Mobile */}
+                <div className="space-y-3 pt-1">
+                  {currentPersons.length === 0 ? (
+                    <div className="p-8 text-center text-xs text-slate-400 border border-dashed border-slate-300 rounded-2xl bg-white/50">
+                      Nenhuma pessoa nesta etapa da jornada.
+                    </div>
+                  ) : (
+                    currentPersons.map((p) => renderCard(p, currentStage.status))
+                  )}
+                </div>
+              </motion.div>
+            )
+          })()}
+        </AnimatePresence>
       </div>
 
       {/* =========================================================================
-          DESKTOP VIEW: FULL 3-COLUMN KANBAN (Drag and Drop enabled)
+          DESKTOP VIEW: FULL 3-COLUMN KANBAN (Drag and Drop + Smooth Motion)
           ========================================================================= */}
       {loading ? (
         <p className="text-xs text-slate-400 text-center py-12">Carregando quadro da jornada...</p>
@@ -472,13 +515,17 @@ export default function Journey() {
         <div className="hidden md:grid grid-cols-3 gap-6 items-start">
           {stages.map((stage) => {
             const stagePersons = persons.filter((p) => p.status === stage.status)
+            const isTarget = dragOverStage === stage.status
 
             return (
               <div
                 key={stage.status}
-                onDragOver={handleDragOver}
+                onDragOver={(e) => handleDragOver(e, stage.status)}
+                onDragLeave={handleDragLeave}
                 onDrop={(e) => handleDrop(e, stage.status)}
-                className={`rounded-3xl border ${stage.color} p-4 sm:p-5 min-h-[580px] flex flex-col justify-between transition-all`}
+                className={`rounded-3xl border ${stage.color} p-4 sm:p-5 min-h-[580px] flex flex-col justify-between transition-all duration-200 shadow-soft ${
+                  isTarget ? stage.activeBorder : ''
+                }`}
               >
                 <div>
                   {/* Column Header */}
@@ -515,7 +562,9 @@ export default function Journey() {
                         {canAccessAll && <p className="text-[10px] mt-1">Arraste cards para cá.</p>}
                       </div>
                     ) : (
-                      stagePersons.map((person) => renderCard(person, stage.status))
+                      <AnimatePresence>
+                        {stagePersons.map((person) => renderCard(person, stage.status))}
+                      </AnimatePresence>
                     )}
                   </div>
                 </div>
@@ -530,6 +579,6 @@ export default function Journey() {
           })}
         </div>
       )}
-    </div>
+    </PageTransition>
   )
 }
