@@ -1,29 +1,22 @@
 import React, { useState, useEffect } from 'react'
 import {
   Mail,
-  Send,
+  Plus,
   Copy,
   Check,
-  Plus,
-  QrCode,
+  Send,
+  Trash2,
   ExternalLink,
   ShieldAlert,
   UserCheck,
   Clock,
-  Sparkles,
-  RefreshCw,
-  Phone,
-  MessageSquare,
-  AlertCircle,
+  ChevronRight,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { invitesService, personsService } from '@/services/church'
 import type { InviteRecord, PersonRecord, UserRole } from '@/types/church'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import {
   Select,
   SelectContent,
@@ -32,31 +25,30 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { toast } from 'sonner'
 import { useRealtime } from '@/hooks/use-realtime'
+import { PageTransition } from '@/components/MotionKit'
 
 export default function Secretary() {
-  const { canAccessAll, role } = useAuth()
+  const { canAccessAll } = useAuth()
+
   const [invites, setInvites] = useState<InviteRecord[]>([])
   const [persons, setPersons] = useState<PersonRecord[]>([])
   const [loading, setLoading] = useState(true)
 
-  // Generate Invite Modal
-  const [createOpen, setCreateOpen] = useState(false)
-  const [inviteEmail, setInviteEmail] = useState('')
-  const [inviteRole, setInviteRole] = useState<'secretary' | 'pastor' | 'leader' | 'member'>(
+  // Create invite modal
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [selectedPersonId, setSelectedPersonId] = useState<string>('')
+  const [selectedRole, setSelectedRole] = useState<'secretary' | 'pastor' | 'leader' | 'member'>(
     'member',
   )
-  const [invitePersonId, setInvitePersonId] = useState<string>('none')
-  const [inviteWhatsapp, setInviteWhatsapp] = useState('')
-  const [isGenerating, setIsGenerating] = useState(false)
+  const [customEmail, setCustomEmail] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Share Dialog state
-  const [shareDialogOpen, setShareDialogOpen] = useState(false)
-  const [activeShareInvite, setActiveShareInvite] = useState<InviteRecord | null>(null)
+  // Copied token state
   const [copiedToken, setCopiedToken] = useState<string | null>(null)
 
-  // Realtime hook
   useRealtime<InviteRecord>('invites', (e) => {
     if (e.action === 'create') {
       setInvites((prev) => [e.record, ...prev])
@@ -70,12 +62,9 @@ export default function Secretary() {
   const loadData = async () => {
     try {
       setLoading(true)
-      const [invitesList, personsList] = await Promise.all([
-        invitesService.list(),
-        personsService.list(),
-      ])
-      setInvites(invitesList)
-      setPersons(personsList)
+      const [invList, perList] = await Promise.all([invitesService.list(), personsService.list()])
+      setInvites(invList)
+      setPersons(perList)
     } catch {
       toast.error('Erro ao carregar dados da secretaria.')
     } finally {
@@ -87,400 +76,284 @@ export default function Secretary() {
     loadData()
   }, [])
 
+  if (!canAccessAll) {
+    return (
+      <div className="p-12 text-center space-y-4 bg-white border border-[#E6E2D8] rounded max-w-lg mx-auto my-12">
+        <ShieldAlert className="w-10 h-10 text-amber-700 mx-auto" strokeWidth={1.5} />
+        <h2 className="font-serif-sacred text-2xl font-bold text-[#141B22]">Acesso Restrito</h2>
+        <p className="text-xs text-slate-600 leading-relaxed">
+          Esta área é reservada para a Secretaria da Igreja e Pastores com permissão de gestão de
+          convites e credenciais de acesso.
+        </p>
+      </div>
+    )
+  }
+
   const handleGenerateInvite = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!inviteEmail.trim()) {
-      toast.error('Informe o e-mail para envio do convite.')
+    if (!selectedPersonId && !customEmail.trim()) {
+      toast.error('Selecione uma pessoa ou informe um e-mail.')
       return
     }
 
     try {
-      setIsGenerating(true)
+      setIsSubmitting(true)
+
+      let targetEmail = customEmail.trim()
+      let personName = 'Novo Usuário'
+
+      if (selectedPersonId) {
+        const found = persons.find((p) => p.id === selectedPersonId)
+        if (found) {
+          personName = found.name
+          if (found.email && !targetEmail) {
+            targetEmail = found.email
+          }
+        }
+      }
+
+      if (!targetEmail) {
+        targetEmail = `${personName.toLowerCase().replace(/\s+/g, '')}@logos.igreja`
+      }
+
       const created = await invitesService.create({
-        email: inviteEmail.trim().toLowerCase(),
-        role: inviteRole,
-        person: invitePersonId !== 'none' ? invitePersonId : undefined,
+        email: targetEmail,
+        role: selectedRole,
+        person: selectedPersonId || undefined,
       })
 
       setInvites((prev) => [created, ...prev])
       toast.success('Convite gerado com sucesso!')
-      setCreateOpen(false)
-
-      // Open sharing dialog immediately
-      setActiveShareInvite(created)
-      setShareDialogOpen(true)
-
-      setInviteEmail('')
-      setInviteRole('member')
-      setInvitePersonId('none')
-      setInviteWhatsapp('')
+      setDialogOpen(false)
+      setSelectedPersonId('')
+      setCustomEmail('')
     } catch {
       toast.error('Erro ao gerar convite.')
     } finally {
-      setIsGenerating(false)
+      setIsSubmitting(false)
     }
   }
 
-  const getInviteLink = (token: string) => {
-    return `${window.location.origin}/convite/${token}`
-  }
-
-  const copyLink = (token: string) => {
-    const link = getInviteLink(token)
+  const handleCopyLink = (token: string) => {
+    const link = `${window.location.origin}/convite?token=${token}`
     navigator.clipboard.writeText(link)
     setCopiedToken(token)
-    toast.success('Link de convite copiado para a área de transferência!')
+    toast.success('Link do convite copiado para a área de transferência!')
     setTimeout(() => setCopiedToken(null), 2500)
   }
 
-  const shareViaWhatsApp = (invite: InviteRecord, phoneOverride?: string) => {
-    const link = getInviteLink(invite.token)
-    const person = persons.find((p) => p.id === invite.person)
-    const name = person?.name ? `Olá, ${person.name.split(' ')[0]}!` : 'Olá!'
-    const text = encodeURIComponent(
-      `${name} A Comunidade Logos preparou seu acesso exclusivo ao nosso portal da igreja.\n\nClique no link abaixo para criar sua senha e entrar:\n${link}\n\nDeus abençoe!`,
-    )
-    const targetPhone = phoneOverride || person?.whatsapp || ''
-    const cleanPhone = targetPhone.replace(/\D/g, '')
-
-    if (cleanPhone) {
-      window.open(`https://wa.me/55${cleanPhone}?text=${text}`, '_blank')
-    } else {
-      window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank')
+  const handleDeleteInvite = async (id: string) => {
+    if (!confirm('Deseja realmente revogar e apagar este convite?')) return
+    try {
+      await invitesService.delete(id)
+      setInvites((prev) => prev.filter((i) => i.id !== id))
+      toast.success('Convite revogado.')
+    } catch {
+      toast.error('Erro ao apagar convite.')
     }
   }
 
-  if (!canAccessAll) {
-    return (
-      <div className="p-8 text-center bg-white rounded-3xl border border-slate-200 space-y-3 max-w-lg mx-auto my-12 shadow-sm">
-        <ShieldAlert className="w-12 h-12 text-amber-500 mx-auto" />
-        <h2 className="text-xl font-serif-sacred font-bold text-[#2C3E50]">Acesso Restrito</h2>
-        <p className="text-xs text-slate-500 leading-relaxed">
-          O módulo de Secretaria & Emissão de Convites é exclusivo para membros da equipe pastoral e
-          secretaria da igreja.
-        </p>
-        <p className="text-[11px] text-slate-400">
-          Você está navegando com a persona <span className="font-bold">{role}</span>. Use o menu
-          superior para alternar para a persona Secretaria.
-        </p>
-      </div>
-    )
+  const roleLabelMap: Record<UserRole, string> = {
+    secretary: 'Secretaria',
+    pastor: 'Pastor',
+    leader: 'Líder',
+    member: 'Membro',
+    visitor: 'Visitante',
   }
 
+  const pendingInvites = invites.filter((i) => !i.used)
+  const claimedInvites = invites.filter((i) => i.used)
+
   return (
-    <div className="space-y-6">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <PageTransition className="space-y-6 sm:space-y-8">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 border-b border-[#E6E2D8] pb-5">
         <div>
-          <h1 className="text-2xl font-serif-sacred font-bold text-[#1F2D3A] flex items-center gap-2">
-            <Mail className="w-6 h-6 text-[#D4AF37]" />
+          <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-slate-500 mb-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#C5A046]" />
+            <span>Gestão Institucional</span>
+            <span className="text-slate-300">/</span>
+            <span>Credenciais de Acesso</span>
+          </div>
+          <h1 className="font-serif-sacred text-3xl sm:text-4xl font-bold tracking-tight text-[#141B22]">
             Secretaria & Emissão de Convites
           </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Geração de links de onboarding seguros, convites por WhatsApp e ativação de contas
-            oficiais.
+          <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl font-normal">
+            Gere links mágicos seguros para que membros, líderes e obreiros resgatem seus acessos ao
+            sistema Logos com seus devidos papéis.
           </p>
         </div>
 
         <Button
-          onClick={() => setCreateOpen(true)}
-          className="bg-[#1F2D3A] hover:bg-[#15202B] text-white text-xs font-semibold h-10 px-4 rounded-xl shadow-md self-start sm:self-auto active:scale-95 transition-all"
+          onClick={() => setDialogOpen(true)}
+          className="bg-[#141B22] hover:bg-[#1E2732] text-white text-xs h-9 px-4 rounded font-mono shadow-none cursor-pointer self-start sm:self-auto"
         >
-          <Plus className="w-4 h-4 mr-1.5" />
+          <Plus className="w-3.5 h-3.5 mr-1.5 text-[#C5A046]" strokeWidth={1.75} />
           Gerar Novo Convite
         </Button>
       </div>
 
-      {/* Quick Info Banner with Modern Elevation */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <Card className="border-slate-200/80 bg-white shadow-soft hover:shadow-elevated rounded-3xl p-4.5 flex items-center gap-3 transition-all duration-200">
-          <div className="w-11 h-11 rounded-2xl bg-amber-50 text-[#D4AF37] flex items-center justify-center font-bold shadow-sm">
-            <Mail className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="text-xs font-bold text-slate-800">{invites.length} Convites Totais</p>
-            <p className="text-[11px] text-slate-400">Histórico de emissão</p>
-          </div>
-        </Card>
-
-        <Card className="border-slate-200/80 bg-white shadow-soft hover:shadow-elevated rounded-3xl p-4.5 flex items-center gap-3 transition-all duration-200">
-          <div className="w-11 h-11 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold shadow-sm">
-            <Clock className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="text-xs font-bold text-slate-800">
-              {invites.filter((i) => !i.used).length} Aguardando Ativação
-            </p>
-            <p className="text-[11px] text-slate-400">Links disponíveis</p>
-          </div>
-        </Card>
-
-        <Card className="border-slate-200/80 bg-white shadow-soft hover:shadow-elevated rounded-3xl p-4.5 flex items-center gap-3 transition-all duration-200">
-          <div className="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold shadow-sm">
-            <UserCheck className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="text-xs font-bold text-slate-800">
-              {invites.filter((i) => i.used).length} Contas Ativadas
-            </p>
-            <p className="text-[11px] text-slate-400">Membros cadastrados</p>
-          </div>
-        </Card>
+      {/* Stats summary row */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-white border border-[#E6E2D8] p-4 rounded space-y-1">
+          <p className="text-[10px] font-mono uppercase tracking-wider text-slate-400">
+            Convites Pendentes
+          </p>
+          <p className="font-serif-sacred text-3xl font-bold text-[#141B22]">
+            {pendingInvites.length}
+          </p>
+        </div>
+        <div className="bg-white border border-[#E6E2D8] p-4 rounded space-y-1">
+          <p className="text-[10px] font-mono uppercase tracking-wider text-slate-400">
+            Acessos Resgatados
+          </p>
+          <p className="font-serif-sacred text-3xl font-bold text-[#141B22]">
+            {claimedInvites.length}
+          </p>
+        </div>
+        <div className="bg-white border border-[#E6E2D8] p-4 rounded space-y-1">
+          <p className="text-[10px] font-mono uppercase tracking-wider text-slate-400">
+            Total Emitido
+          </p>
+          <p className="font-serif-sacred text-3xl font-bold text-[#141B22]">{invites.length}</p>
+        </div>
       </div>
 
-      {/* =========================================================================
-          MOBILE VIEW: TOUCH-FIRST CARDS (Visible only on < md)
-          ========================================================================= */}
-      <div className="md:hidden space-y-3">
-        {loading ? (
-          <p className="text-xs text-slate-400 text-center py-10">Carregando convites...</p>
-        ) : invites.length === 0 ? (
-          <Card className="border-slate-200 p-8 text-center bg-white rounded-2xl shadow-sm">
-            <Mail className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-            <p className="text-sm font-semibold text-slate-700">Nenhum convite emitido</p>
-            <p className="text-xs text-slate-400 mt-1">
-              Gere um link para convidar novos líderes ou membros.
+      {/* Convites em Aberto (Editorial Table) */}
+      <div className="bg-white border border-[#E6E2D8] rounded space-y-3 p-5">
+        <div className="pb-3 border-b border-[#E6E2D8] flex items-center justify-between">
+          <div>
+            <h3 className="font-serif-sacred text-lg font-bold text-[#141B22]">
+              Convites Ativos & Aguardando Resgate
+            </h3>
+            <p className="text-[11px] text-slate-500 font-mono mt-0.5">
+              Envie o link para o membro criar sua senha
             </p>
-          </Card>
+          </div>
+          <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded border border-[#E6E2D8] text-slate-600">
+            {pendingInvites.length} aguardando
+          </span>
+        </div>
+
+        {loading ? (
+          <p className="text-center text-xs text-slate-400 font-mono py-8">Carregando...</p>
+        ) : pendingInvites.length === 0 ? (
+          <p className="text-center text-xs text-slate-400 py-8 font-mono italic">
+            Nenhum convite pendente no momento.
+          </p>
         ) : (
-          invites.map((inv) => {
-            const p = persons.find((person) => person.id === inv.person)
-            return (
-              <div
-                key={inv.id}
-                className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-sm space-y-3"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="font-bold text-xs text-slate-800 truncate">{inv.email}</p>
-                    {p && (
-                      <p className="text-[11px] text-[#2C3E50] font-semibold mt-0.5">
-                        Pessoa: {p.name}
+          <div className="divide-y divide-[#F0EDE4] text-xs">
+            {pendingInvites.map((inv) => {
+              const person = persons.find((p) => p.id === inv.person)
+              return (
+                <div
+                  key={inv.id}
+                  className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-[#FAF9F6] px-2 transition-colors"
+                >
+                  <div className="min-w-0 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <p className="font-semibold text-[#141B22] truncate">
+                        {person?.name || inv.email}
                       </p>
-                    )}
+                      <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded border border-[#E6E2D8] text-slate-700 bg-white">
+                        {roleLabelMap[inv.role]}
+                      </span>
+                    </div>
+                    <p className="text-[11px] font-mono text-slate-500 truncate">
+                      Destinatário: {inv.email} &bull; Gerado em{' '}
+                      {new Date(inv.created).toLocaleDateString('pt-BR')}
+                    </p>
                   </div>
-                  <Badge
-                    variant={inv.used ? 'secondary' : 'default'}
-                    className={`text-[10px] font-bold rounded-full ${
-                      inv.used
-                        ? 'bg-slate-100 text-slate-600'
-                        : 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                    }`}
-                  >
-                    {inv.used ? 'Ativado' : 'Aguardando'}
-                  </Badge>
-                </div>
 
-                <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
-                  <span className="capitalize font-semibold text-slate-700">Papel: {inv.role}</span>
-                  <span className="text-[10px]">
-                    {new Date(inv.created).toLocaleDateString('pt-BR')}
-                  </span>
-                </div>
-
-                {/* Quick Share Buttons Mobile */}
-                {!inv.used && (
-                  <div className="flex items-center gap-2 pt-1">
+                  <div className="flex items-center gap-2 flex-shrink-0">
                     <Button
                       size="sm"
-                      onClick={() => shareViaWhatsApp(inv, p?.whatsapp)}
-                      className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs h-9 rounded-xl font-semibold"
-                    >
-                      <MessageSquare className="w-3.5 h-3.5 mr-1.5" />
-                      Enviar WhatsApp
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => copyLink(inv.token)}
-                      className="h-9 px-3 rounded-xl border-slate-200 text-slate-700"
+                      onClick={() => handleCopyLink(inv.token)}
+                      className="text-xs h-8 px-3 rounded font-mono bg-[#141B22] hover:bg-[#1E2732] text-white"
                     >
                       {copiedToken === inv.token ? (
-                        <Check className="w-4 h-4 text-emerald-600" />
+                        <>
+                          <Check className="w-3.5 h-3.5 mr-1 text-[#C5A046]" />
+                          Copiado!
+                        </>
                       ) : (
-                        <Copy className="w-4 h-4" />
+                        <>
+                          <Copy className="w-3.5 h-3.5 mr-1 text-[#C5A046]" />
+                          Copiar Link
+                        </>
                       )}
                     </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleDeleteInvite(inv.id)}
+                      className="text-xs h-8 text-slate-400 hover:text-red-700 font-mono"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
                   </div>
-                )}
-              </div>
-            )
-          })
+                </div>
+              )
+            })}
+          </div>
         )}
       </div>
 
-      {/* =========================================================================
-          DESKTOP VIEW: RICH MANAGEMENT TABLE (Visible on >= md)
-          ========================================================================= */}
-      <Card className="hidden md:block border-slate-200/90 bg-white shadow-soft rounded-3xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[10px]">
-              <tr>
-                <th className="py-3.5 px-4">E-mail Convidado</th>
-                <th className="py-3.5 px-4">Pessoa Vinculada</th>
-                <th className="py-3.5 px-4">Papel Concedido</th>
-                <th className="py-3.5 px-4">Status</th>
-                <th className="py-3.5 px-4">Data do Convite</th>
-                <th className="py-3.5 px-4 text-right">Ações de Envio</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {loading ? (
-                <tr>
-                  <td colSpan={6} className="text-center py-10 text-slate-400">
-                    Carregando convites...
-                  </td>
-                </tr>
-              ) : invites.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="text-center py-12 text-slate-400">
-                    Nenhum convite emitido até o momento.
-                  </td>
-                </tr>
-              ) : (
-                invites.map((inv) => {
-                  const p = persons.find((person) => person.id === inv.person)
+      {/* Convites já resgatados */}
+      {claimedInvites.length > 0 && (
+        <div className="bg-white border border-[#E6E2D8] rounded space-y-3 p-5">
+          <div className="pb-3 border-b border-[#E6E2D8]">
+            <h3 className="font-serif-sacred text-lg font-bold text-[#141B22]">
+              Histórico de Convites Concluídos
+            </h3>
+            <p className="text-[11px] text-slate-500 font-mono mt-0.5">
+              Usuários que já ativaram sua conta e definiram senha
+            </p>
+          </div>
 
-                  return (
-                    <tr key={inv.id} className="hover:bg-slate-50/70 transition-colors">
-                      <td className="py-3.5 px-4 font-bold text-slate-800">{inv.email}</td>
-                      <td className="py-3.5 px-4">
-                        {p ? (
-                          <div className="flex items-center gap-1.5">
-                            <span className="font-semibold text-slate-700">{p.name}</span>
-                            {p.whatsapp && (
-                              <span className="text-[10px] text-slate-400">({p.whatsapp})</span>
-                            )}
-                          </div>
-                        ) : (
-                          <span className="text-slate-400 italic">Novo registro</span>
-                        )}
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <Badge variant="outline" className="text-[10px] capitalize font-semibold">
-                          {inv.role}
-                        </Badge>
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <Badge
-                          variant={inv.used ? 'secondary' : 'default'}
-                          className={`text-[10px] font-bold rounded-full ${
-                            inv.used
-                              ? 'bg-slate-100 text-slate-600'
-                              : 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                          }`}
-                        >
-                          {inv.used ? 'Ativado' : 'Aguardando'}
-                        </Badge>
-                      </td>
-                      <td className="py-3.5 px-4 text-slate-500">
-                        {new Date(inv.created).toLocaleDateString('pt-BR', {
-                          day: '2-digit',
-                          month: 'short',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </td>
-                      <td className="py-3.5 px-4 text-right">
-                        {!inv.used ? (
-                          <div className="flex items-center justify-end gap-1.5">
-                            <Button
-                              size="sm"
-                              onClick={() => shareViaWhatsApp(inv, p?.whatsapp)}
-                              className="h-8 px-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs rounded-xl font-medium"
-                            >
-                              <MessageSquare className="w-3.5 h-3.5 mr-1.5" />
-                              WhatsApp
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => copyLink(inv.token)}
-                              className="h-8 px-2.5 text-xs rounded-xl border-slate-200"
-                            >
-                              {copiedToken === inv.token ? (
-                                <Check className="w-3.5 h-3.5 text-emerald-600 mr-1" />
-                              ) : (
-                                <Copy className="w-3.5 h-3.5 mr-1" />
-                              )}
-                              <span>Copiar Link</span>
-                            </Button>
-                          </div>
-                        ) : (
-                          <span className="text-xs text-slate-400 italic">Conta já ativa</span>
-                        )}
-                      </td>
-                    </tr>
-                  )
-                })
-              )}
-            </tbody>
-          </table>
+          <div className="divide-y divide-[#F0EDE4] text-xs">
+            {claimedInvites.map((inv) => (
+              <div
+                key={inv.id}
+                className="py-2.5 flex items-center justify-between text-slate-600 px-2 font-mono text-[11px]"
+              >
+                <div className="flex items-center gap-2">
+                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>{inv.email}</span>
+                  <span className="text-[10px] text-slate-400">({roleLabelMap[inv.role]})</span>
+                </div>
+                <span className="text-slate-400">Ativado</span>
+              </div>
+            ))}
+          </div>
         </div>
-      </Card>
+      )}
 
-      {/* =========================================================================
-          GENERATE INVITE DIALOG
-          ========================================================================= */}
-      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent className="sm:max-w-md bg-white rounded-2xl">
-          <DialogHeader>
-            <DialogTitle className="font-serif-sacred text-xl text-[#2C3E50]">
-              Gerar Convite de Acesso
+      {/* CREATE INVITE DIALOG */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-md bg-white rounded border-[#E6E2D8]">
+          <DialogHeader className="border-b border-[#E6E2D8] pb-3">
+            <DialogTitle className="font-serif-sacred text-2xl text-[#141B22]">
+              Gerar Link de Convite
             </DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleGenerateInvite} className="space-y-4 pt-2 text-xs">
             <div className="space-y-1">
-              <Label htmlFor="inv-email">E-mail do Convidado *</Label>
-              <Input
-                id="inv-email"
-                type="email"
-                required
-                value={inviteEmail}
-                onChange={(e) => setInviteEmail(e.target.value)}
-                placeholder="exemplo@igreja.com"
-                className="h-10 rounded-xl"
-              />
-            </div>
-
-            <div className="space-y-1">
-              <Label htmlFor="inv-role">Papel / Nível de Acesso</Label>
-              <Select
-                value={inviteRole}
-                onValueChange={(val) =>
-                  setInviteRole(val as 'secretary' | 'pastor' | 'leader' | 'member')
-                }
+              <Label
+                htmlFor="inv-person"
+                className="font-mono uppercase tracking-wider text-slate-600"
               >
-                <SelectTrigger id="inv-role" className="h-10 rounded-xl">
-                  <SelectValue />
+                Associar a Pessoa do Livro (Opcional)
+              </Label>
+              <Select value={selectedPersonId} onValueChange={setSelectedPersonId}>
+                <SelectTrigger
+                  id="inv-person"
+                  className="h-9 rounded bg-[#FAF9F6] border-[#E6E2D8]"
+                >
+                  <SelectValue placeholder="Selecione um irmão ou deixe avulso..." />
                 </SelectTrigger>
-                <SelectContent className="bg-white rounded-xl">
-                  <SelectItem value="member">Membro (Meu lar & jornada)</SelectItem>
-                  <SelectItem value="leader">Líder (Grupo & acompanhamento)</SelectItem>
-                  <SelectItem value="pastor">Pastor (Gestão pastoral plena)</SelectItem>
-                  <SelectItem value="secretary">Secretaria (Gestão total)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-1">
-              <Label htmlFor="inv-person">Vincular a Pessoa Existente (Opcional)</Label>
-              <Select
-                value={invitePersonId}
-                onValueChange={(val) => {
-                  setInvitePersonId(val)
-                  const p = persons.find((person) => person.id === val)
-                  if (p?.email && !inviteEmail) setInviteEmail(p.email)
-                  if (p?.whatsapp) setInviteWhatsapp(p.whatsapp)
-                }}
-              >
-                <SelectTrigger id="inv-person" className="h-10 rounded-xl">
-                  <SelectValue placeholder="Selecione caso a pessoa já esteja cadastrada" />
-                </SelectTrigger>
-                <SelectContent className="bg-white rounded-xl">
-                  <SelectItem value="none">Criar novo vínculo</SelectItem>
+                <SelectContent className="bg-white rounded max-h-56">
                   {persons.map((p) => (
                     <SelectItem key={p.id} value={p.id}>
                       {p.name} ({p.status})
@@ -490,68 +363,58 @@ export default function Secretary() {
               </Select>
             </div>
 
+            <div className="space-y-1">
+              <Label
+                htmlFor="inv-role"
+                className="font-mono uppercase tracking-wider text-slate-600"
+              >
+                Papel / Permissão Concedida *
+              </Label>
+              <Select
+                value={selectedRole}
+                onValueChange={(val) =>
+                  setSelectedRole(val as 'secretary' | 'pastor' | 'leader' | 'member')
+                }
+              >
+                <SelectTrigger id="inv-role" className="h-9 rounded bg-[#FAF9F6] border-[#E6E2D8]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-white rounded">
+                  <SelectItem value="member">Membro (Comunhão e seu núcleo familiar)</SelectItem>
+                  <SelectItem value="leader">Líder (Visão do seu pequeno grupo)</SelectItem>
+                  <SelectItem value="pastor">Pastor (Visão pastoral e rebanho)</SelectItem>
+                  <SelectItem value="secretary">Secretaria (Gestão plena institucional)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1">
+              <Label
+                htmlFor="inv-email"
+                className="font-mono uppercase tracking-wider text-slate-600"
+              >
+                E-mail para Acesso
+              </Label>
+              <Input
+                id="inv-email"
+                type="email"
+                value={customEmail}
+                onChange={(e) => setCustomEmail(e.target.value)}
+                placeholder="membro@exemplo.com (ou deixe em branco se selecionou a pessoa)"
+                className="h-9 rounded bg-[#FAF9F6] border-[#E6E2D8]"
+              />
+            </div>
+
             <Button
               type="submit"
-              disabled={isGenerating}
-              className="w-full bg-[#2C3E50] hover:bg-[#1E2B37] text-white text-xs h-10 rounded-xl font-semibold shadow-md"
+              disabled={isSubmitting}
+              className="w-full bg-[#141B22] hover:bg-[#1E2732] text-white text-xs h-9 rounded font-mono"
             >
-              {isGenerating ? 'Gerando convite...' : 'Gerar Convite & Link'}
+              {isSubmitting ? 'Gerando convite...' : 'Gerar e Obter Link'}
             </Button>
           </form>
         </DialogContent>
       </Dialog>
-
-      {/* =========================================================================
-          SHARE INVITE MODAL (Fast sharing via WhatsApp/Link)
-          ========================================================================= */}
-      <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
-        <DialogContent className="sm:max-w-md bg-white rounded-2xl">
-          <DialogHeader>
-            <DialogTitle className="font-serif-sacred text-xl text-[#2C3E50] flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-[#D4AF37]" />
-              Convite Gerado com Sucesso!
-            </DialogTitle>
-          </DialogHeader>
-
-          {activeShareInvite && (
-            <div className="space-y-4 pt-2 text-xs">
-              <p className="text-slate-600 leading-relaxed">
-                O token de segurança foi criado para{' '}
-                <span className="font-bold text-slate-800">{activeShareInvite.email}</span> com
-                papel de <span className="font-bold capitalize">{activeShareInvite.role}</span>.
-              </p>
-
-              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200 space-y-1.5">
-                <span className="text-[10px] uppercase font-bold text-slate-400">
-                  Link Único de Ativação:
-                </span>
-                <p className="font-mono text-[11px] text-slate-800 break-all bg-white p-2.5 rounded-xl border border-slate-200">
-                  {getInviteLink(activeShareInvite.token)}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                <Button
-                  onClick={() => copyLink(activeShareInvite.token)}
-                  variant="outline"
-                  className="h-10 text-xs rounded-xl border-slate-200 font-semibold"
-                >
-                  <Copy className="w-4 h-4 mr-1.5" />
-                  Copiar Link
-                </Button>
-
-                <Button
-                  onClick={() => shareViaWhatsApp(activeShareInvite)}
-                  className="h-10 text-xs rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
-                >
-                  <MessageSquare className="w-4 h-4 mr-1.5" />
-                  Enviar no WhatsApp
-                </Button>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-    </div>
+    </PageTransition>
   )
 }

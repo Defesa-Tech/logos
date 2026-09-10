@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import {
   Users,
   UserPlus,
@@ -10,15 +9,12 @@ import {
   GitFork,
   Calendar,
   CheckCircle2,
-  Sparkles,
   QrCode,
   Clock,
-  Compass,
   Send,
   Lock,
   ChevronRight,
   Activity,
-  Layers,
   ArrowRight,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
@@ -30,8 +26,6 @@ import {
 } from '@/services/church'
 import type { PersonRecord, FamilyRecord, InviteRecord, ActivityRecord } from '@/types/church'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import {
   Dialog,
@@ -45,13 +39,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { toast } from 'sonner'
 import { useRealtime } from '@/hooks/use-realtime'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
-import {
-  AnimatedCounter,
-  PageTransition,
-  StaggerContainer,
-  StaggerItem,
-  MotionCard,
-} from '@/components/MotionKit'
+import { AnimatedCounter, PageTransition } from '@/components/MotionKit'
 
 export default function Index() {
   const { role, currentPerson, canAccessAll, isLeader, isMemberOrVisitor, login, user } = useAuth()
@@ -81,7 +69,7 @@ export default function Index() {
   useRealtime<PersonRecord>('persons', (e) => {
     if (e.action === 'create') {
       setPersons((prev) => [e.record, ...prev])
-      toast.info(`Novo cadastro recebido: ${e.record.name}!`)
+      toast.info(`Novo cadastro recebido: ${e.record.name}`)
     } else if (e.action === 'update') {
       setPersons((prev) => prev.map((p) => (p.id === e.record.id ? e.record : p)))
     } else if (e.action === 'delete') {
@@ -110,7 +98,7 @@ export default function Index() {
       setInvites(invitesData)
       setActivities(activitiesData.items)
     } catch {
-      toast.error('Erro ao carregar dados do dashboard.')
+      toast.error('Erro ao carregar dados do painel.')
     } finally {
       setLoading(false)
     }
@@ -125,7 +113,7 @@ export default function Index() {
     setIsLoggingIn(true)
     try {
       await login(authEmail, authPass)
-      toast.success('Autenticado com sucesso como Secretaria!')
+      toast.success('Autenticado com sucesso como Secretaria.')
       loadDashboardData()
     } catch {
       toast.error('Falha no login. Verifique as credenciais.')
@@ -139,11 +127,11 @@ export default function Index() {
     try {
       await activitiesService.create({
         title: `Reunião: ${meetingGroup}`,
-        description: `Presença de ${meetingAttendance} pessoas. Notas: ${meetingNotes || 'Reunião abençoada com louvor e palavra.'}`,
+        description: `Presença de ${meetingAttendance} pessoas. ${meetingNotes ? `Notas: ${meetingNotes}` : 'Encontro de comunhão e palavra.'}`,
         type: 'meeting_report',
         person: currentPerson?.id || undefined,
       })
-      toast.success('Relatório de reunião registrado com sucesso!')
+      toast.success('Relatório pastoral registrado com sucesso.')
       setReportModalOpen(false)
       setMeetingNotes('')
     } catch {
@@ -177,47 +165,39 @@ export default function Index() {
     return p.status === 'member' || p.status === 'attender'
   })
 
-  return (
-    <PageTransition className="space-y-6 sm:space-y-8">
-      {/* =========================================================================
-          HERO BANNER - Sacred Modernism layered elevation + glowing accents
-          ========================================================================= */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.98, y: 10 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-        className="relative overflow-hidden rounded-3xl midnight-card text-white p-5 sm:p-7 md:p-8 shadow-elevated border border-slate-700/60"
-      >
-        {/* Subtle decorative gold light glow */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-[#D4AF37]/20 to-transparent rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-10 -left-10 w-60 h-60 bg-blue-500/10 rounded-full blur-2xl pointer-events-none" />
+  const recentVisitors = persons.filter((p) => p.status === 'visitor').slice(0, 5)
 
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
-          <div className="space-y-2.5 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-amber-300 text-[11px] font-semibold border border-amber-400/30 backdrop-blur-md shadow-sm">
-              <Sparkles className="w-3.5 h-3.5 text-[#D4AF37] animate-pulse" />
-              <span>Logos &bull; Visão do {role.toUpperCase()}</span>
+  return (
+    <PageTransition className="space-y-8 sm:space-y-12">
+      {/* =========================================================================
+          HERO MASTHEAD — Austere, bold editorial headline (44-60px), zero AI glow
+          ========================================================================= */}
+      <section className="border-b border-[#E6E2D8] pb-6 sm:pb-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-3 max-w-3xl">
+            <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-slate-500">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#C5A046]" />
+              <span>Logos Eclesial</span>
+              <span className="text-slate-300">/</span>
+              <span className="text-[#141B22] font-semibold">Persona {role}</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif-sacred font-bold tracking-tight text-white leading-tight">
-              Graça e Paz,{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-amber-100 to-amber-200">
-                {user?.name?.split(' ')[0] ||
-                  currentPerson?.name?.split(' ')[0] ||
-                  'Comunidade Logos'}
-              </span>
+
+            <h1 className="font-serif-sacred text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#141B22] leading-[1.05]">
+              Cuidado pastoral e crescimento dos lares.
             </h1>
-            <p className="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl">
-              Cuidado pastoral de pessoas, acolhimento de novos visitantes e acompanhamento do
-              crescimento dos lares em Cristo com excelência visual e espiritual.
+
+            <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl font-normal">
+              Acompanhamento de novos visitantes acolhidos no culto de domingo, discipulado nos
+              lares e integração de membros na comunhão bíblica.
             </p>
           </div>
 
-          {/* Quick Actions with microinteractions */}
-          <div className="flex flex-wrap items-center gap-2.5 pt-1 md:pt-0">
+          {/* Quick Actions Bar — Editorial buttons */}
+          <div className="flex flex-wrap items-center gap-2 pt-2 md:pt-0 flex-shrink-0">
             <Link to="/visitante-cadastro" target="_blank" rel="noopener noreferrer">
-              <Button variant="gold" className="text-xs h-10 px-4 rounded-xl">
-                <QrCode className="w-4 h-4 mr-2" />
-                QR Visitante
+              <Button className="bg-[#141B22] hover:bg-[#1E2732] text-[#FAF9F6] text-xs h-9 px-4 rounded font-mono shadow-none cursor-pointer">
+                <QrCode className="w-3.5 h-3.5 mr-2 text-[#C5A046]" strokeWidth={1.75} />
+                QR Culto
               </Button>
             </Link>
 
@@ -225,9 +205,9 @@ export default function Index() {
               <Link to="/secretaria">
                 <Button
                   variant="outline"
-                  className="border-white/20 bg-white/10 hover:bg-white/20 text-white hover:text-white text-xs h-10 px-4 rounded-xl backdrop-blur-md"
+                  className="bg-white hover:bg-slate-50 text-[#141B22] border-[#E6E2D8] text-xs h-9 px-4 rounded font-mono shadow-none"
                 >
-                  <Mail className="w-4 h-4 mr-2" />
+                  <Mail className="w-3.5 h-3.5 mr-2" strokeWidth={1.75} />
                   Gerar Convite
                 </Button>
               </Link>
@@ -238,52 +218,56 @@ export default function Index() {
                 <DialogTrigger asChild>
                   <Button
                     variant="outline"
-                    className="bg-white text-[#1F2D3A] hover:bg-slate-100 text-xs font-semibold h-10 px-4 rounded-xl shadow-sm border-transparent"
+                    className="bg-transparent hover:bg-slate-100 text-slate-700 border-[#E6E2D8] text-xs h-9 px-3 rounded font-mono"
                   >
-                    <Lock className="w-4 h-4 mr-2" />
-                    Entrar (Secretaria)
+                    <Lock className="w-3.5 h-3.5 mr-1.5" strokeWidth={1.75} />
+                    Entrar
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-md bg-white rounded-3xl p-6 shadow-elevated border-slate-200">
+                <DialogContent className="sm:max-w-md bg-white rounded-md p-6 border-[#E6E2D8]">
                   <DialogHeader>
-                    <DialogTitle className="font-serif-sacred text-2xl text-[#1F2D3A]">
-                      Entrar no Logos
+                    <DialogTitle className="font-serif-sacred text-2xl text-[#141B22]">
+                      Acesso ao Sistema
                     </DialogTitle>
                   </DialogHeader>
                   <form onSubmit={handleLogin} className="space-y-4 pt-2">
                     <div>
-                      <label className="text-xs font-semibold text-slate-700">
-                        Email da Secretaria
+                      <label className="text-xs font-mono uppercase tracking-wider text-slate-600">
+                        E-mail
                       </label>
                       <Input
                         type="email"
                         value={authEmail}
                         onChange={(e) => setAuthEmail(e.target.value)}
                         required
-                        className="mt-1 text-xs h-10 rounded-xl"
+                        className="mt-1 text-xs h-9 rounded bg-[#FAF9F6] border-[#E6E2D8]"
                       />
                     </div>
                     <div>
-                      <label className="text-xs font-semibold text-slate-700">Senha</label>
+                      <label className="text-xs font-mono uppercase tracking-wider text-slate-600">
+                        Senha
+                      </label>
                       <Input
                         type="password"
                         value={authPass}
                         onChange={(e) => setAuthPass(e.target.value)}
                         required
-                        className="mt-1 text-xs h-10 rounded-xl"
+                        className="mt-1 text-xs h-9 rounded bg-[#FAF9F6] border-[#E6E2D8]"
                       />
                     </div>
-                    <p className="text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-                      Seed padrão:{' '}
-                      <code className="font-bold text-slate-700">cleristonx.lima@gmail.com</code> /{' '}
-                      <code className="font-bold text-slate-700">Skip@Pass</code>
-                    </p>
+                    <div className="text-[11px] font-mono text-slate-500 bg-[#FAF9F6] p-3 rounded border border-[#E6E2D8]">
+                      Acesso demonstrativo: <br />
+                      <span className="text-[#141B22] font-semibold">
+                        cleristonx.lima@gmail.com
+                      </span>{' '}
+                      / <span className="text-[#141B22] font-semibold">Skip@Pass</span>
+                    </div>
                     <Button
                       type="submit"
                       disabled={isLoggingIn}
-                      className="w-full bg-[#1F2D3A] hover:bg-[#15202B] text-white text-xs h-10 rounded-xl font-semibold cursor-pointer shadow-md"
+                      className="w-full bg-[#141B22] hover:bg-[#1E2732] text-white text-xs h-9 rounded font-mono"
                     >
-                      {isLoggingIn ? 'Entrando...' : 'Confirmar Acesso'}
+                      {isLoggingIn ? 'Autenticando...' : 'Confirmar Entrada'}
                     </Button>
                   </form>
                 </DialogContent>
@@ -291,707 +275,624 @@ export default function Index() {
             )}
           </div>
         </div>
-      </motion.div>
+      </section>
 
       {/* =========================================================================
-          QUICK ACTIONS ROW (Stagger animated touch cards)
+          ASYMMETRIC EDITORIAL BLOCK (Secretary / Pastor)
+          Left: Giant Dominant Hero Number + Trend. Right: Editorial Dense List.
           ========================================================================= */}
-      <StaggerContainer className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <StaggerItem>
-          <MotionCard>
-            <Link
-              to="/pessoas"
-              className="flex items-center gap-3 p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-soft hover:shadow-elevated hover:border-[#D4AF37]/50 transition-all group block"
-            >
-              <div className="w-10 h-10 rounded-xl bg-amber-50 text-[#D4AF37] flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-100 transition-all duration-200">
-                <Users className="w-5 h-5" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs font-bold text-slate-800 truncate">Pessoas</p>
-                <p className="text-[10px] text-slate-400 truncate">Ver cadastros</p>
-              </div>
-            </Link>
-          </MotionCard>
-        </StaggerItem>
-
-        <StaggerItem>
-          <MotionCard>
-            <Link
-              to="/jornada"
-              className="flex items-center gap-3 p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-soft hover:shadow-elevated hover:border-[#D4AF37]/50 transition-all group block"
-            >
-              <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-blue-100 transition-all duration-200">
-                <GitFork className="w-5 h-5" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs font-bold text-slate-800 truncate">Jornada</p>
-                <p className="text-[10px] text-slate-400 truncate">Pipeline de fé</p>
-              </div>
-            </Link>
-          </MotionCard>
-        </StaggerItem>
-
-        <StaggerItem>
-          <MotionCard>
-            <Link
-              to="/familias"
-              className="flex items-center gap-3 p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-soft hover:shadow-elevated hover:border-[#D4AF37]/50 transition-all group block"
-            >
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-emerald-100 transition-all duration-200">
-                <HomeIcon className="w-5 h-5" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs font-bold text-slate-800 truncate">Famílias</p>
-                <p className="text-[10px] text-slate-400 truncate">Casas e lares</p>
-              </div>
-            </Link>
-          </MotionCard>
-        </StaggerItem>
-
-        <StaggerItem>
-          <MotionCard>
-            {canAccessAll ? (
-              <Link
-                to="/secretaria"
-                className="flex items-center gap-3 p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-soft hover:shadow-elevated hover:border-[#D4AF37]/50 transition-all group block"
-              >
-                <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-purple-100 transition-all duration-200">
-                  <Mail className="w-5 h-5" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-xs font-bold text-slate-800 truncate">Secretaria</p>
-                  <p className="text-[10px] text-slate-400 truncate">Convites ativos</p>
-                </div>
-              </Link>
-            ) : (
-              <Link
-                to="/visitante-cadastro"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-soft hover:shadow-elevated hover:border-[#D4AF37]/50 transition-all group block"
-              >
-                <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-rose-100 transition-all duration-200">
-                  <QrCode className="w-5 h-5" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-xs font-bold text-slate-800 truncate">QR Recepção</p>
-                  <p className="text-[10px] text-slate-400 truncate">Abrir cartão</p>
-                </div>
-              </Link>
-            )}
-          </MotionCard>
-        </StaggerItem>
-      </StaggerContainer>
-
-      {/* =========================================================================
-          ROLE-BASED WIDGETS
-          ========================================================================= */}
-
-      {/* 1. SECRETARY / PASTOR WIDGETS (Acesso Total & Desktop Management) */}
       {canAccessAll && (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-2.5 h-2.5 rounded-full bg-[#D4AF37] ring-4 ring-[#D4AF37]/20" />
-              <h2 className="text-base sm:text-lg font-serif-sacred font-bold text-[#1F2D3A]">
-                Indicadores Pastorais & Gestão
-              </h2>
+        <section className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
+            {/* DOMINANT HERO BLOCK (7 cols) — Dark Sovereign Surface, Big Serif Number */}
+            <div className="lg:col-span-7 bg-[#141B22] text-[#FAF9F6] p-6 sm:p-8 lg:p-10 rounded border border-white/10 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between pb-4 border-b border-white/10">
+                  <span className="text-[11px] font-mono uppercase tracking-widest text-[#C5A046]">
+                    Indicador Central de Acolhimento
+                  </span>
+                  <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded border border-white/15 text-slate-300">
+                    Semana Vigente
+                  </span>
+                </div>
+
+                <div className="pt-6 sm:pt-8 space-y-2">
+                  <p className="text-xs sm:text-sm text-slate-400 font-normal">
+                    Pessoas recebidas e cadastradas no culto:
+                  </p>
+                  <div className="flex items-baseline gap-4">
+                    <span className="font-serif-sacred text-6xl sm:text-7xl lg:text-8xl font-bold tracking-tight text-[#FAF9F6]">
+                      <AnimatedCounter value={visitorsCount} />
+                    </span>
+                    <span className="text-sm font-mono text-emerald-400 flex items-center gap-1">
+                      <ArrowUpRight className="w-4 h-4" />
+                      em acolhimento
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-8 sm:pt-10 border-t border-white/10 mt-6 grid grid-cols-3 gap-4">
+                <div>
+                  <p className="text-[10px] font-mono uppercase tracking-wider text-slate-400">
+                    Membros Plenos
+                  </p>
+                  <p className="font-serif-sacred text-2xl sm:text-3xl font-bold text-white mt-1">
+                    <AnimatedCounter value={membersCount} />
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-mono uppercase tracking-wider text-slate-400">
+                    Lares & Famílias
+                  </p>
+                  <p className="font-serif-sacred text-2xl sm:text-3xl font-bold text-white mt-1">
+                    <AnimatedCounter value={families.length} />
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-mono uppercase tracking-wider text-slate-400">
+                    Convites Ativos
+                  </p>
+                  <p className="font-serif-sacred text-2xl sm:text-3xl font-bold text-white mt-1">
+                    <AnimatedCounter value={pendingInvitesCount} />
+                  </p>
+                </div>
+              </div>
             </div>
-            <Badge
-              variant="outline"
-              className="text-[11px] font-semibold bg-emerald-50 text-emerald-800 border-emerald-200 px-2.5 py-0.5 rounded-full shadow-sm"
-            >
-              <Activity className="w-3 h-3 mr-1 text-emerald-600 animate-pulse" />
-              Tempo Real
-            </Badge>
+
+            {/* SECONDARY EDITORIAL BLOCK (5 cols) — Dense Typographic Visitor Register */}
+            <div className="lg:col-span-5 bg-white border border-[#E6E2D8] p-6 rounded flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between pb-3 border-b border-[#E6E2D8]">
+                  <div>
+                    <h3 className="font-serif-sacred text-lg font-bold text-[#141B22]">
+                      Acolhimentos Recentes
+                    </h3>
+                    <p className="text-[11px] text-slate-500 font-mono mt-0.5">
+                      Últimos visitantes registrados via QR Code
+                    </p>
+                  </div>
+                  <Link
+                    to="/pessoas?filter=visitor"
+                    className="text-xs font-mono text-[#141B22] hover:text-[#C5A046] flex items-center gap-1 font-medium"
+                  >
+                    Ver todos
+                    <ChevronRight className="w-3 h-3" />
+                  </Link>
+                </div>
+
+                {/* Dense Typographic List — Thin Hairlines */}
+                <div className="divide-y divide-[#F0EDE4] pt-1">
+                  {recentVisitors.length === 0 ? (
+                    <p className="text-xs text-slate-400 py-8 text-center font-mono">
+                      Nenhum novo visitante registrado.
+                    </p>
+                  ) : (
+                    recentVisitors.map((v) => (
+                      <div
+                        key={v.id}
+                        onClick={() => navigate(`/pessoas?id=${v.id}`)}
+                        className="py-3 flex items-baseline justify-between gap-3 group cursor-pointer hover:bg-[#FAF9F6] px-1 transition-colors"
+                      >
+                        <div className="min-w-0 pr-2">
+                          <p className="text-xs font-semibold text-[#141B22] group-hover:text-[#C5A046] transition-colors truncate">
+                            {v.name}
+                          </p>
+                          <p className="text-[11px] font-mono text-slate-500 truncate mt-0.5">
+                            {v.whatsapp || 'WhatsApp não informado'} &bull; {v.how_met || 'Culto'}
+                          </p>
+                        </div>
+                        <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded border border-[#E6E2D8] text-slate-600 flex-shrink-0">
+                          {new Date(v.created).toLocaleDateString('pt-BR', {
+                            day: '2-digit',
+                            month: 'short',
+                          })}
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-[#E6E2D8] mt-3 flex items-center justify-between text-[11px] font-mono text-slate-500">
+                <span>{visitorsCount} visitantes no pipeline</span>
+                <Link
+                  to="/jornada"
+                  className="text-[#141B22] hover:underline flex items-center gap-1 font-semibold"
+                >
+                  Abrir pipeline &rarr;
+                </Link>
+              </div>
+            </div>
           </div>
 
-          {/* KPI Metric Cards with Animated Count-Up */}
-          <StaggerContainer className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            {/* Visitors */}
-            <StaggerItem>
-              <Card className="border-slate-200/80 bg-white shadow-soft hover:shadow-elevated hover:border-amber-300/60 transition-all duration-200 rounded-2xl">
-                <CardHeader className="p-4 pb-2 flex flex-row items-center justify-between">
-                  <CardTitle className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    Novos Visitantes
-                  </CardTitle>
-                  <div className="p-2 rounded-xl bg-amber-50 text-[#D4AF37]">
-                    <UserPlus className="w-4 h-4" />
-                  </div>
-                </CardHeader>
-                <CardContent className="p-4 pt-0">
-                  <div className="text-2xl sm:text-3xl font-bold text-[#1F2D3A]">
-                    <AnimatedCounter value={visitorsCount} />
-                  </div>
-                  <p className="text-[11px] text-emerald-600 flex items-center gap-1 mt-1 font-semibold">
-                    <ArrowUpRight className="w-3.5 h-3.5" />
-                    No acolhimento
+          {/* EDITORIAL DATA ROW: Growth Chart + Secondary Metrics */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+            {/* Chart: Growth of Families (8 cols) */}
+            <div className="lg:col-span-8 bg-white border border-[#E6E2D8] p-6 rounded space-y-4">
+              <div className="flex items-baseline justify-between pb-3 border-b border-[#E6E2D8]">
+                <div>
+                  <h3 className="font-serif-sacred text-lg font-bold text-[#141B22]">
+                    Evolução dos Núcleos Familiares
+                  </h3>
+                  <p className="text-[11px] text-slate-500 font-mono mt-0.5">
+                    Histórico de lares ativos mapeados e integrados à igreja
                   </p>
-                </CardContent>
-              </Card>
-            </StaggerItem>
-
-            {/* Members */}
-            <StaggerItem>
-              <Card className="border-slate-200/80 bg-white shadow-soft hover:shadow-elevated hover:border-blue-300/60 transition-all duration-200 rounded-2xl">
-                <CardHeader className="p-4 pb-2 flex flex-row items-center justify-between">
-                  <CardTitle className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    Membros Efetivos
-                  </CardTitle>
-                  <div className="p-2 rounded-xl bg-blue-50 text-blue-600">
-                    <Users className="w-4 h-4" />
-                  </div>
-                </CardHeader>
-                <CardContent className="p-4 pt-0">
-                  <div className="text-2xl sm:text-3xl font-bold text-[#1F2D3A]">
-                    <AnimatedCounter value={membersCount} />
-                  </div>
-                  <p className="text-[11px] text-slate-500 mt-1">
-                    +{attendersCount} frequentadores
-                  </p>
-                </CardContent>
-              </Card>
-            </StaggerItem>
-
-            {/* Families */}
-            <StaggerItem>
-              <Card className="border-slate-200/80 bg-white shadow-soft hover:shadow-elevated hover:border-emerald-300/60 transition-all duration-200 rounded-2xl">
-                <CardHeader className="p-4 pb-2 flex flex-row items-center justify-between">
-                  <CardTitle className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    Lares & Famílias
-                  </CardTitle>
-                  <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600">
-                    <HomeIcon className="w-4 h-4" />
-                  </div>
-                </CardHeader>
-                <CardContent className="p-4 pt-0">
-                  <div className="text-2xl sm:text-3xl font-bold text-[#1F2D3A]">
-                    <AnimatedCounter value={families.length} />
-                  </div>
-                  <p className="text-[11px] text-slate-500 mt-1">Núcleos familiares</p>
-                </CardContent>
-              </Card>
-            </StaggerItem>
-
-            {/* Invites */}
-            <StaggerItem>
-              <Card className="border-slate-200/80 bg-white shadow-soft hover:shadow-elevated hover:border-purple-300/60 transition-all duration-200 rounded-2xl">
-                <CardHeader className="p-4 pb-2 flex flex-row items-center justify-between">
-                  <CardTitle className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    Convites Ativos
-                  </CardTitle>
-                  <div className="p-2 rounded-xl bg-purple-50 text-purple-600">
-                    <Mail className="w-4 h-4" />
-                  </div>
-                </CardHeader>
-                <CardContent className="p-4 pt-0">
-                  <div className="text-2xl sm:text-3xl font-bold text-[#1F2D3A]">
-                    <AnimatedCounter value={pendingInvitesCount} />
-                  </div>
-                  <p className="text-[11px] text-amber-600 mt-1 font-semibold">
-                    Aguardando ativação
-                  </p>
-                </CardContent>
-              </Card>
-            </StaggerItem>
-          </StaggerContainer>
-
-          {/* Desktop Rich Management Grid: Chart + Visitor Quick Table */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Chart: Growth */}
-            <Card className="lg:col-span-2 border-slate-200/80 bg-white shadow-soft rounded-3xl overflow-hidden">
-              <CardHeader className="p-5 sm:p-6 pb-2">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-base font-serif-sacred text-[#1F2D3A]">
-                      Crescimento de Lares e Famílias
-                    </CardTitle>
-                    <CardDescription className="text-xs text-slate-500 mt-0.5">
-                      Evolução mensal de núcleos familiares conectados ao Logos
-                    </CardDescription>
-                  </div>
-                  <Badge variant="outline" className="text-xs bg-slate-50 rounded-lg">
-                    Semestral
-                  </Badge>
                 </div>
-              </CardHeader>
-              <CardContent className="p-5 sm:p-6 pt-2 h-64">
+                <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded border border-[#E6E2D8] text-slate-600">
+                  Visão Semestral
+                </span>
+              </div>
+
+              <div className="h-56 pt-2">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={chartData} margin={{ top: 10, right: 20, left: -20, bottom: 0 }}>
+                  <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
                     <defs>
-                      <linearGradient id="colorFamModern" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#D4AF37" stopOpacity={0.45} />
-                        <stop offset="95%" stopColor="#D4AF37" stopOpacity={0.01} />
+                      <linearGradient id="editorialGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#141B22" stopOpacity={0.15} />
+                        <stop offset="95%" stopColor="#141B22" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <XAxis dataKey="month" stroke="#94a3b8" fontSize={11} tickLine={false} />
-                    <YAxis stroke="#94a3b8" fontSize={11} allowDecimals={false} tickLine={false} />
+                    <XAxis
+                      dataKey="month"
+                      stroke="#8E8B82"
+                      fontSize={11}
+                      tickLine={false}
+                      fontFamily="Inter, sans-serif"
+                    />
+                    <YAxis
+                      stroke="#8E8B82"
+                      fontSize={11}
+                      allowDecimals={false}
+                      tickLine={false}
+                      fontFamily="Inter, sans-serif"
+                    />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: '#1B2733',
-                        color: '#fff',
-                        borderRadius: '16px',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        fontSize: '12px',
-                        boxShadow: '0 12px 30px rgba(0,0,0,0.25)',
+                        backgroundColor: '#141B22',
+                        color: '#FAF9F6',
+                        borderRadius: '4px',
+                        border: '1px solid rgba(255,255,255,0.15)',
+                        fontSize: '11px',
+                        fontFamily: 'Inter, sans-serif',
                       }}
                     />
                     <Area
                       type="monotone"
                       dataKey="familias"
-                      stroke="#D4AF37"
-                      strokeWidth={3}
+                      stroke="#141B22"
+                      strokeWidth={1.5}
                       fillOpacity={1}
-                      fill="url(#colorFamModern)"
+                      fill="url(#editorialGrad)"
                     />
                   </AreaChart>
                 </ResponsiveContainer>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            {/* Quick Visitors List */}
-            <Card className="border-slate-200/80 bg-white shadow-soft rounded-3xl flex flex-col overflow-hidden">
-              <CardHeader className="p-5 pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base font-serif-sacred text-[#1F2D3A] flex items-center gap-2">
-                    <UserPlus className="w-4 h-4 text-[#D4AF37]" />
-                    <span>Acolhimento Rápido</span>
-                  </CardTitle>
-                  <Link
-                    to="/pessoas"
-                    className="text-xs text-[#D4AF37] hover:text-[#b89324] font-semibold flex items-center gap-0.5"
-                  >
-                    Ver todos
-                    <ChevronRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
-                <CardDescription className="text-xs text-slate-500">
-                  Visitantes recentes cadastrados via QR Code
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-5 pt-0 flex-1 space-y-2.5">
-                {persons
-                  .filter((p) => p.status === 'visitor')
-                  .slice(0, 4)
-                  .map((v) => (
-                    <motion.div
-                      key={v.id}
-                      whileHover={{ x: 2 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => navigate(`/pessoas?id=${v.id}`)}
-                      className="p-3 rounded-2xl bg-slate-50 hover:bg-amber-50/50 transition-all flex items-center justify-between cursor-pointer border border-slate-100 hover:border-amber-200/60 group"
-                    >
-                      <div className="min-w-0 pr-2">
-                        <p className="font-semibold text-xs text-slate-800 truncate group-hover:text-[#1F2D3A]">
-                          {v.name}
-                        </p>
-                        <p className="text-[11px] text-slate-500 truncate mt-0.5">
-                          {v.whatsapp || 'WhatsApp não informado'}
-                        </p>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#D4AF37] transition-colors flex-shrink-0" />
-                    </motion.div>
-                  ))}
-                {visitorsCount === 0 && (
-                  <p className="text-xs text-slate-400 text-center py-8">
-                    Nenhum visitante recente no momento.
-                  </p>
-                )}
-              </CardContent>
-            </Card>
+            {/* Quick Management Shortcuts (4 cols) — Editorial Text Menu */}
+            <div className="lg:col-span-4 bg-white border border-[#E6E2D8] p-6 rounded space-y-4">
+              <div className="pb-3 border-b border-[#E6E2D8]">
+                <h3 className="font-serif-sacred text-lg font-bold text-[#141B22]">
+                  Cadernos Pastorais
+                </h3>
+                <p className="text-[11px] text-slate-500 font-mono mt-0.5">
+                  Acesso direto aos livros de registros
+                </p>
+              </div>
+
+              <nav className="divide-y divide-[#F0EDE4] text-xs">
+                <Link
+                  to="/pessoas"
+                  className="py-3 flex items-center justify-between group hover:text-[#C5A046] transition-colors"
+                >
+                  <div>
+                    <p className="font-medium text-[#141B22] group-hover:text-[#C5A046]">
+                      Livro de Pessoas
+                    </p>
+                    <p className="text-[11px] font-mono text-slate-400">
+                      {persons.length} registros cadastrados
+                    </p>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#C5A046] transition-colors" />
+                </Link>
+
+                <Link
+                  to="/familias"
+                  className="py-3 flex items-center justify-between group hover:text-[#C5A046] transition-colors"
+                >
+                  <div>
+                    <p className="font-medium text-[#141B22] group-hover:text-[#C5A046]">
+                      Núcleos Familiares
+                    </p>
+                    <p className="text-[11px] font-mono text-slate-400">
+                      {families.length} lares organizados
+                    </p>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#C5A046] transition-colors" />
+                </Link>
+
+                <Link
+                  to="/jornada"
+                  className="py-3 flex items-center justify-between group hover:text-[#C5A046] transition-colors"
+                >
+                  <div>
+                    <p className="font-medium text-[#141B22] group-hover:text-[#C5A046]">
+                      Jornada Logos (Pipeline)
+                    </p>
+                    <p className="text-[11px] font-mono text-slate-400">
+                      3 estágios de maturidade bíblica
+                    </p>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#C5A046] transition-colors" />
+                </Link>
+
+                <Link
+                  to="/secretaria"
+                  className="py-3 flex items-center justify-between group hover:text-[#C5A046] transition-colors"
+                >
+                  <div>
+                    <p className="font-medium text-[#141B22] group-hover:text-[#C5A046]">
+                      Secretaria & Convites
+                    </p>
+                    <p className="text-[11px] font-mono text-slate-400">
+                      {pendingInvitesCount} convites aguardando
+                    </p>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#C5A046] transition-colors" />
+                </Link>
+              </nav>
+            </div>
           </div>
-        </div>
+        </section>
       )}
 
-      {/* 2. LEADER WIDGETS (Restrito ao Contexto) */}
+      {/* =========================================================================
+          LEADER VIEW (Restricted to Context) — Sharp Editorial Layout
+          ========================================================================= */}
       {isLeader && (
-        <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <section className="space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-3 border-b border-[#E6E2D8] pb-4">
             <div>
-              <h2 className="text-base sm:text-lg font-serif-sacred font-bold text-[#1F2D3A] flex items-center gap-2">
-                <Users className="w-5 h-5 text-blue-600" />
-                Painel do Líder de Grupo
+              <h2 className="font-serif-sacred text-2xl font-bold text-[#141B22]">
+                Pequeno Grupo & Pessoas Acompanhadas
               </h2>
-              <p className="text-xs text-slate-500">
-                Pessoas e lares sob seu acompanhamento espiritual
+              <p className="text-xs text-slate-500 font-mono mt-0.5">
+                Visão restrita às pessoas e lares sob sua liderança espiritual
               </p>
             </div>
+
             <Dialog open={reportModalOpen} onOpenChange={setReportModalOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-[#1F2D3A] hover:bg-[#15202B] text-white text-xs font-semibold h-9 rounded-xl shadow-sm self-start sm:self-auto">
-                  <Send className="w-3.5 h-3.5 mr-1.5" />
-                  Relatar Reunião do Grupo
+                <Button className="bg-[#141B22] hover:bg-[#1E2732] text-white text-xs h-9 px-4 rounded font-mono shadow-none">
+                  <Send className="w-3.5 h-3.5 mr-1.5 text-[#C5A046]" strokeWidth={1.75} />
+                  Relatar Encontro do Grupo
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-md bg-white rounded-3xl p-6 shadow-elevated">
+              <DialogContent className="sm:max-w-md bg-white rounded-md p-6 border-[#E6E2D8]">
                 <DialogHeader>
-                  <DialogTitle className="font-serif-sacred text-xl text-[#1F2D3A]">
-                    Relatar Encontro do Pequeno Grupo
+                  <DialogTitle className="font-serif-sacred text-xl text-[#141B22]">
+                    Relatório do Pequeno Grupo
                   </DialogTitle>
                 </DialogHeader>
-                <form onSubmit={handleReportMeeting} className="space-y-4 pt-2">
+                <form onSubmit={handleReportMeeting} className="space-y-4 pt-2 text-xs">
                   <div>
-                    <label className="text-xs font-semibold text-slate-700">Nome do Grupo</label>
+                    <label className="font-mono uppercase tracking-wider text-slate-600 block">
+                      Nome do Grupo
+                    </label>
                     <Input
                       value={meetingGroup}
                       onChange={(e) => setMeetingGroup(e.target.value)}
                       required
-                      className="mt-1 text-xs h-10 rounded-xl"
+                      className="mt-1 h-9 rounded bg-[#FAF9F6] border-[#E6E2D8]"
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-semibold text-slate-700">Presentes no Lar</label>
+                    <label className="font-mono uppercase tracking-wider text-slate-600 block">
+                      Presentes no Encontro
+                    </label>
                     <Input
                       type="number"
                       value={meetingAttendance}
                       onChange={(e) => setMeetingAttendance(e.target.value)}
                       required
-                      className="mt-1 text-xs h-10 rounded-xl"
+                      className="mt-1 h-9 rounded bg-[#FAF9F6] border-[#E6E2D8]"
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-semibold text-slate-700">
-                      Notas / Pedidos de Oração
+                    <label className="font-mono uppercase tracking-wider text-slate-600 block">
+                      Notas Pastorais / Pedidos de Oração
                     </label>
                     <Textarea
                       rows={3}
                       value={meetingNotes}
                       onChange={(e) => setMeetingNotes(e.target.value)}
-                      placeholder="Ex: Tivemos 2 novos visitantes. Oramos pela família do Pedro..."
-                      className="mt-1 text-xs rounded-xl"
+                      placeholder="Ex: Tivemos 2 visitantes no lar. Oramos pela recuperação da saúde da irmã Maria..."
+                      className="mt-1 rounded bg-[#FAF9F6] border-[#E6E2D8]"
                     />
                   </div>
                   <Button
                     type="submit"
-                    className="w-full bg-[#1F2D3A] hover:bg-[#15202B] text-white text-xs h-10 rounded-xl font-semibold shadow-md"
+                    className="w-full bg-[#141B22] hover:bg-[#1E2732] text-white text-xs h-9 rounded font-mono"
                   >
-                    Enviar Relatório Pastoral
+                    Registrar Relatório
                   </Button>
                 </form>
               </DialogContent>
             </Dialog>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Members List */}
-            <Card className="md:col-span-2 border-slate-200/80 bg-white shadow-soft rounded-3xl">
-              <CardHeader className="p-5">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base font-serif-sacred text-[#1F2D3A]">
-                    Membros sob sua Liderança
-                  </CardTitle>
-                  <Badge variant="outline" className="text-xs bg-slate-50">
-                    {leaderGroupPersons.length} pessoas
-                  </Badge>
-                </div>
-                <CardDescription className="text-xs text-slate-500">
-                  Visibilidade focada nos integrantes do seu grupo
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-5 pt-0 space-y-2.5">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Members table */}
+            <div className="lg:col-span-8 bg-white border border-[#E6E2D8] p-6 rounded space-y-4">
+              <div className="flex items-baseline justify-between pb-3 border-b border-[#E6E2D8]">
+                <h3 className="font-serif-sacred text-base font-bold text-[#141B22]">
+                  Integrantes sob seu Acompanhamento ({leaderGroupPersons.length})
+                </h3>
+                <span className="text-[10px] font-mono text-slate-500">Comunhão no Lar</span>
+              </div>
+
+              <div className="divide-y divide-[#F0EDE4] text-xs">
                 {leaderGroupPersons.map((p) => (
                   <div
                     key={p.id}
-                    className="p-3 rounded-2xl bg-slate-50 flex items-center justify-between text-xs hover:bg-slate-100/80 transition-colors"
+                    onClick={() => navigate(`/pessoas?id=${p.id}`)}
+                    className="py-3 flex items-center justify-between hover:bg-[#FAF9F6] px-1 transition-colors cursor-pointer group"
                   >
                     <div>
-                      <p className="font-semibold text-slate-800">{p.name}</p>
-                      <p className="text-[11px] text-slate-500">
-                        {p.whatsapp || 'WhatsApp não cadastrado'}
+                      <p className="font-medium text-[#141B22] group-hover:text-[#C5A046] transition-colors">
+                        {p.name}
+                      </p>
+                      <p className="text-[11px] font-mono text-slate-400">
+                        {p.whatsapp || 'Sem telefone'} &bull; {p.status}
                       </p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="capitalize text-[10px]">
-                        {p.status}
-                      </Badge>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => navigate(`/pessoas?id=${p.id}`)}
-                        className="text-xs h-8 text-[#1F2D3A] hover:text-[#D4AF37]"
-                      >
-                        Perfil &rarr;
-                      </Button>
-                    </div>
+                    <span className="text-[10px] font-mono text-slate-500 flex items-center gap-1 group-hover:text-[#141B22]">
+                      Ver perfil &rarr;
+                    </span>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
-
-            {/* Birthdays */}
-            <Card className="border-slate-200/80 bg-white shadow-soft rounded-3xl">
-              <CardHeader className="p-5">
-                <CardTitle className="text-base font-serif-sacred text-[#1F2D3A] flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-[#D4AF37]" />
-                  Aniversários do Mês
-                </CardTitle>
-                <CardDescription className="text-xs text-slate-500">
-                  Atenção e oração pastoral
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-5 pt-0 space-y-3">
-                <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/70 text-xs">
-                  <p className="font-semibold text-slate-800">Ana Carolina Silva</p>
-                  <p className="text-[11px] text-slate-500">18 de Outubro &bull; Família Silva</p>
-                  <Badge className="bg-[#D4AF37] text-[#19242E] text-[10px] font-bold mt-2">
-                    Em breve
-                  </Badge>
-                </div>
-                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70 text-xs">
-                  <p className="font-semibold text-slate-800">Lucas Silva</p>
-                  <p className="text-[11px] text-slate-500">04 de Novembro &bull; Família Silva</p>
-                  <span className="text-[10px] text-slate-400 block mt-1.5">Próximo mês</span>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      )}
-
-      {/* 3. MEMBER / VISITOR WIDGETS (Mobile-First Experience) */}
-      {isMemberOrVisitor && (
-        <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <h2 className="text-base sm:text-lg font-serif-sacred font-bold text-[#1F2D3A] flex items-center gap-2">
-                <Compass className="w-5 h-5 text-emerald-600" />
-                Minha Jornada & Espaço da Igreja
-              </h2>
-              <p className="text-xs text-slate-500">
-                Acompanhe seus passos na fé e comunhão da comunidade
-              </p>
+              </div>
             </div>
-            <Button
-              onClick={() => {
-                setCheckedIn(true)
-                toast.success('Check-in confirmado no culto de hoje!')
-              }}
-              disabled={checkedIn}
-              className={`text-xs font-semibold h-10 px-4 rounded-xl shadow-md transition-all ${
-                checkedIn
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-gradient-to-r from-[#D4AF37] to-[#E5C358] text-[#19242E] hover:shadow-lg'
-              }`}
-            >
-              <CheckCircle2 className="w-4 h-4 mr-2" />
-              {checkedIn ? 'Presença Confirmada Hoje' : 'Fazer Check-in no Culto'}
-            </Button>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Personal Journey Tracker */}
-            <Card className="md:col-span-2 border-slate-200/80 bg-white shadow-soft rounded-3xl">
-              <CardHeader className="p-5">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base font-serif-sacred text-[#1F2D3A]">
-                    Progresso da Minha Jornada
-                  </CardTitle>
-                  <Badge className="bg-[#1F2D3A] text-[#D4AF37] text-xs capitalize rounded-full px-3">
-                    {currentPerson?.status || 'Visitante'}
-                  </Badge>
-                </div>
-                <CardDescription className="text-xs text-slate-500">
-                  Seus marcos espirituais e de serviço na igreja
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-5 pt-0 space-y-5">
-                <div>
-                  <div className="flex justify-between text-xs font-semibold text-slate-700 mb-2">
-                    <span>
-                      Estágio:{' '}
-                      {currentPerson?.status === 'member'
-                        ? 'Membro Confirmado'
-                        : currentPerson?.status === 'attender'
-                          ? 'Frequentador Assíduo'
-                          : 'Novo Visitante'}
-                    </span>
-                    <span className="text-[#D4AF37] font-bold">
-                      {currentPerson?.status === 'member'
-                        ? '100%'
-                        : currentPerson?.status === 'attender'
-                          ? '65%'
-                          : '30%'}
-                    </span>
-                  </div>
-                  <Progress
-                    value={
-                      currentPerson?.status === 'member'
-                        ? 100
-                        : currentPerson?.status === 'attender'
-                          ? 65
-                          : 30
-                    }
-                    className="h-2.5 bg-slate-100 rounded-full"
-                  />
-                </div>
+            {/* Pastoral alerts / Birthdays */}
+            <div className="lg:col-span-4 bg-white border border-[#E6E2D8] p-6 rounded space-y-4">
+              <div className="pb-3 border-b border-[#E6E2D8]">
+                <h3 className="font-serif-sacred text-base font-bold text-[#141B22] flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-[#C5A046]" strokeWidth={1.75} />
+                  Aniversários do Mês
+                </h3>
+                <p className="text-[11px] text-slate-500 font-mono mt-0.5">
+                  Atenção pastoral direta
+                </p>
+              </div>
 
-                {/* Steps List */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
-                  <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-emerald-50 text-emerald-900 border border-emerald-100 shadow-sm">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                    <span className="font-medium">Primeira Visita Registrada</span>
-                  </div>
-                  <div
-                    className={`flex items-center gap-2.5 p-3 rounded-2xl border ${
-                      currentPerson?.checklist_welcome_class
-                        ? 'bg-emerald-50 text-emerald-900 border-emerald-100'
-                        : 'bg-slate-50 text-slate-500 border-slate-100'
-                    }`}
-                  >
-                    <CheckCircle2
-                      className={`w-4 h-4 flex-shrink-0 ${
-                        currentPerson?.checklist_welcome_class
-                          ? 'text-emerald-600'
-                          : 'text-slate-300'
-                      }`}
-                    />
-                    <span className="font-medium">Classe de Boas-Vindas</span>
-                  </div>
-                  <div
-                    className={`flex items-center gap-2.5 p-3 rounded-2xl border ${
-                      currentPerson?.checklist_baptized
-                        ? 'bg-emerald-50 text-emerald-900 border-emerald-100'
-                        : 'bg-slate-50 text-slate-500 border-slate-100'
-                    }`}
-                  >
-                    <CheckCircle2
-                      className={`w-4 h-4 flex-shrink-0 ${
-                        currentPerson?.checklist_baptized ? 'text-emerald-600' : 'text-slate-300'
-                      }`}
-                    />
-                    <span className="font-medium">Batismo Bíblico</span>
-                  </div>
-                  <div
-                    className={`flex items-center gap-2.5 p-3 rounded-2xl border ${
-                      currentPerson?.checklist_small_group
-                        ? 'bg-emerald-50 text-emerald-900 border-emerald-100'
-                        : 'bg-slate-50 text-slate-500 border-slate-100'
-                    }`}
-                  >
-                    <CheckCircle2
-                      className={`w-4 h-4 flex-shrink-0 ${
-                        currentPerson?.checklist_small_group ? 'text-emerald-600' : 'text-slate-300'
-                      }`}
-                    />
-                    <span className="font-medium">Pequeno Grupo (Comunhão)</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* My Family Card */}
-            <Card className="border-slate-200/80 bg-white shadow-soft rounded-3xl">
-              <CardHeader className="p-5">
-                <CardTitle className="text-base font-serif-sacred text-[#1F2D3A] flex items-center gap-2">
-                  <HomeIcon className="w-4 h-4 text-[#D4AF37]" />
-                  Meu Lar / Família
-                </CardTitle>
-                <CardDescription className="text-xs text-slate-500">
-                  Vínculo familiar cadastrado
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-5 pt-0 space-y-3.5">
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70">
-                  <p className="font-bold text-xs text-slate-800">
-                    {currentPerson?.expand?.family?.name || 'Família ainda não associada'}
+              <div className="space-y-3 text-xs">
+                <div className="p-3 bg-[#FAF9F6] border border-[#E6E2D8] rounded">
+                  <p className="font-medium text-[#141B22]">Ana Carolina Silva</p>
+                  <p className="text-[11px] font-mono text-slate-500">
+                    18 de Outubro &bull; Família Silva
                   </p>
-                  <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
-                    {currentPerson?.expand?.family?.address ||
-                      'Solicite à secretaria o vínculo oficial do seu lar no sistema.'}
-                  </p>
+                  <span className="inline-block text-[10px] font-mono uppercase text-[#C5A046] mt-1">
+                    Esta semana
+                  </span>
                 </div>
-                <Link to="/familias" className="w-full block">
-                  <Button
-                    variant="outline"
-                    className="w-full text-xs text-[#1F2D3A] hover:bg-slate-50 h-9.5 rounded-xl border-slate-200"
-                  >
-                    Ver Detalhes do Lar
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+                <div className="p-3 bg-[#FAF9F6] border border-[#E6E2D8] rounded">
+                  <p className="font-medium text-[#141B22]">Lucas Silva</p>
+                  <p className="text-[11px] font-mono text-slate-500">
+                    04 de Novembro &bull; Família Silva
+                  </p>
+                  <span className="inline-block text-[10px] font-mono uppercase text-slate-400 mt-1">
+                    Próximo mês
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
       )}
 
       {/* =========================================================================
-          ACTIVITY FEED (Linha do Tempo da Comunidade com Motion)
+          MEMBER / VISITOR VIEW — Clean Personal Progress, No Glassmorphism
           ========================================================================= */}
-      <Card className="border-slate-200/80 bg-white shadow-soft rounded-3xl overflow-hidden">
-        <CardHeader className="p-5 sm:p-6 pb-3 flex flex-row items-center justify-between">
-          <div>
-            <CardTitle className="text-base font-serif-sacred text-[#1F2D3A] flex items-center gap-2">
-              <GitFork className="w-4 h-4 text-[#D4AF37]" />
-              Linha do Tempo & Movimentações
-            </CardTitle>
-            <CardDescription className="text-xs text-slate-500 mt-0.5">
-              Passos na jornada, novos visitantes e celebrações da igreja
-            </CardDescription>
+      {isMemberOrVisitor && (
+        <section className="space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-3 border-b border-[#E6E2D8] pb-4">
+            <div>
+              <h2 className="font-serif-sacred text-2xl font-bold text-[#141B22]">
+                Minha Jornada Comunitária
+              </h2>
+              <p className="text-xs text-slate-500 font-mono mt-0.5">
+                Passos na fé e comunhão da Igreja Logos
+              </p>
+            </div>
+
+            <Button
+              onClick={() => {
+                setCheckedIn(true)
+                toast.success('Presença confirmada no culto de hoje.')
+              }}
+              disabled={checkedIn}
+              className={`text-xs h-9 px-4 rounded font-mono shadow-none transition-colors ${
+                checkedIn
+                  ? 'bg-emerald-700 text-white'
+                  : 'bg-[#141B22] hover:bg-[#1E2732] text-white'
+              }`}
+            >
+              <CheckCircle2 className="w-3.5 h-3.5 mr-2" strokeWidth={1.75} />
+              {checkedIn ? 'Presença Confirmada' : 'Fazer Check-in no Culto'}
+            </Button>
           </div>
-          <Badge
-            variant="outline"
-            className="text-xs text-slate-500 hidden sm:inline-flex rounded-lg"
-          >
-            Recentes
-          </Badge>
-        </CardHeader>
-        <CardContent className="p-5 sm:p-6 pt-2">
-          <div className="relative pl-6 space-y-5 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
-            {activities.length === 0 ? (
-              <p className="text-xs text-slate-400 py-4">Nenhuma atividade recente.</p>
-            ) : (
-              activities.map((act) => {
-                const isVisitor = act.type === 'visitor_signup'
-                const isJourney = act.type === 'journey_change'
-                return (
-                  <motion.div
-                    key={act.id}
-                    initial={{ opacity: 0, x: -6 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.25 }}
-                    className="relative group"
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Progress Card */}
+            <div className="lg:col-span-8 bg-white border border-[#E6E2D8] p-6 rounded space-y-6">
+              <div className="flex items-baseline justify-between pb-3 border-b border-[#E6E2D8]">
+                <div>
+                  <h3 className="font-serif-sacred text-lg font-bold text-[#141B22]">
+                    Progresso Espiritual
+                  </h3>
+                  <p className="text-[11px] text-slate-500 font-mono mt-0.5">
+                    Estágio atual: {currentPerson?.status || 'Visitante'}
+                  </p>
+                </div>
+                <span className="font-serif-sacred text-xl font-bold text-[#141B22]">
+                  {currentPerson?.status === 'member'
+                    ? '100%'
+                    : currentPerson?.status === 'attender'
+                      ? '65%'
+                      : '30%'}
+                </span>
+              </div>
+
+              <div>
+                <Progress
+                  value={
+                    currentPerson?.status === 'member'
+                      ? 100
+                      : currentPerson?.status === 'attender'
+                        ? 65
+                        : 30
+                  }
+                  className="h-2 bg-[#FAF9F6] border border-[#E6E2D8] rounded"
+                />
+              </div>
+
+              {/* Steps with hairline dividers */}
+              <div className="divide-y divide-[#F0EDE4] text-xs">
+                <div className="py-3 flex items-center justify-between">
+                  <span className="font-medium text-[#141B22]">
+                    1. Primeiro Acolhimento no Culto
+                  </span>
+                  <span className="text-[10px] font-mono text-emerald-700 font-semibold">
+                    ● Concluído
+                  </span>
+                </div>
+                <div className="py-3 flex items-center justify-between">
+                  <span className="font-medium text-[#141B22]">2. Classe de Boas-Vindas</span>
+                  <span
+                    className={`text-[10px] font-mono ${
+                      currentPerson?.checklist_welcome_class
+                        ? 'text-emerald-700 font-semibold'
+                        : 'text-slate-400'
+                    }`}
                   >
-                    {/* Circle Bullet */}
-                    <div
-                      className={`absolute -left-6 top-1 w-5 h-5 rounded-full flex items-center justify-center ring-4 ring-white shadow-sm transition-transform duration-200 group-hover:scale-110 ${
-                        isVisitor
-                          ? 'bg-[#D4AF37] text-white'
-                          : isJourney
-                            ? 'bg-[#1F2D3A] text-[#D4AF37]'
-                            : 'bg-emerald-500 text-white'
-                      }`}
-                    >
-                      {isVisitor ? (
-                        <UserPlus className="w-3 h-3" />
-                      ) : isJourney ? (
-                        <GitFork className="w-3 h-3" />
-                      ) : (
-                        <CheckCircle2 className="w-3 h-3" />
-                      )}
-                    </div>
-                    {/* Content Box */}
-                    <div className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200/70 group-hover:bg-slate-100/90 group-hover:border-slate-300/80 transition-all">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
-                        <span className="font-bold text-xs text-slate-800">{act.title}</span>
-                        <span className="text-[10px] text-slate-400 flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {new Date(act.created).toLocaleDateString('pt-BR', {
-                            day: '2-digit',
-                            month: 'short',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </span>
-                      </div>
-                      <p className="text-xs text-slate-600 leading-relaxed">{act.description}</p>
-                    </div>
-                  </motion.div>
-                )
-              })
-            )}
+                    {currentPerson?.checklist_welcome_class ? '● Concluído' : 'Pendente'}
+                  </span>
+                </div>
+                <div className="py-3 flex items-center justify-between">
+                  <span className="font-medium text-[#141B22]">3. Batismo Bíblico</span>
+                  <span
+                    className={`text-[10px] font-mono ${
+                      currentPerson?.checklist_baptized
+                        ? 'text-emerald-700 font-semibold'
+                        : 'text-slate-400'
+                    }`}
+                  >
+                    {currentPerson?.checklist_baptized ? '● Concluído' : 'Pendente'}
+                  </span>
+                </div>
+                <div className="py-3 flex items-center justify-between">
+                  <span className="font-medium text-[#141B22]">4. Pequeno Grupo nos Lares</span>
+                  <span
+                    className={`text-[10px] font-mono ${
+                      currentPerson?.checklist_small_group
+                        ? 'text-emerald-700 font-semibold'
+                        : 'text-slate-400'
+                    }`}
+                  >
+                    {currentPerson?.checklist_small_group ? '● Concluído' : 'Pendente'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* My Family Card */}
+            <div className="lg:col-span-4 bg-white border border-[#E6E2D8] p-6 rounded space-y-4">
+              <div className="pb-3 border-b border-[#E6E2D8]">
+                <h3 className="font-serif-sacred text-lg font-bold text-[#141B22] flex items-center gap-2">
+                  <HomeIcon className="w-4 h-4 text-[#C5A046]" strokeWidth={1.75} />
+                  Meu Lar / Família
+                </h3>
+                <p className="text-[11px] text-slate-500 font-mono mt-0.5">
+                  Vínculo familiar cadastrado
+                </p>
+              </div>
+
+              <div className="p-4 bg-[#FAF9F6] border border-[#E6E2D8] rounded text-xs space-y-2">
+                <p className="font-bold text-[#141B22]">
+                  {currentPerson?.expand?.family?.name || 'Família ainda não associada'}
+                </p>
+                <p className="text-[11px] text-slate-500 leading-relaxed font-mono">
+                  {currentPerson?.expand?.family?.address ||
+                    'Solicite à secretaria da igreja a confirmação do seu vínculo familiar.'}
+                </p>
+              </div>
+
+              <Link to="/familias" className="block pt-2">
+                <Button
+                  variant="outline"
+                  className="w-full text-xs font-mono h-9 rounded border-[#E6E2D8] text-[#141B22] hover:bg-[#FAF9F6]"
+                >
+                  Consultar Núcleos Familiares
+                </Button>
+              </Link>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        </section>
+      )}
+
+      {/* =========================================================================
+          ACTIVITY CHRONICLE — Editorial Line Timeline (No Round Cards)
+          ========================================================================= */}
+      <section className="bg-white border border-[#E6E2D8] p-6 sm:p-8 rounded space-y-4">
+        <div className="flex items-baseline justify-between pb-4 border-b border-[#E6E2D8]">
+          <div>
+            <h2 className="font-serif-sacred text-xl font-bold text-[#141B22]">
+              Crônica Comunitária & Movimentações
+            </h2>
+            <p className="text-[11px] text-slate-500 font-mono mt-0.5">
+              Registro histórico em tempo real de novos cadastros, avanços na fé e avisos pastorais
+            </p>
+          </div>
+          <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded border border-[#E6E2D8] text-slate-600 hidden sm:inline-block">
+            Histórico Recente
+          </span>
+        </div>
+
+        <div className="divide-y divide-[#F0EDE4] text-xs">
+          {activities.length === 0 ? (
+            <p className="text-xs text-slate-400 py-8 text-center font-mono">
+              Nenhuma movimentação recente registrada.
+            </p>
+          ) : (
+            activities.map((act) => (
+              <div
+                key={act.id}
+                className="py-3.5 flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 hover:bg-[#FAF9F6] px-2 transition-colors"
+              >
+                <div className="space-y-1 min-w-0 pr-4">
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#141B22]" />
+                    <p className="font-semibold text-[#141B22] tracking-tight">{act.title}</p>
+                  </div>
+                  <p className="text-slate-600 text-[11px] leading-relaxed pl-3.5">
+                    {act.description}
+                  </p>
+                </div>
+                <span className="text-[10px] font-mono text-slate-400 flex-shrink-0 pl-3.5 sm:pl-0">
+                  {new Date(act.created).toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </span>
+              </div>
+            ))
+          )}
+        </div>
+      </section>
     </PageTransition>
   )
 }

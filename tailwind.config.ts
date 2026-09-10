@@ -27,8 +27,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter var', 'SF Pro Display', 'system-ui', 'sans-serif'],
-        display: ['SF Pro Display', 'Inter var', 'system-ui', 'sans-serif'],
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        serif: ['Fraunces', 'Playfair Display', 'Georgia', 'serif'],
+        display: ['Fraunces', 'Georgia', 'serif'],
       },
       colors: {
         border: 'hsl(var(--border))',

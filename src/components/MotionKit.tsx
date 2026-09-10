@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 
 /**
- * Animated Counter component that smoothly animates a number upwards (count-up).
- * Automatically respects prefers-reduced-motion.
+ * Animated Counter component that animates numeric value with tabular numerals.
+ * Respects prefers-reduced-motion.
  */
 interface AnimatedCounterProps {
   value: number
@@ -15,7 +15,7 @@ interface AnimatedCounterProps {
 
 export function AnimatedCounter({
   value,
-  duration = 0.9,
+  duration = 0.8,
   prefix = '',
   suffix = '',
   className = '',
@@ -41,8 +41,8 @@ export function AnimatedCounter({
     const step = (timestamp: number) => {
       if (!startTimestamp) startTimestamp = timestamp
       const progress = Math.min((timestamp - startTimestamp) / (duration * 1000), 1)
-      // Ease out cubic
-      const easedProgress = 1 - Math.pow(1 - progress, 3)
+      // Ease out quartic — elegant deceleration
+      const easedProgress = 1 - Math.pow(1 - progress, 4)
       const current = Math.floor(easedProgress * (endValue - startValue) + startValue)
       setDisplayValue(current)
 
@@ -58,7 +58,7 @@ export function AnimatedCounter({
   }, [value, duration, shouldReduceMotion])
 
   return (
-    <span className={className}>
+    <span className={`tabular-nums ${className}`}>
       {prefix}
       {displayValue}
       {suffix}
@@ -67,7 +67,8 @@ export function AnimatedCounter({
 }
 
 /**
- * Page transition wrapper that smoothly animates page mounting with fade and subtle slide.
+ * Page transition wrapper that smoothly animates page mounting with subtle fade.
+ * Zero aggressive bouncing.
  */
 export function PageTransition({
   children,
@@ -84,10 +85,10 @@ export function PageTransition({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }}
+      initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -8 }}
-      transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+      exit={{ opacity: 0, y: -4 }}
+      transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
       className={className}
     >
       {children}
@@ -96,11 +97,11 @@ export function PageTransition({
 }
 
 /**
- * Stagger container for animating lists/cards sequentially on mount.
+ * Stagger container for animating lists sequentially on mount.
  */
 export function StaggerContainer({
   children,
-  staggerChildren = 0.05,
+  staggerChildren = 0.04,
   delayChildren = 0.02,
   className = '',
 }: {
@@ -154,12 +155,11 @@ export function StaggerItem({
   return (
     <motion.div
       variants={{
-        hidden: { opacity: 0, y: 12, scale: 0.98 },
+        hidden: { opacity: 0, y: 6 },
         visible: {
           opacity: 1,
           y: 0,
-          scale: 1,
-          transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] },
+          transition: { duration: 0.28, ease: [0.16, 1, 0.3, 1] },
         },
       }}
       className={className}
@@ -193,8 +193,8 @@ export function MotionCard({
 
   return (
     <motion.div
-      whileHover={{ y: -3, transition: { duration: 0.2 } }}
-      whileTap={{ scale: 0.985, y: 0 }}
+      whileHover={{ y: -1, transition: { duration: 0.15 } }}
+      whileTap={{ scale: 0.99 }}
       onClick={onClick}
       className={className}
     >

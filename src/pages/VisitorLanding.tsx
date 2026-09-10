@@ -1,24 +1,25 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  Compass,
   Heart,
-  CheckCircle2,
   Calendar,
-  Send,
-  Sparkles,
-  ArrowRight,
-  ExternalLink,
-  MessageSquare,
-  QrCode,
   MapPin,
   Clock,
-  Instagram,
-  Youtube,
+  CheckCircle2,
+  Phone,
+  Mail,
+  User,
+  MessageSquare,
+  Sparkles,
+  ArrowRight,
+  Shield,
+  Church,
 } from 'lucide-react'
+import { personsService, activitiesService } from '@/services/church'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
   SelectContent,
@@ -26,311 +27,314 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Card, CardContent } from '@/components/ui/card'
-import { personsService } from '@/services/church'
 import { toast } from 'sonner'
+import { PageTransition } from '@/components/MotionKit'
 
 export default function VisitorLanding() {
-  const [submitted, setSubmitted] = useState(false)
-  const [loading, setLoading] = useState(false)
-
-  // Form states
   const [name, setName] = useState('')
   const [whatsapp, setWhatsapp] = useState('')
-  const [birthDate, setBirthDate] = useState('')
   const [email, setEmail] = useState('')
-  const [howMet, setHowMet] = useState('QR Code no Culto')
+  const [howMet, setHowMet] = useState('Culto de Domingo')
+  const [prayerRequest, setPrayerRequest] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!name.trim()) {
-      toast.error('Por favor, informe seu nome completo.')
+      toast.error('Por favor, informe o seu nome completo.')
       return
     }
 
     try {
-      setLoading(true)
-      await personsService.create({
+      setSubmitting(true)
+      const notes = [
+        howMet ? `Como conheceu: ${howMet}` : '',
+        prayerRequest ? `Pedido de oração: ${prayerRequest}` : '',
+      ]
+        .filter(Boolean)
+        .join('\n')
+
+      const person = await personsService.create({
         name: name.trim(),
-        whatsapp: whatsapp.trim(),
-        birth_date: birthDate || undefined,
+        whatsapp: whatsapp.trim() || undefined,
         email: email.trim() || undefined,
-        how_met: howMet,
         status: 'visitor',
+        how_met: howMet,
+        notes: notes || undefined,
       })
+
+      // Log activity
+      await activitiesService.create({
+        title: `Novo Visitante: ${person.name}`,
+        description: `Cadastro via QR Code no culto (${howMet || 'Recepção'}).`,
+        type: 'visitor_signup',
+        person: person.id,
+      })
+
       setSubmitted(true)
-      toast.success('Que alegria ter você conosco! Seu cadastro foi recebido.')
+      toast.success('Que alegria ter você conosco! Seja muito bem-vindo à Família Logos.')
     } catch {
-      toast.error('Ocorreu um erro ao enviar. Tente novamente.')
+      toast.error('Erro ao enviar seu cadastro. Avise nossa equipe de recepção.')
     } finally {
-      setLoading(false)
+      setSubmitting(false)
     }
   }
 
-  // Thank You Page (Pós-Envio)
-  if (submitted) {
-    return (
-      <div className="min-h-screen bg-[#F8FAFC] flex flex-col justify-between items-center px-4 py-12">
-        <div className="max-w-md w-full text-center space-y-6 animate-fade-in my-auto">
-          <div className="w-20 h-20 mx-auto rounded-full bg-emerald-50 border-2 border-emerald-500/20 flex items-center justify-center text-emerald-600 shadow-lg">
-            <CheckCircle2 className="w-10 h-10 stroke-[2.2]" />
-          </div>
-
-          <div className="space-y-2">
-            <span className="text-xs uppercase tracking-widest text-[#D4AF37] font-bold">
-              Cadastro Confirmado
-            </span>
-            <h1 className="text-3xl font-serif-sacred font-bold text-[#2C3E50]">
-              Seja Bem-vindo(a) à Família Logos, {name.split(' ')[0]}!
-            </h1>
-            <p className="text-sm text-slate-600 leading-relaxed">
-              É uma honra receber você. Nossa equipe pastoral já foi notificada e estamos muito
-              felizes por conectar com você e sua família.
-            </p>
-          </div>
-
-          <Card className="border-slate-200 shadow-sm bg-white text-left p-4">
-            <div className="flex items-start gap-3">
-              <div className="p-2 rounded-lg bg-amber-50 text-[#D4AF37] mt-0.5">
-                <Heart className="w-4 h-4" />
-              </div>
-              <div>
-                <h4 className="text-xs font-semibold text-slate-800">Nosso Próximo Encontro</h4>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Culto de Celebração &bull; Domingo às 10h e às 18h.
-                </p>
-              </div>
-            </div>
-          </Card>
-
-          <div className="space-y-3 pt-2">
-            <p className="text-xs font-medium text-slate-500">Conecte-se com a gente nas redes:</p>
-            <div className="flex items-center justify-center gap-3">
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-pink-500 to-rose-500 text-white text-xs font-semibold shadow-sm hover:opacity-90 transition-opacity"
-              >
-                <Instagram className="w-4 h-4" />
-                <span>Instagram</span>
-              </a>
-              <a
-                href="https://youtube.com"
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-600 text-white text-xs font-semibold shadow-sm hover:opacity-90 transition-opacity"
-              >
-                <Youtube className="w-4 h-4" />
-                <span>YouTube</span>
-              </a>
-              <a
-                href="https://wa.me"
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-semibold shadow-sm hover:opacity-90 transition-opacity"
-              >
-                <MessageSquare className="w-4 h-4" />
-                <span>WhatsApp</span>
-              </a>
-            </div>
-          </div>
-
-          <div className="pt-6">
-            <Link to="/">
-              <Button variant="ghost" className="text-xs text-[#2C3E50] hover:text-[#D4AF37]">
-                Acessar Portal Logos
-                <ArrowRight className="w-3.5 h-3.5 ml-1" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-
-        <footer className="text-center text-xs text-slate-400">
-          Logos Gestão de Igreja &bull; Todos os direitos reservados.
-        </footer>
-      </div>
-    )
-  }
-
-  // Registration Landing Form
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col justify-between selection:bg-[#D4AF37]/30 selection:text-[#1F2D3A]">
-      {/* Top Bar */}
-      <header className="px-6 py-4 bg-white/90 backdrop-blur-md border-b border-slate-200/80 flex items-center justify-between shadow-sm">
-        <Link to="/" className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#D4AF37] via-[#F7E7A9] to-[#C49E2C] flex items-center justify-center text-[#1F2D3A] shadow-md shadow-[#D4AF37]/20">
-            <Compass className="w-5 h-5 stroke-[2.3]" />
-          </div>
-          <span className="font-serif-sacred text-2xl font-bold text-[#1F2D3A]">Logos</span>
-        </Link>
-        <div className="flex items-center gap-1.5 text-xs text-slate-600 font-semibold bg-amber-50 px-3 py-1.5 rounded-full border border-amber-200">
-          <QrCode className="w-4 h-4 text-[#D4AF37]" />
-          <span>Cadastro de Visitante</span>
+    <div className="min-h-screen bg-[#FAF9F6] text-[#17212A] selection:bg-[#C5A046]/20 selection:text-[#141B22]">
+      {/* =========================================================================
+          TOP MINIMAL MASTHEAD
+          ========================================================================= */}
+      <header className="border-b border-[#E6E2D8] bg-[#FAF9F6] py-5 px-6">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <Link to="/" className="flex items-baseline gap-2">
+            <span className="font-serif-sacred text-2xl font-bold tracking-tight text-[#141B22]">
+              Logos
+            </span>
+            <span className="text-[10px] tracking-widest uppercase font-mono text-[#C5A046] font-semibold">
+              Recepção
+            </span>
+          </Link>
+          <span className="text-[11px] font-mono text-slate-500 hidden sm:inline-block">
+            Culto Dominical &bull; 10h & 18h
+          </span>
         </div>
       </header>
 
-      {/* Main Container */}
-      <main className="max-w-4xl mx-auto px-4 py-8 md:py-12 w-full grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-        {/* Left Hero Card */}
-        <div className="md:col-span-5 space-y-6 text-center md:text-left">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 text-amber-800 text-xs font-semibold border border-amber-200">
-            <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
-            Seja Muito Bem-vindo(a)
+      {/* =========================================================================
+          HERO & EDITORIAL INVITATION (Warmer, welcoming, typography-led)
+          ========================================================================= */}
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-16 space-y-12">
+        <section className="text-center space-y-4 max-w-2xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#E6E2D8] bg-white font-mono text-[11px] text-slate-600">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#C5A046]" />
+            <span>Porta de Entrada da Comunidade</span>
           </div>
 
-          <h1 className="text-3xl md:text-4xl font-serif-sacred font-bold text-[#2C3E50] leading-tight">
-            Uma igreja feita de lares, amor e comunhão.
+          <h1 className="font-serif-sacred text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#141B22] leading-[1.08]">
+            É uma honra ter você conosco neste dia.
           </h1>
 
-          <p className="text-sm text-slate-600 leading-relaxed">
-            Estamos felizes em ter você aqui conosco hoje! Preencha seus dados rápidos para que
-            possamos orar por você, enviar uma mensagem de boas-vindas e manter contato.
+          <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+            Se você está visitando a Igreja Logos pela primeira vez, preencha este breve cartão para
+            que nossa equipe pastoral possa acolher você com carinho e orar pela sua família.
           </p>
+        </section>
 
-          <div className="space-y-3 pt-2 text-xs text-slate-600">
-            <div className="flex items-center gap-2.5 justify-center md:justify-start">
-              <MapPin className="w-4 h-4 text-[#D4AF37]" />
-              <span>Av. Central, 1000 &bull; Sede Logos</span>
-            </div>
-            <div className="flex items-center gap-2.5 justify-center md:justify-start">
-              <Clock className="w-4 h-4 text-[#D4AF37]" />
-              <span>Cultos de Domingo às 10h e 18h</span>
-            </div>
-          </div>
+        {/* =========================================================================
+            REGISTRATION CARD / SUCCESS SCREEN
+            ========================================================================= */}
+        <div className="max-w-xl mx-auto bg-white border border-[#E6E2D8] rounded p-6 sm:p-10 shadow-editorial">
+          {submitted ? (
+            <div className="text-center py-8 space-y-6">
+              <div className="w-14 h-14 rounded-full bg-[#FAF9F6] border border-[#C5A046] text-[#141B22] flex items-center justify-center mx-auto">
+                <CheckCircle2 className="w-7 h-7 text-[#C5A046]" strokeWidth={1.75} />
+              </div>
 
-          {/* Picture banner */}
-          <div className="relative rounded-2xl overflow-hidden shadow-md hidden sm:block">
-            <img
-              src="https://img.usecurling.com/p/600/340?q=church%20community"
-              alt="Comunidade acolhedora"
-              className="w-full h-44 object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#2C3E50]/80 via-transparent to-transparent flex items-end p-4">
-              <p className="text-xs text-white font-medium">
-                Acolhimento com excelência e propósito bíblico.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Form Card */}
-        <div className="md:col-span-7">
-          <Card className="border-slate-200 shadow-xl bg-white rounded-2xl">
-            <CardContent className="p-6 md:p-8 space-y-6">
-              <div>
-                <h2 className="text-xl font-serif-sacred font-bold text-[#2C3E50]">
-                  Cartão de Boas-Vindas
+              <div className="space-y-2">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-[#C5A046]">
+                  Acolhimento Confirmado
+                </span>
+                <h2 className="font-serif-sacred text-3xl font-bold text-[#141B22]">
+                  Seja muito bem-vindo!
                 </h2>
-                <p className="text-xs text-slate-500 mt-1">
-                  Leva menos de 1 minuto. Seus dados são confidenciais e tratados com carinho pela
-                  pastoral.
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-sm mx-auto">
+                  Recebemos seus dados com zelo pastoral. Nossa equipe de recepção entrará em
+                  contato via WhatsApp para agradecer sua visita.
                 </p>
               </div>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="v-name" className="text-xs font-semibold text-slate-700">
-                    Nome Completo *
-                  </Label>
+
+              <div className="p-4 bg-[#FAF9F6] border border-[#E6E2D8] rounded text-left text-xs space-y-2 font-mono">
+                <p className="font-semibold text-[#141B22] font-sans">Próximos Encontros:</p>
+                <p className="text-slate-600">
+                  &bull; Domingo: Cultos às 10h e às 18h <br />
+                  &bull; Quarta-feira: Estudo Bíblico & Oração às 20h <br />
+                  &bull; Pequenos Grupos nos Lares durante a semana
+                </p>
+              </div>
+
+              <div className="pt-2">
+                <Link to="/">
+                  <Button
+                    variant="outline"
+                    className="text-xs font-mono h-9 rounded border-[#E6E2D8] text-[#141B22]"
+                  >
+                    Voltar ao Início
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-5 text-xs">
+              <div className="pb-3 border-b border-[#E6E2D8]">
+                <h2 className="font-serif-sacred text-xl font-bold text-[#141B22]">
+                  Cartão Pastoral de Boas-Vindas
+                </h2>
+                <p className="text-[11px] text-slate-500 font-mono mt-0.5">
+                  Leva apenas 1 minuto &bull; 100% confidencial
+                </p>
+              </div>
+
+              {/* Name */}
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="vis-name"
+                  className="font-mono uppercase tracking-wider text-slate-600"
+                >
+                  Seu Nome Completo *
+                </Label>
+                <div className="relative">
+                  <User
+                    className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                    strokeWidth={1.75}
+                  />
                   <Input
-                    id="v-name"
+                    id="vis-name"
                     required
-                    placeholder="Ex: João da Silva"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="text-xs h-10"
+                    placeholder="Ex: Amanda Carvalho de Castro"
+                    className="pl-8 text-xs h-10 rounded bg-[#FAF9F6] border-[#E6E2D8] focus:border-[#141B22]"
                   />
                 </div>
+              </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="v-whatsapp" className="text-xs font-semibold text-slate-700">
-                      WhatsApp com DDD
-                    </Label>
-                    <Input
-                      id="v-whatsapp"
-                      placeholder="(11) 98765-4321"
-                      value={whatsapp}
-                      onChange={(e) => setWhatsapp(e.target.value)}
-                      className="text-xs h-10"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="v-birth" className="text-xs font-semibold text-slate-700">
-                      Data de Nascimento
-                    </Label>
-                    <Input
-                      id="v-birth"
-                      type="date"
-                      value={birthDate}
-                      onChange={(e) => setBirthDate(e.target.value)}
-                      className="text-xs h-10"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label htmlFor="v-email" className="text-xs font-semibold text-slate-700">
-                    E-mail (opcional)
-                  </Label>
+              {/* WhatsApp */}
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="vis-phone"
+                  className="font-mono uppercase tracking-wider text-slate-600"
+                >
+                  WhatsApp com DDD *
+                </Label>
+                <div className="relative">
+                  <Phone
+                    className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                    strokeWidth={1.75}
+                  />
                   <Input
-                    id="v-email"
+                    id="vis-phone"
+                    required
+                    value={whatsapp}
+                    onChange={(e) => setWhatsapp(e.target.value)}
+                    placeholder="(11) 98765-4321"
+                    className="pl-8 text-xs h-10 rounded bg-[#FAF9F6] border-[#E6E2D8] focus:border-[#141B22]"
+                  />
+                </div>
+              </div>
+
+              {/* Email */}
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="vis-email"
+                  className="font-mono uppercase tracking-wider text-slate-600"
+                >
+                  E-mail (Opcional)
+                </Label>
+                <div className="relative">
+                  <Mail
+                    className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                    strokeWidth={1.75}
+                  />
+                  <Input
+                    id="vis-email"
                     type="email"
-                    placeholder="joao@exemplo.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="text-xs h-10"
+                    placeholder="amanda@exemplo.com"
+                    className="pl-8 text-xs h-10 rounded bg-[#FAF9F6] border-[#E6E2D8] focus:border-[#141B22]"
                   />
                 </div>
+              </div>
 
-                <div className="space-y-1.5">
-                  <Label htmlFor="v-how" className="text-xs font-semibold text-slate-700">
-                    Como você conheceu a Igreja?
-                  </Label>
-                  <Select value={howMet} onValueChange={setHowMet}>
-                    <SelectTrigger id="v-how" className="text-xs h-10">
-                      <SelectValue placeholder="Selecione..." />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      <SelectItem value="QR Code no Culto">QR Code no Culto de Domingo</SelectItem>
-                      <SelectItem value="Convite de Familiar / Amigo">
-                        Convite de Amigo ou Familiar
-                      </SelectItem>
-                      <SelectItem value="Instagram / Redes Sociais">
-                        Instagram / Redes Sociais
-                      </SelectItem>
-                      <SelectItem value="Passei em frente à Igreja">
-                        Passei em frente à Igreja
-                      </SelectItem>
-                      <SelectItem value="Outro canal">Outro</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-[#1F2D3A] hover:bg-[#15202B] text-white text-xs h-11 rounded-2xl font-semibold shadow-lg shadow-slate-900/15 active:scale-[0.98] transition-all cursor-pointer"
+              {/* How met */}
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="vis-how"
+                  className="font-mono uppercase tracking-wider text-slate-600"
                 >
-                  {loading ? (
-                    'Registrando...'
-                  ) : (
-                    <>
-                      <Send className="w-4 h-4 mr-2 text-[#D4AF37]" />
-                      Confirmar Presença e Boas-Vindas
-                    </>
-                  )}
-                </Button>
-              </form>{' '}
-            </CardContent>
-          </Card>
-        </div>
-      </main>
+                  Como conheceu a Igreja Logos?
+                </Label>
+                <Select value={howMet} onValueChange={setHowMet}>
+                  <SelectTrigger
+                    id="vis-how"
+                    className="h-10 rounded bg-[#FAF9F6] border-[#E6E2D8] text-xs"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white rounded text-xs">
+                    <SelectItem value="Culto de Domingo">Culto Dominical (Presencial)</SelectItem>
+                    <SelectItem value="Convite de Amigo / Familiar">
+                      Convite de Amigo ou Familiar
+                    </SelectItem>
+                    <SelectItem value="Redes Sociais / Internet">
+                      Instagram / Redes Sociais
+                    </SelectItem>
+                    <SelectItem value="Pequeno Grupo no Lar">Pequeno Grupo nos Lares</SelectItem>
+                    <SelectItem value="Passando em frente ao templo">Moro na vizinhança</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-      {/* Footer */}
-      <footer className="px-6 py-4 text-center text-xs text-slate-400 border-t border-slate-200 bg-white">
-        Logos &bull; Sistema de Gestão de Igreja &bull; Todos os direitos reservados.
-      </footer>
+              {/* Prayer Request */}
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="vis-prayer"
+                  className="font-mono uppercase tracking-wider text-slate-600"
+                >
+                  Pedido de Oração (Opcional & Confidencial)
+                </Label>
+                <Textarea
+                  id="vis-prayer"
+                  rows={3}
+                  value={prayerRequest}
+                  onChange={(e) => setPrayerRequest(e.target.value)}
+                  placeholder="Gostaria de oração por saúde, família, decisões profissionais..."
+                  className="rounded bg-[#FAF9F6] border-[#E6E2D8] text-xs focus:border-[#141B22]"
+                />
+              </div>
+
+              <Button
+                type="submit"
+                disabled={submitting}
+                className="w-full bg-[#141B22] hover:bg-[#1E2732] text-white text-xs h-11 rounded font-mono shadow-none cursor-pointer"
+              >
+                {submitting ? 'Registrando acolhimento...' : 'Entregar Cartão de Visita'}
+              </Button>
+            </form>
+          )}
+        </div>
+
+        {/* Church identity footnote */}
+        <section className="pt-6 border-t border-[#E6E2D8] grid grid-cols-1 sm:grid-cols-3 gap-6 text-center sm:text-left text-xs text-slate-600">
+          <div>
+            <p className="font-serif-sacred font-bold text-sm text-[#141B22] mb-1">
+              Cultos Dominicais
+            </p>
+            <p className="leading-relaxed font-mono text-[11px] text-slate-500">
+              Manhã às 10h00 &bull; Noite às 18h00 <br />
+              Com ministério infantil em ambos os horários.
+            </p>
+          </div>
+          <div>
+            <p className="font-serif-sacred font-bold text-sm text-[#141B22] mb-1">
+              Pequenos Grupos
+            </p>
+            <p className="leading-relaxed font-mono text-[11px] text-slate-500">
+              Encontros nos lares de terça a quinta-feira para comunhão, oração e estudo bíblico.
+            </p>
+          </div>
+          <div>
+            <p className="font-serif-sacred font-bold text-sm text-[#141B22] mb-1">
+              Cuidado Pastoral
+            </p>
+            <p className="leading-relaxed font-mono text-[11px] text-slate-500">
+              Agende uma visita pastoral ou aconselhamento com a secretaria após o culto.
+            </p>
+          </div>
+        </section>
+      </main>
     </div>
   )
 }
