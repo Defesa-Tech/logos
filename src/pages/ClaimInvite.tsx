@@ -10,7 +10,7 @@ import {
   Lock,
 } from 'lucide-react'
 import { invitesService, personsService } from '@/services/church'
-import type { InviteRecord, PersonRecord, UserRole } from '@/types/church'
+import type { InviteRecord, PersonRecord } from '@/types/church'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -21,7 +21,7 @@ import { PageTransition } from '@/components/MotionKit'
 export default function ClaimInvite() {
   const { token } = useParams<{ token: string }>()
   const navigate = useNavigate()
-  const { switchSimulatedRole } = useAuth()
+  const { login, refreshProfile } = useAuth()
 
   const [loading, setLoading] = useState(true)
   const [invite, setInvite] = useState<InviteRecord | null>(null)
@@ -106,8 +106,12 @@ export default function ClaimInvite() {
         })
       }
 
-      // 3. Switch role to the invited role
-      switchSimulatedRole(invite.role as UserRole)
+      // 3. Automatically authenticate user with their credentials
+      try {
+        await login(invite.email, password)
+      } catch {
+        await refreshProfile()
+      }
 
       setClaimed(true)
       toast.success('Convite resgatado com sucesso! Bem-vindo à equipe Logos.')

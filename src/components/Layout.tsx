@@ -36,7 +36,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { useRealtime } from '@/hooks/use-realtime'
 
 export default function Layout() {
-  const { user, role, switchSimulatedRole, logout, canAccessAll } = useAuth()
+  const { user, role, logout, canAccessAll } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -164,57 +164,29 @@ export default function Layout() {
           </span>
         </div>
 
-        {/* Persona quick switch dropdown — Nubank pill selector */}
+        {/* User Identity Display — Non-simulated passive badge */}
         <div className="px-5 py-4 border-b border-[#F0F1F5] bg-[#F8F9FB]">
           <div className="flex items-center justify-between text-[11px] font-semibold text-gray-500 mb-2">
             <span className="flex items-center gap-1.5">
-              <Shield className="w-3.5 h-3.5 text-[#820AD1]" /> Papel Ativo
+              <Shield className="w-3.5 h-3.5 text-[#820AD1]" /> Perfil Autenticado
             </span>
-            <span className="text-[10px] text-gray-400 font-medium">Simulação</span>
+            <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Ativo
+            </span>
           </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="w-full text-left px-3 py-2 rounded-xl bg-white hover:bg-gray-50 border border-[#E9ECEF] flex items-center justify-between transition-all text-xs text-[#191919] group cursor-pointer shadow-xs">
-                <div className="flex items-center gap-2 truncate">
-                  <span className={`w-2 h-2 rounded-full ${currentMeta.dotColor}`} />
-                  <span className="font-bold">{currentMeta.label}</span>
-                  <span className="text-[11px] text-gray-400">
-                    &bull; {currentMeta.roleType.split(' ')[0]}
-                  </span>
-                </div>
-                <ChevronDown className="w-3.5 h-3.5 text-gray-400 group-hover:text-[#820AD1] transition-colors" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="start"
-              className="w-60 bg-white text-[#191919] border border-[#E9ECEF] rounded-2xl p-1.5 shadow-xl"
-            >
-              <DropdownMenuLabel className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-2 py-1">
-                Alternar Papel Simulado
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-gray-100 my-1" />
-              {(['secretary', 'pastor', 'leader', 'member', 'visitor'] as UserRole[]).map((r) => (
-                <DropdownMenuItem
-                  key={r}
-                  onClick={() => switchSimulatedRole(r)}
-                  className={`cursor-pointer rounded-xl px-2.5 py-2 text-xs transition-colors ${
-                    role === r
-                      ? 'bg-[#F7EEFD] text-[#820AD1] font-bold'
-                      : 'text-gray-700 hover:text-[#820AD1] hover:bg-gray-50'
-                  }`}
-                >
-                  <div className="flex items-center gap-2 w-full">
-                    <span className={`w-2 h-2 rounded-full ${roleMeta[r].dotColor}`} />
-                    <span>{roleMeta[r].label}</span>
-                    <span className="text-[10px] text-gray-400 ml-auto">
-                      {roleMeta[r].roleType}
-                    </span>
-                  </div>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="w-full px-3 py-2.5 rounded-xl bg-white border border-[#E9ECEF] flex items-center justify-between text-xs text-[#191919] shadow-xs">
+            <div className="flex items-center gap-2 truncate">
+              <span className={`w-2 h-2 rounded-full ${currentMeta.dotColor}`} />
+              <span className="font-bold">{currentMeta.label}</span>
+              <span className="text-[11px] text-gray-400">
+                &bull; {currentMeta.roleType.split(' ')[0]}
+              </span>
+            </div>
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#F7EEFD] text-[#820AD1] flex-shrink-0">
+              Real
+            </span>
+          </div>
         </div>
 
         {/* Navigation list */}
@@ -322,38 +294,11 @@ export default function Layout() {
               </div>
             </Link>
 
-            {/* Mobile quick persona pill */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-1.5 text-[11px] font-semibold bg-white/15 text-white px-2.5 py-1 rounded-full border border-white/20 ml-1 transition-all active:scale-95">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  <span>{currentMeta.label}</span>
-                  <ChevronDown className="w-3 h-3 text-white/70" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="start"
-                className="w-56 bg-white text-[#191919] shadow-xl border border-gray-100 rounded-2xl p-1.5 text-xs"
-              >
-                <DropdownMenuLabel className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-2 py-1">
-                  Persona Ativa
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-gray-100" />
-                {(['secretary', 'pastor', 'leader', 'member', 'visitor'] as UserRole[]).map((r) => (
-                  <DropdownMenuItem
-                    key={r}
-                    onClick={() => switchSimulatedRole(r)}
-                    className="cursor-pointer font-medium rounded-xl py-2 px-2.5 hover:bg-[#F7EEFD] hover:text-[#820AD1]"
-                  >
-                    <span className={`w-2 h-2 rounded-full mr-2 ${roleMeta[r].dotColor}`} />
-                    <span>{roleMeta[r].label}</span>
-                    <span className="text-[10px] text-gray-400 ml-auto">
-                      {roleMeta[r].roleType.split(' ')[0]}
-                    </span>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* Mobile passive identity pill */}
+            <div className="flex items-center gap-1.5 text-[11px] font-semibold bg-white/15 text-white px-2.5 py-1 rounded-full border border-white/20 ml-1 select-none">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <span>{currentMeta.label}</span>
+            </div>
           </div>
 
           {/* Desktop Section indicator (breadcrumb) */}
@@ -685,28 +630,22 @@ export default function Layout() {
             </button>
           </div>
 
-          {/* Persona selector mobile */}
+          {/* Authenticated user status mobile */}
           <div className="p-4 border-b border-gray-100 bg-[#F8F9FB]">
             <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2">
-              Persona Ativa:
+              Perfil Autenticado:
             </p>
-            <div className="grid grid-cols-2 gap-2">
-              {(['secretary', 'pastor', 'leader', 'member', 'visitor'] as UserRole[]).map((r) => (
-                <button
-                  key={r}
-                  onClick={() => {
-                    switchSimulatedRole(r)
-                    setMobileMenuOpen(false)
-                  }}
-                  className={`text-xs px-3 py-2 rounded-xl text-center font-medium transition-all cursor-pointer ${
-                    role === r
-                      ? 'bg-[#820AD1] text-white font-bold shadow-sm'
-                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-                  }`}
-                >
-                  {roleMeta[r].label}
-                </button>
-              ))}
+            <div className="flex items-center justify-between p-3 rounded-2xl bg-white border border-gray-200 text-xs">
+              <div className="flex items-center gap-2 min-w-0">
+                <span className={`w-2 h-2 rounded-full ${currentMeta.dotColor}`} />
+                <span className="font-bold text-[#191919]">{currentMeta.label}</span>
+                <span className="text-[11px] text-gray-400 truncate">
+                  &bull; {currentMeta.roleType}
+                </span>
+              </div>
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#F7EEFD] text-[#820AD1] flex-shrink-0">
+                {user ? 'Autenticado' : 'Visitante'}
+              </span>
             </div>
           </div>
 

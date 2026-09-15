@@ -8,10 +8,9 @@ interface AuthContextType {
   currentPerson: PersonRecord | null
   role: UserRole
   isLoading: boolean
-  isSimulatedRole: boolean
+  refreshProfile: () => Promise<void>
   login: (email: string, pass: string) => Promise<void>
   logout: () => void
-  switchSimulatedRole: (newRole: UserRole) => void
   canAccessAll: boolean
   isLeader: boolean
   isMemberOrVisitor: boolean
@@ -22,7 +21,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<{ id: string; email: string; name: string } | null>(null)
   const [currentPerson, setCurrentPerson] = useState<PersonRecord | null>(null)
-  const [simulatedRole, setSimulatedRole] = useState<UserRole | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)
 
   const fetchProfile = async () => {
@@ -47,10 +45,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const byEmail = await personsService.list(`email="${u.email}"`)
             if (byEmail.length > 0) {
               setCurrentPerson(byEmail[0])
+            } else {
+              setCurrentPerson(null)
             }
           }
         } catch {
-          // ignore error
+          setCurrentPerson(null)
         }
       } else {
         setUser(null)
@@ -58,6 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } catch {
       setUser(null)
+      setCurrentPerson(null)
     } finally {
       setIsLoading(false)
     }
@@ -79,15 +80,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     pb.authStore.clear()
     setUser(null)
     setCurrentPerson(null)
-    setSimulatedRole(null)
   }
 
-  const switchSimulatedRole = (newRole: UserRole) => {
-    setSimulatedRole(newRole)
-  }
-
-  // Determine actual role
-  const actualRole: UserRole = useMemo(() => {
+  // Determine actual role exclusively from authenticated user & linked person record
+  const role: UserRole = useMemo(() => {
     if (!user) return 'visitor'
     if (user.email === 'cleristonx.lima@gmail.com') return 'secretary'
     if (currentPerson) {
@@ -95,11 +91,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (currentPerson.status === 'leader') return 'leader'
       if (currentPerson.status === 'member') return 'member'
       if (currentPerson.status === 'attender') return 'member'
+      if (currentPerson.status === 'visitor') return 'visitor'
     }
-    return 'secretary' // default fallback for admin
+    // Default fallback for authenticated accounts without linked person
+    return 'member'
   }, [user, currentPerson])
-
-  const role: UserRole = simulatedRole || actualRole
 
   const canAccessAll = role === 'secretary' || role === 'pastor'
   const isLeader = role === 'leader'
@@ -112,10 +108,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         currentPerson,
         role,
         isLoading,
-        isSimulatedRole: simulatedRole !== null,
+        refreshProfile: fetchProfile,
         login,
         logout,
-        switchSimulatedRole,
         canAccessAll,
         isLeader,
         isMemberOrVisitor,
