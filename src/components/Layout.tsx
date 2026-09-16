@@ -293,12 +293,6 @@ export default function Layout() {
                 <span className="text-[10px] text-purple-200 leading-none">Igreja Viva</span>
               </div>
             </Link>
-
-            {/* Mobile passive identity pill */}
-            <div className="flex items-center gap-1.5 text-[11px] font-semibold bg-white/15 text-white px-2.5 py-1 rounded-full border border-white/20 ml-1 select-none">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              <span>{currentMeta.label}</span>
-            </div>
           </div>
 
           {/* Desktop Section indicator (breadcrumb) */}
