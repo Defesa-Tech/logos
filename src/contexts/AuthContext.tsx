@@ -11,6 +11,8 @@ interface AuthContextType {
   refreshProfile: () => Promise<void>
   login: (email: string, pass: string) => Promise<void>
   logout: () => void
+  isLoginModalOpen: boolean
+  setIsLoginModalOpen: (open: boolean) => void
   canAccessAll: boolean
   isLeader: boolean
   isMemberOrVisitor: boolean
@@ -22,6 +24,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<{ id: string; email: string; name: string } | null>(null)
   const [currentPerson, setCurrentPerson] = useState<PersonRecord | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false)
 
   const fetchProfile = async () => {
     setIsLoading(true)
@@ -111,6 +114,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         refreshProfile: fetchProfile,
         login,
         logout,
+        isLoginModalOpen,
+        setIsLoginModalOpen,
         canAccessAll,
         isLeader,
         isMemberOrVisitor,

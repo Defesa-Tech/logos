@@ -29,6 +29,7 @@ import {
   invitesService,
   activitiesService,
 } from '@/services/church'
+import { LogIn, LogOut } from 'lucide-react'
 import type { PersonRecord, FamilyRecord, InviteRecord, ActivityRecord } from '@/types/church'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
@@ -47,8 +48,23 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 import { AnimatedCounter, PageTransition } from '@/components/MotionKit'
 
 export default function Index() {
-  const { role, currentPerson, canAccessAll, isLeader, isMemberOrVisitor, login, user } = useAuth()
+  const {
+    role,
+    currentPerson,
+    canAccessAll,
+    isLeader,
+    isMemberOrVisitor,
+    user,
+    logout,
+    setIsLoginModalOpen,
+  } = useAuth()
   const navigate = useNavigate()
+
+  const handleLogout = () => {
+    logout()
+    toast.success('Você encerrou a sessão com sucesso.')
+    navigate('/')
+  }
 
   const [persons, setPersons] = useState<PersonRecord[]>([])
   const [families, setFamilies] = useState<FamilyRecord[]>([])
@@ -67,11 +83,6 @@ export default function Index() {
 
   // Quick check-in state for member/visitor
   const [checkedIn, setCheckedIn] = useState(false)
-
-  // Login shortcut helper
-  const [authEmail, setAuthEmail] = useState('cleristonx.lima@gmail.com')
-  const [authPass, setAuthPass] = useState('Skip@Pass')
-  const [isLoggingIn, setIsLoggingIn] = useState(false)
 
   // Realtime hook for persons list
   useRealtime<PersonRecord>('persons', (e) => {
@@ -115,20 +126,6 @@ export default function Index() {
   useEffect(() => {
     loadDashboardData()
   }, [])
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoggingIn(true)
-    try {
-      await login(authEmail, authPass)
-      toast.success('Autenticado com sucesso como Secretaria.')
-      loadDashboardData()
-    } catch {
-      toast.error('Falha no login. Verifique as credenciais.')
-    } finally {
-      setIsLoggingIn(false)
-    }
-  }
 
   const handleReportMeeting = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -179,11 +176,11 @@ export default function Index() {
       {/* =========================================================================
           NUBANK HERO & GREETING
           ========================================================================= */}
-      <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 sm:p-6 rounded-3xl border border-gray-100 shadow-xs">
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold text-[#820AD1] mb-1">
             <span className="w-2 h-2 rounded-full bg-[#820AD1]" />
-            <span>Olá, {user?.name ? user.name.split(' ')[0] : 'Igreja Logos'}</span>
+            <span>Olá, {user?.name ? user.name.split(' ')[0] : 'Visitante'}</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191919]">
             Painel da Igreja
@@ -191,6 +188,36 @@ export default function Index() {
           <p className="text-xs sm:text-sm text-gray-500 mt-1 max-w-xl">
             Tudo o que está acontecendo na membresia, acolhimento e lares hoje.
           </p>
+        </div>
+
+        {/* User Account Controls */}
+        <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap">
+          {user ? (
+            <div className="flex items-center gap-2 bg-[#F8F9FB] border border-[#E9ECEF] px-3.5 py-2 rounded-full text-xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span className="font-semibold text-gray-700 max-w-[140px] truncate">
+                {user.name}
+              </span>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="ml-1.5 flex items-center gap-1 text-red-600 hover:text-red-700 font-bold hover:underline cursor-pointer active:scale-95 transition-all"
+                title="Desconectar do sistema"
+              >
+                <LogOut className="w-3.5 h-3.5" strokeWidth={2} />
+                <span>Sair</span>
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setIsLoginModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#820AD1] text-white hover:bg-[#7008B7] font-bold text-xs shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all cursor-pointer"
+            >
+              <LogIn className="w-3.5 h-3.5" strokeWidth={2} />
+              <span>Entrar no Sistema</span>
+            </button>
+          )}
         </div>
       </section>
 
