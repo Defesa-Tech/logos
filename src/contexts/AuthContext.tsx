@@ -123,6 +123,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const isSecretaria = isSuperAdmin || hasRole(/Secretár|Secretaria/i)
     const isPastor = hasRole(/Pastor/i) || currentPerson?.status === 'pastor'
+    const isDeptLider = activeAssignments.some(
+      (a) =>
+        a.leadership_level === 'lider' ||
+        a.leadership_level === 'vice_lider' ||
+        a.expand?.role?.level === 'lider',
+    )
     const isBoasVindasLider = hasRole(/Líder/i, /Boas-Vindas|Recepção/i)
     const isBoasVindasVoluntario =
       isBoasVindasLider || hasRole(/Voluntário|Recepção/i, /Boas-Vindas|Recepção/i)
@@ -139,11 +145,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       canEditOfficialFields: isSecretaria,
       canChangeStage: isSecretaria,
       canConfirmFrequentador: isBoasVindasLider || isSecretaria,
-      canManageAssignments: isSecretaria,
+      canManageAssignments: isSecretaria || isDeptLider,
       canRegisterPresence: isBoasVindasVoluntario || isSecretaria,
       canViewAll: isPastor || isSecretaria,
       canOnlySeeVisitorsAndAttenders:
         (isBoasVindasVoluntario || isBoasVindasLider) && !isSecretaria && !isPastor,
+      canManageDepartments: isSecretaria,
+      canManageRoles: isSecretaria || isDeptLider,
+      canManageOverlaps: isSecretaria || isDeptLider,
     }
   }, [user, currentPerson, activeAssignments])
 

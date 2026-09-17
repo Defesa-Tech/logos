@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-17T00:33:24.736Z",
+  "generatedAt": "2026-09-17T01:29:45.396Z",
   "collections": [
     {
       "name": "users",
@@ -327,6 +327,43 @@
           "type": "bool",
           "required": false,
           "system": false
+        },
+        {
+          "name": "is_possible_relative",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "relative_phone_owner",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "device_token",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "full_form_completed",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "full_form_date",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "contact_preference",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["whatsapp", "ligacao", "nenhum"]
         }
       ],
       "indexes": [
@@ -576,6 +613,33 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "unit_type",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["departamento", "subdepartamento", "supervisao"]
+        },
+        {
+          "name": "parent_unit",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "departments"
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["ativo", "arquivado"]
+        },
+        {
+          "name": "order_index",
+          "type": "number",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": ["CREATE UNIQUE INDEX idx_departments_code ON departments (code)"]
@@ -630,6 +694,25 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "requirements",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["ativo", "arquivado"]
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": ["CREATE INDEX idx_dep_roles_dept ON department_roles (department)"]
@@ -697,6 +780,26 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "leadership_level",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["voluntario", "lider", "vice_lider", "lideranca_adicional"]
+        },
+        {
+          "name": "requirements_checklist",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "department",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "departments"
         }
       ],
       "indexes": [
@@ -765,6 +868,24 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "end_time",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tolerance_minutes_before",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tolerance_minutes_after",
+          "type": "number",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": ["CREATE INDEX idx_cultos_date ON cultos (date_time DESC)"]
@@ -833,6 +954,19 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "origin",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["qr_code", "boas_vindas", "autoatendimento", "secretaria"]
+        },
+        {
+          "name": "device_token",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
@@ -974,6 +1108,190 @@
         }
       ],
       "indexes": ["CREATE UNIQUE INDEX idx_settings_key ON church_settings (key)"]
+    },
+    {
+      "name": "overlap_rules",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "name",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "role_a",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "department_roles"
+        },
+        {
+          "name": "department_a",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "departments"
+        },
+        {
+          "name": "role_b",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "department_roles"
+        },
+        {
+          "name": "department_b",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "departments"
+        },
+        {
+          "name": "rule_type",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["bloqueado", "permitido", "aviso"]
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "created_by_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_overlap_role_a ON overlap_rules (role_a)",
+        "CREATE INDEX idx_overlap_role_b ON overlap_rules (role_b)"
+      ]
+    },
+    {
+      "name": "registration_divergences",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "person",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "persons"
+        },
+        {
+          "name": "phone",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "field_name",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "current_value",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "submitted_value",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "divergence_type",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["email_diferente", "nome_variacao", "nome_possivel_familiar", "outro"]
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["pendente", "aprovada", "rejeitada", "resolvida"]
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "resolved_by",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "resolved_at",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_divergences_person ON registration_divergences (person)",
+        "CREATE INDEX idx_divergences_status ON registration_divergences (status)"
+      ]
     }
   ]
 }

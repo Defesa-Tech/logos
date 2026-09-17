@@ -14,8 +14,14 @@ import {
   ExternalLink,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
-import { invitesService, personsService } from '@/services/church'
-import type { InviteRecord, PersonRecord, UserRole } from '@/types/church'
+import { invitesService, personsService, divergencesService } from '@/services/church'
+import type {
+  InviteRecord,
+  PersonRecord,
+  UserRole,
+  RegistrationDivergenceRecord,
+} from '@/types/church'
+import { AlertCircle, CheckCircle2, XCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -36,6 +42,7 @@ export default function Secretary() {
 
   const [invites, setInvites] = useState<InviteRecord[]>([])
   const [persons, setPersons] = useState<PersonRecord[]>([])
+  const [divergences, setDivergences] = useState<RegistrationDivergenceRecord[]>([])
   const [loading, setLoading] = useState(true)
 
   // Create invite dialog
@@ -63,9 +70,14 @@ export default function Secretary() {
   const loadData = async () => {
     try {
       setLoading(true)
-      const [invList, perList] = await Promise.all([invitesService.list(), personsService.list()])
+      const [invList, perList, divList] = await Promise.all([
+        invitesService.list(),
+        personsService.list(),
+        divergencesService.list('status = "pendente"'),
+      ])
       setInvites(invList)
       setPersons(perList)
+      setDivergences(divList)
     } catch {
       toast.error('Erro ao listar convites da secretaria.')
     } finally {
@@ -126,6 +138,34 @@ export default function Secretary() {
     }
   }
 
+  const handleResolveDivergence = async (
+    div: RegistrationDivergenceRecord,
+    status: 'aprovada' | 'rejeitada',
+  ) => {
+    try {
+      if (status === 'aprovada') {
+        // Apply submitted value to person
+        if (div.field_name === 'email') {
+          await personsService.update(div.person, { email: div.submitted_value })
+        } else if (div.field_name === 'name' && div.divergence_type === 'nome_variacao') {
+          await personsService.update(div.person, { name: div.submitted_value })
+        }
+      }
+      await divergencesService.resolve(
+        div.id,
+        status,
+        'Secretaria',
+        `Resolvida pela Secretaria: ${status}`,
+      )
+      setDivergences((prev) => prev.filter((d) => d.id !== div.id))
+      toast.success(
+        status === 'aprovada' ? 'Divergência aprovada e aplicada.' : 'Divergência rejeitada.',
+      )
+    } catch {
+      toast.error('Erro ao resolver divergência.')
+    }
+  }
+
   const roleLabels: Record<UserRole, string> = {
     secretary: 'Secretaria',
     pastor: 'Pastor',
@@ -174,6 +214,80 @@ export default function Secretary() {
           Gerar Novo Convite
         </Button>
       </div>
+
+      {/* Conciliação de Divergências de Cadastro do QR Code (D12 Cenários 7 & 8) */}
+      {divergences.length > 0 && (
+        <section className="bg-white border border-amber-200 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-amber-100">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold">
+                <AlertCircle className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="text-[10px] uppercase font-bold text-amber-800">
+                  Conciliação de Cadastros (QR Code)
+                </span>
+                <h2 className="text-base font-bold text-[#191919]">
+                  Divergências Submetidas no Culto ({divergences.length})
+                </h2>
+              </div>
+            </div>
+            <span className="text-xs bg-amber-50 text-amber-900 border border-amber-200 px-3 py-1 rounded-full font-bold">
+              Pendentes de Revisão
+            </span>
+          </div>
+
+          <div className="divide-y divide-amber-100 text-xs">
+            {divergences.map((div) => {
+              const person = persons.find((p) => p.id === div.person)
+              return (
+                <div
+                  key={div.id}
+                  className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                >
+                  <div className="space-y-0.5">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-[#191919]">Telefone: {div.phone}</span>
+                      <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                        {div.divergence_type === 'email_diferente'
+                          ? 'E-mail Diferente'
+                          : div.divergence_type === 'nome_variacao'
+                            ? 'Variação de Nome'
+                            : 'Possível Familiar'}
+                      </span>
+                    </div>
+                    <p className="text-gray-600 text-[11px]">
+                      Valor Atual: <strong>{div.current_value || 'Nenhum'}</strong> &rarr; Submetido
+                      no QR: <strong className="text-[#820AD1]">{div.submitted_value}</strong>
+                    </p>
+                    {div.notes && <p className="text-[10px] text-gray-400 italic">{div.notes}</p>}
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      onClick={() => handleResolveDivergence(div, 'aprovada')}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-8 px-3 rounded-full"
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
+                      Aprovar &amp; Atualizar
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleResolveDivergence(div, 'rejeitada')}
+                      className="text-gray-500 hover:text-red-600 border-gray-200 font-bold text-xs h-8 px-3 rounded-full"
+                    >
+                      <XCircle className="w-3.5 h-3.5 mr-1" />
+                      Manter Atual
+                    </Button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </section>
+      )}
 
       {/* Nubank Rounded Table Container */}
       <div className="bg-white border border-gray-100 rounded-3xl overflow-hidden shadow-sm">

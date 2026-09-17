@@ -173,6 +173,7 @@ export default function Cultos() {
         modality: 'presencial',
         presence_type: presenceType,
         registered_by_name: user?.name || 'Recepção Boas-Vindas',
+        origin: 'boas_vindas',
       })
 
       // If visitor or attender, create follow-up task with 48h deadline (per spec J1/J3)
@@ -248,6 +249,7 @@ export default function Cultos() {
         modality: 'presencial',
         presence_type: 'primeira_visita',
         registered_by_name: user?.name || 'Recepção Boas-Vindas',
+        origin: 'boas_vindas',
       })
 
       // Create 48h follow-up task if contact authorized
@@ -656,10 +658,14 @@ export default function Cultos() {
                         >
                           {isFirst ? '1ª Visita' : isRet ? 'Retorno' : 'Membro'}
                         </span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 border border-gray-200">
+                          {pres.origin === 'qr_code' ? '📱 QR Code Fixo' : '🤝 Boas-Vindas'}
+                        </span>
                       </div>
                       <p className="text-[11px] text-gray-400 mt-0.5">
-                        Contato: {person?.phone || person?.whatsapp || 'Sem telefone'} &bull;
-                        Registrado por: {pres.registered_by_name || 'Recepção'} &bull; Horário:{' '}
+                        Contato: {person?.phone || person?.whatsapp || 'Sem telefone'} &bull; Canal:{' '}
+                        {pres.origin === 'qr_code' ? 'Autoatendimento QR' : 'Balcão Recepção'}{' '}
+                        &bull; Horário:{' '}
                         {new Date(pres.created).toLocaleTimeString('pt-BR', {
                           hour: '2-digit',
                           minute: '2-digit',

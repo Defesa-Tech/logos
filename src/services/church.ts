@@ -11,6 +11,8 @@ import type {
   DepartmentRecord,
   DepartmentRoleRecord,
   AssignmentRecord,
+  OverlapRuleRecord,
+  RegistrationDivergenceRecord,
   ChurchSettingRecord,
   PersonStage,
 } from '@/types/church'
@@ -31,9 +33,22 @@ export const personsService = {
   async findByPhone(phone: string) {
     if (!phone) return null
     const clean = phone.replace(/\D/g, '')
+    if (!clean) return null
     try {
       const records = await pb.collection('persons').getFullList<PersonRecord>({
         filter: `phone ~ "${clean}" || whatsapp ~ "${clean}"`,
+      })
+      return records[0] || null
+    } catch {
+      return null
+    }
+  },
+
+  async findByDeviceToken(token: string) {
+    if (!token) return null
+    try {
+      const records = await pb.collection('persons').getFullList<PersonRecord>({
+        filter: `device_token = "${token}"`,
       })
       return records[0] || null
     } catch {
@@ -108,6 +123,41 @@ export const cultosService = {
       filter: 'status = "aberto"',
       sort: '-date_time',
     })
+  },
+
+  // Find currently active culto within tolerance window (D11)
+  async getActiveCultoNow(): Promise<CultoRecord | null> {
+    try {
+      const openCultos = await pb.collection('cultos').getFullList<CultoRecord>({
+        filter: 'status = "aberto"',
+        sort: '-date_time',
+      })
+      if (openCultos.length === 0) return null
+
+      const now = new Date().getTime()
+
+      // Check which open culto has the current time inside [start - tolerance, end + tolerance]
+      for (const c of openCultos) {
+        const start = new Date(c.date_time).getTime()
+        const tolBefore = (c.tolerance_minutes_before ?? 60) * 60000
+        const tolAfter = (c.tolerance_minutes_after ?? 60) * 60000
+
+        let end = c.end_time ? new Date(c.end_time).getTime() : start + 2 * 3600000 // default 2 hours
+
+        if (now >= start - tolBefore && now <= end + tolAfter) {
+          return c
+        }
+      }
+
+      // If only one open culto exists and was created today, return it as fallback
+      if (openCultos.length === 1) {
+        return openCultos[0]
+      }
+
+      return openCultos[0] || null
+    } catch {
+      return null
+    }
   },
 
   async getById(id: string) {
@@ -205,18 +255,195 @@ export const followUpService = {
 }
 
 export const departmentsService = {
-  async list() {
+  async list(filter?: string) {
     return pb.collection('departments').getFullList<DepartmentRecord>({
-      sort: 'name',
+      filter: filter || '',
+      sort: 'unit_type,order_index,name',
+      expand: 'parent_unit',
     })
   },
 
+  async getById(id: string) {
+    return pb.collection('departments').getOne<DepartmentRecord>(id, {
+      expand: 'parent_unit',
+    })
+  },
+
+  async create(data: Partial<DepartmentRecord>) {
+    return pb.collection('departments').create<DepartmentRecord>({
+      unit_type: data.unit_type || 'departamento',
+      status: data.status || 'ativo',
+      ...data,
+    })
+  },
+
+  async update(id: string, data: Partial<DepartmentRecord>) {
+    return pb.collection('departments').update<DepartmentRecord>(id, data)
+  },
+
+  async archive(id: string) {
+    // Check if there are active assignments
+    const activeAssignments = await pb.collection('assignments').getFullList<AssignmentRecord>({
+      filter: `(role.department = "${id}" || department = "${id}") && status = "ativa"`,
+      expand: 'role',
+    })
+    if (activeAssignments.length > 0) {
+      throw new Error(
+        `Não é possível arquivar a unidade. Existem ${activeAssignments.length} atuação(ões) ativa(s) vinculadas. Encerre-as primeiro.`,
+      )
+    }
+    return pb.collection('departments').update<DepartmentRecord>(id, { status: 'arquivado' })
+  },
+
+  // Roles (Funções)
   async listRoles(departmentId?: string) {
     const filter = departmentId ? `department = "${departmentId}"` : ''
     return pb.collection('department_roles').getFullList<DepartmentRoleRecord>({
       filter,
       sort: 'name',
+      expand: 'department,department.parent_unit',
+    })
+  },
+
+  async getRoleById(id: string) {
+    return pb.collection('department_roles').getOne<DepartmentRoleRecord>(id, {
       expand: 'department',
+    })
+  },
+
+  async createRole(data: Partial<DepartmentRoleRecord>) {
+    return pb.collection('department_roles').create<DepartmentRoleRecord>({
+      status: 'ativo',
+      level: data.level || 'voluntario',
+      ...data,
+    })
+  },
+
+  async updateRole(id: string, data: Partial<DepartmentRoleRecord>) {
+    return pb.collection('department_roles').update<DepartmentRoleRecord>(id, data)
+  },
+
+  async archiveRole(id: string) {
+    const activeAssignments = await pb.collection('assignments').getFullList<AssignmentRecord>({
+      filter: `role = "${id}" && status = "ativa"`,
+    })
+    if (activeAssignments.length > 0) {
+      throw new Error(
+        `Não é possível arquivar a função. Existem ${activeAssignments.length} atuação(ões) ativa(s) vinculadas.`,
+      )
+    }
+    return pb
+      .collection('department_roles')
+      .update<DepartmentRoleRecord>(id, { status: 'arquivado' })
+  },
+}
+
+export const overlapRulesService = {
+  async list() {
+    return pb.collection('overlap_rules').getFullList<OverlapRuleRecord>({
+      sort: 'name',
+      expand: 'role_a,role_b,department_a,department_b',
+    })
+  },
+
+  async create(data: Partial<OverlapRuleRecord>) {
+    return pb.collection('overlap_rules').create<OverlapRuleRecord>(data)
+  },
+
+  async update(id: string, data: Partial<OverlapRuleRecord>) {
+    return pb.collection('overlap_rules').update<OverlapRuleRecord>(id, data)
+  },
+
+  async delete(id: string) {
+    return pb.collection('overlap_rules').delete(id)
+  },
+
+  // Check if assigning person to targetRoleId violates any overlap rules
+  async validateOverlap(
+    personId: string,
+    targetRoleId: string,
+  ): Promise<{ allowed: boolean; blockingRule?: OverlapRuleRecord; warning?: string }> {
+    try {
+      const activeAssignments = await pb.collection('assignments').getFullList<AssignmentRecord>({
+        filter: `person = "${personId}" && status = "ativa"`,
+        expand: 'role,role.department',
+      })
+
+      if (activeAssignments.length === 0) {
+        return { allowed: true }
+      }
+
+      const allRules = await pb.collection('overlap_rules').getFullList<OverlapRuleRecord>({
+        expand: 'role_a,role_b,department_a,department_b',
+      })
+
+      const targetRole = await departmentsService.getRoleById(targetRoleId)
+      const targetDeptId = targetRole.department
+
+      for (const asg of activeAssignments) {
+        const existingRoleId = asg.role
+        const existingDeptId = asg.expand?.role?.department
+
+        for (const rule of allRules) {
+          // Check role-to-role match
+          const matchesRoleA = rule.role_a === targetRoleId || rule.role_a === existingRoleId
+          const matchesRoleB = rule.role_b === targetRoleId || rule.role_b === existingRoleId
+          const directRoleMatch = matchesRoleA && matchesRoleB && rule.role_a && rule.role_b
+
+          // Check dept-to-dept match
+          const matchesDeptA =
+            rule.department_a === targetDeptId || rule.department_a === existingDeptId
+          const matchesDeptB =
+            rule.department_b === targetDeptId || rule.department_b === existingDeptId
+          const deptMatch =
+            rule.department_a &&
+            rule.department_b &&
+            ((rule.department_a === targetDeptId && rule.department_b === existingDeptId) ||
+              (rule.department_b === targetDeptId && rule.department_a === existingDeptId))
+
+          // Check mixed match (e.g. role in dept A + role in dept B)
+          if (directRoleMatch || deptMatch) {
+            if (rule.rule_type === 'bloqueado') {
+              return {
+                allowed: false,
+                blockingRule: rule,
+              }
+            }
+          }
+        }
+      }
+
+      return { allowed: true }
+    } catch {
+      return { allowed: true }
+    }
+  },
+}
+
+export const divergencesService = {
+  async list(filter?: string) {
+    return pb.collection('registration_divergences').getFullList<RegistrationDivergenceRecord>({
+      filter: filter || '',
+      sort: '-created',
+      expand: 'person',
+    })
+  },
+
+  async create(data: Partial<RegistrationDivergenceRecord>) {
+    return pb.collection('registration_divergences').create<RegistrationDivergenceRecord>(data)
+  },
+
+  async resolve(
+    id: string,
+    status: 'aprovada' | 'rejeitada' | 'resolvida',
+    resolvedBy: string,
+    notes?: string,
+  ) {
+    return pb.collection('registration_divergences').update<RegistrationDivergenceRecord>(id, {
+      status,
+      resolved_by: resolvedBy,
+      resolved_at: new Date().toISOString(),
+      notes,
     })
   },
 }
@@ -226,7 +453,7 @@ export const assignmentsService = {
     return pb.collection('assignments').getFullList<AssignmentRecord>({
       filter: `person = "${personId}"`,
       sort: '-start_date',
-      expand: 'role,role.department',
+      expand: 'role,role.department,department',
     })
   },
 
@@ -236,16 +463,19 @@ export const assignmentsService = {
     return pb.collection('assignments').getFullList<AssignmentRecord>({
       filter: finalFilter,
       sort: '-start_date',
-      expand: 'person,role,role.department',
+      expand: 'person,role,role.department,department',
     })
   },
 
   async create(data: {
     person: string
     role: string
+    department?: string
     start_date: string
     end_date?: string
     notes?: string
+    leadership_level?: 'voluntario' | 'lider' | 'vice_lider' | 'lideranca_adicional'
+    requirements_checklist?: any[]
   }) {
     // R8 enforcement: Check if person is 'membro'
     const person = await personsService.getById(data.person)
@@ -254,13 +484,24 @@ export const assignmentsService = {
       throw new Error('Regra R8: Só membros podem receber atuações em departamentos.')
     }
 
+    // Overlap validation (D19)
+    const check = await overlapRulesService.validateOverlap(data.person, data.role)
+    if (!check.allowed && check.blockingRule) {
+      throw new Error(
+        `Regra de sobreposição impeditiva (${check.blockingRule.name}): ${check.blockingRule.reason}`,
+      )
+    }
+
     return pb.collection('assignments').create<AssignmentRecord>({
       person: data.person,
       role: data.role,
+      department: data.department || undefined,
       start_date: data.start_date,
       end_date: data.end_date || undefined,
       status: 'ativa',
       notes: data.notes,
+      leadership_level: data.leadership_level || 'voluntario',
+      requirements_checklist: data.requirements_checklist || [],
     })
   },
 
