@@ -31,6 +31,7 @@ import {
   Award,
   Clock,
   Compass,
+  GraduationCap,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import {
@@ -44,6 +45,8 @@ import {
   departmentsService,
   assignmentsService,
   divergencesService,
+  coursesService,
+  volunteerProfilesService,
 } from '@/services/church'
 import { LogIn, LogOut } from 'lucide-react'
 import type {
@@ -56,6 +59,7 @@ import type {
   FollowUpTaskRecord,
   AssignmentRecord,
   RegistrationDivergenceRecord,
+  VolunteerProfileRecord,
 } from '@/types/church'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
@@ -91,6 +95,21 @@ export default function Index() {
 
   // Frequentador next step state
   const [nextStepSubmitted, setNextStepSubmitted] = useState<string | null>(null)
+
+  // Feature 2: Bloco "Seu caminho para servir"
+  const [volunteerProfile, setVolunteerProfile] = useState<VolunteerProfileRecord | null>(null)
+  const [c1JourneyStatus, setC1JourneyStatus] = useState<{
+    completed: boolean
+    isEnrolled: boolean
+    activeEnrollment?: any
+    isWaived: boolean
+    hasC1OrWaiver: boolean
+  }>({
+    completed: false,
+    isEnrolled: false,
+    isWaived: false,
+    hasC1OrWaiver: false,
+  })
 
   // Realtime hook for persons list
   useRealtime<PersonRecord>('persons', (e) => {
@@ -141,6 +160,16 @@ export default function Index() {
       if (cultosData.length > 0) {
         const pres = await presencesService.listByCulto(cultosData[0].id)
         setTodayPresences(pres)
+      }
+
+      // Feature 2: Carrega perfil de serviço e C1 da pessoa
+      if (currentPerson?.id) {
+        const [prof, c1] = await Promise.all([
+          volunteerProfilesService.getByPerson(currentPerson.id),
+          coursesService.checkC1Status(currentPerson.id),
+        ])
+        setVolunteerProfile(prof)
+        setC1JourneyStatus(c1)
       }
     } catch {
       toast.error('Erro ao carregar dados do painel.')
@@ -652,6 +681,65 @@ export default function Index() {
       )}
 
       {/* =========================================================================
+          FEATURE 2: BLOCO "SEU CAMINHO PARA SERVIR" (Membro ou Frequentador com Perfil/C1)
+          ========================================================================= */}
+      {(isMembroStage || isFrequentadorStage || volunteerProfile) && (
+        <section className="bg-gradient-to-br from-[#820AD1] to-[#5A0792] rounded-3xl p-6 sm:p-7 text-white shadow-lg shadow-[#820AD1]/15 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <span className="text-[10px] uppercase font-bold text-purple-200 tracking-wider bg-white/10 px-2.5 py-0.5 rounded-full">
+                Jornada Ministerial
+              </span>
+              <h2 className="text-lg sm:text-xl font-extrabold mt-1">Seu Caminho Para Servir</h2>
+              <p className="text-xs text-purple-100 max-w-xl">
+                Acompanhe o seu progresso rumo ao serviço nos departamentos da Igreja Defesa da Fé.
+              </p>
+            </div>
+
+            <Link to="/quero-servir">
+              <Button className="bg-white text-[#820AD1] hover:bg-purple-50 font-bold text-xs h-9 px-4 rounded-full shadow-sm">
+                Abrir Jornada Completa &rarr;
+              </Button>
+            </Link>
+          </div>
+
+          <div className="p-4 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div className="space-y-1">
+              <span className="text-[10px] uppercase font-bold text-purple-200">Etapa Atual</span>
+              <p className="font-extrabold text-white text-sm sm:text-base">
+                {c1JourneyStatus.hasC1OrWaiver
+                  ? c1JourneyStatus.isWaived
+                    ? 'C1 Dispensado pela Secretaria — Pronto para Ativação!'
+                    : 'C1 Concluído — Pronto para Atuação nos Ministérios!'
+                  : c1JourneyStatus.isEnrolled
+                    ? `Inscrito no C1 (${c1JourneyStatus.activeEnrollment?.expand?.course_class?.name || 'Turma em andamento'})`
+                    : volunteerProfile
+                      ? 'Perfil de serviço cadastrado &bull; Aguardando inscrição no C1'
+                      : 'Descubra seus dons &bull; Inicie sua jornada ministerial'}
+              </p>
+              <p className="text-[11px] text-purple-200">
+                {c1JourneyStatus.hasC1OrWaiver
+                  ? 'Os líderes dos departamentos podem convidá-lo(a) formalmente para as funções.'
+                  : c1JourneyStatus.isEnrolled
+                    ? 'Aguardando encerramento das aulas e confirmação oficial da Secretaria.'
+                    : 'O C1 é requisito da igreja para qualquer função. Inscrição em 1 toque na jornada.'}
+              </p>
+            </div>
+
+            <div className="shrink-0 flex items-center gap-2">
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-white/20 text-white">
+                {c1JourneyStatus.hasC1OrWaiver
+                  ? 'Etapa 3 de 4: Alinhamento'
+                  : c1JourneyStatus.isEnrolled
+                    ? 'Etapa 2 de 4: C1 em curso'
+                    : 'Etapa 1 de 4: Perfil'}
+              </span>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* =========================================================================
           BLOCO 6: ONDE EU SIRVO (Voluntário)
           ========================================================================= */}
       {hasVolunteerAssignments && (
@@ -849,6 +937,20 @@ export default function Index() {
               <Users className="w-5 h-5" strokeWidth={2} />
             </div>
             <span className="nu-action-label">Cultos &amp; Presenças</span>
+          </Link>
+
+          <Link to="/quero-servir" className="nu-action-btn group">
+            <div className="nu-action-circle bg-purple-50 text-[#820AD1] group-hover:bg-[#ebdcfc] transition-all">
+              <HeartHandshake className="w-5 h-5" strokeWidth={2} />
+            </div>
+            <span className="nu-action-label font-bold text-[#820AD1]">Quero Servir</span>
+          </Link>
+
+          <Link to="/cursos" className="nu-action-btn group">
+            <div className="nu-action-circle group-hover:bg-[#F7EEFD] group-hover:text-[#820AD1] transition-all">
+              <GraduationCap className="w-5 h-5" strokeWidth={2} />
+            </div>
+            <span className="nu-action-label">Cursos &amp; C1</span>
           </Link>
 
           <Link to="/departamentos" className="nu-action-btn group">

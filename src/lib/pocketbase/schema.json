@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-17T01:44:28.814Z",
+  "generatedAt": "2026-09-17T09:34:02.638Z",
   "collections": [
     {
       "name": "users",
@@ -695,6 +695,12 @@
           "type": "number",
           "required": false,
           "system": false
+        },
+        {
+          "name": "requirements",
+          "type": "json",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": ["CREATE UNIQUE INDEX idx_departments_code ON departments (code)"]
@@ -1347,6 +1353,420 @@
         "CREATE INDEX idx_divergences_person ON registration_divergences (person)",
         "CREATE INDEX idx_divergences_status ON registration_divergences (status)"
       ]
+    },
+    {
+      "name": "courses",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "name",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE UNIQUE INDEX idx_courses_code ON courses (code)"]
+    },
+    {
+      "name": "course_classes",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "course",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "courses"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "start_date",
+          "type": "date",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "end_date",
+          "type": "date",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "capacity",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["aberta", "fechada", "concluida"]
+        },
+        {
+          "name": "schedule_info",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "location",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_classes_course ON course_classes (course)"]
+    },
+    {
+      "name": "course_enrollments",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "course_class",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "course_classes"
+        },
+        {
+          "name": "course",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "courses"
+        },
+        {
+          "name": "person",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "persons"
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["inscrito", "concluido", "desistente"]
+        },
+        {
+          "name": "enrollment_date",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "completion_date",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "completed_by",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_enroll_class ON course_enrollments (course_class)",
+        "CREATE INDEX idx_enroll_person ON course_enrollments (person)"
+      ]
+    },
+    {
+      "name": "church_requirements",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "title",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "is_default",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "course_linked",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "courses"
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE UNIQUE INDEX idx_church_reqs_code ON church_requirements (code)"]
+    },
+    {
+      "name": "requirement_waivers",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "person",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "persons"
+        },
+        {
+          "name": "requirement_type",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "requirement_id",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "requirement_title",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "granted_by",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "granted_at",
+          "type": "date",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_waivers_person ON requirement_waivers (person)"]
+    },
+    {
+      "name": "volunteer_profiles",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "",
+        "update": "",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "person",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "persons"
+        },
+        {
+          "name": "skills",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "interested_departments",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "availability",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "notify_when_c1_opens",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE UNIQUE INDEX idx_volunteer_prof_person ON volunteer_profiles (person)"]
     }
   ]
 }

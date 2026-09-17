@@ -269,4 +269,62 @@ Itens mapeados nas discussões de produto que **não integram o MVP atual**:
 
 - **D5/D6/D7 (Camada de Supervisão)**: Entidade `supervisao` que agrupa múltiplos departamentos, com perfil de supervisor exclusivamente consultivo.
 - **Módulo de Escalas Departamentais**: Geração de escalas mensais por culto, confirmação de presença de voluntários, substituições e trocas com validação de choques de horário.
-- **Aprovação de Candidatos a Voluntário**: Fluxo formal de inscrição de membros em vagas ministeriais abertas, com triagem e aprovação pastoral.
+- **Aprovação Avançada de Candidatos & Escalas**: Escalas automáticas por culto, substituições de escalas e presenças aula a aula do módulo de cursos com certificados digitais.
+
+---
+
+## 10. Features Aprovadas — Requisitos em Camadas, Jornada Quero Servir & Módulo de Cursos
+
+### 10.1 Requisitos em Três Camadas Cumulativas (Feature 1)
+
+Os requisitos para que uma pessoa atue em uma função passam a ter **três níveis, que se somam cumulativamente**, além da regra inegociável **R8** (apenas membros do rol servem em funções):
+
+1. **Nível Igreja (Padrão)**:
+   - Exemplo: Conclusão do curso **C1** para qualquer função ministerial.
+   - **Quem define**: Exclusivamente a **Secretaria**.
+   - **Regra de ouro**: O líder departamental **não pode remover o requisito padrão**. O C1 é política da igreja, e não do departamento.
+   - **Dispensas**: Se houver exceção (como alguém vindo de outra igreja com formação equivalente), **somente a secretaria pode registrar a dispensa**, com justificativa formal auditada (quem dispensou, quando e motivo). O líder visualiza a dispensa no sistema, mas não pode criá-la nem removê-la.
+2. **Nível Departamento**:
+   - Exemplo: _Entrevista pastoral com o líder da Música_, teste de alinhamento doutrinário.
+   - **Quem define**: Líder da unidade ou Secretaria.
+3. **Nível Função**:
+   - Exemplo: _Treinamento técnico de mesa de som_ para a função de Técnico de Áudio.
+   - **Quem define**: Líder da unidade ou Secretaria.
+
+**Exemplo prático**: Para ser _Técnico de Áudio_, a pessoa precisa cumprir cumulativamente:
+
+- Ser membro em comunhão (regra R8);
+- C1 concluído ou com dispensa formal da Secretaria (Nível Igreja);
+- Entrevista com o líder da Música (Nível Departamento);
+- Treinamento da mesa de som (Nível Função).
+
+O sistema exibe o checklist auditado completo em qualquer atribuição, registrando quem validou cada item e a data.
+
+### 10.2 Jornada "Quero Servir" (Feature 2)
+
+O princípio de UX mais importante é **mostrar o caminho inteiro logo no início**. Se a pessoa preenche habilidades e interesses e só depois descobre que não pode servir ainda, a sensação é de ter sido barrada. Ao ver o caminho completo antes, o C1 vira uma etapa esperada e formativa.
+
+- **Tela de abertura ("Quero servir")**: O membro/frequentador toca em "Quero servir" e vê claramente o percurso em 4 etapas:
+  1. _Perfil de serviço_
+  2. _Curso C1_
+  3. _Conversa com o líder_
+  4. _Início na função_
+     As etapas já cumpridas aparecem marcadas com check verde.
+- **Perfil de serviço**: Habilidades e dons, interesses por departamento e disponibilidade de horários. É preenchido mesmo sem C1, pois a manifestação do interesse já é valiosa para a igreja.
+- **C1**: Se a pessoa já concluiu, avança direto. Se não concluiu, exibe a próxima turma aberta com datas e botão de inscrição em um toque. Se não houver turma aberta no momento, oferece o botão _"Me avise quando abrir turma"_.
+- **Tela Inicial do Membro**: Ganha o bloco _"Seu caminho para servir"_, exibindo a etapa atual em tempo real (ex.: _"Inscrito no C1, turma de Março"_).
+- **Visão do Líder Ministerial**: Candidatos aparecem na lista de potenciais voluntários com a etiqueta **"Aguardando C1"**. O líder já pode conhecer os irmãos, dialogar e planejar as escalas, mas **o botão de ativar a atuação formal fica bloqueado** até o C1 estar concluído ou dispensado formalmente pela Secretaria.
+
+### 10.3 Módulo Mínimo de Cursos (Feature 3)
+
+Versão enxuta focada em operacionalizar o C1 e cursos preparatórios:
+
+- **Curso**: Nome, código e status ativo.
+- **Turma**: Curso vinculado, datas de início e término, vagas (opcional), status (_aberta_, _fechada_, _concluída_), horário e local.
+- **Inscrição**: Pessoa vinculada, turma, status (_inscrito_, _concluído_, _desistente_), datas e notas.
+- **Conclusão pela Secretaria**: A Secretaria marca quem concluiu cada turma em um toque, liberando automaticamente a aptidão ministerial do aluno.
+- **Regra de Inscrição (Decisão Confirmada)**: A inscrição no C1 é **aberta a membros e frequentadores** (o frequentador ganha tempo, faz o curso antes do batismo e já chega pronto para servir assim que for recebido como membro). A atuação em função continua exigindo o estágio de membro (R8).
+
+### 10.4 Migração do Rol (Voluntários Atuais)
+
+Na migração do rol histórico para o sistema Logos, **todos os membros que já servem atualmente em departamentos devem entrar com o C1 marcado como concluído ou dispensado**. Caso contrário, nenhuma atuação ativa seria mantida no primeiro dia de implantação. Os scripts de importação e seed oficial inicializam os voluntários pioneiros com status de C1 regularizado.

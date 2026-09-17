@@ -15,6 +15,12 @@ import type {
   RegistrationDivergenceRecord,
   ChurchSettingRecord,
   PersonStage,
+  ChurchRequirementRecord,
+  RequirementWaiverRecord,
+  CourseRecord,
+  CourseClassRecord,
+  CourseEnrollmentRecord,
+  VolunteerProfileRecord,
 } from '@/types/church'
 
 export const personsService = {
@@ -484,6 +490,14 @@ export const assignmentsService = {
       throw new Error('Regra R8: Só membros podem receber atuações em departamentos.')
     }
 
+    // C1 Check: Atuação ativa só é válida se o C1 estiver concluído ou dispensado
+    const c1Status = await coursesService.checkC1Status(data.person)
+    if (!c1Status.hasC1OrWaiver) {
+      throw new Error(
+        'Requisito Igreja C1 obrigatório: A pessoa precisa ter o C1 concluído ou dispensa registrada pela Secretaria.',
+      )
+    }
+
     // Overlap validation (D19)
     const check = await overlapRulesService.validateOverlap(data.person, data.role)
     if (!check.allowed && check.blockingRule) {
@@ -638,5 +652,350 @@ export const activitiesService = {
 
   async create(data: Partial<ActivityRecord>) {
     return pb.collection('activities').create<ActivityRecord>(data)
+  },
+}
+
+// -------------------------------------------------------------
+// FEATURE 1: REQUISITOS EM CAMADAS & DISPENSAS
+// -------------------------------------------------------------
+export const churchRequirementsService = {
+  async list(filter?: string) {
+    return pb.collection('church_requirements').getFullList<ChurchRequirementRecord>({
+      filter: filter || '',
+      sort: 'code',
+      expand: 'course_linked',
+    })
+  },
+
+  async getById(id: string) {
+    return pb.collection('church_requirements').getOne<ChurchRequirementRecord>(id, {
+      expand: 'course_linked',
+    })
+  },
+
+  async create(data: Partial<ChurchRequirementRecord>) {
+    return pb.collection('church_requirements').create<ChurchRequirementRecord>({
+      is_active: data.is_active ?? true,
+      is_default: data.is_default ?? false,
+      ...data,
+    })
+  },
+
+  async update(id: string, data: Partial<ChurchRequirementRecord>) {
+    return pb.collection('church_requirements').update<ChurchRequirementRecord>(id, data)
+  },
+
+  async delete(id: string) {
+    return pb.collection('church_requirements').delete(id)
+  },
+}
+
+export const requirementWaiversService = {
+  async listByPerson(personId: string) {
+    return pb.collection('requirement_waivers').getFullList<RequirementWaiverRecord>({
+      filter: `person = "${personId}"`,
+      sort: '-granted_at',
+      expand: 'person',
+    })
+  },
+
+  async list(filter?: string) {
+    return pb.collection('requirement_waivers').getFullList<RequirementWaiverRecord>({
+      filter: filter || '',
+      sort: '-granted_at',
+      expand: 'person',
+    })
+  },
+
+  async create(data: {
+    person: string
+    requirement_type: 'igreja' | 'departamento' | 'funcao'
+    requirement_id: string
+    requirement_title: string
+    reason: string
+    granted_by: string
+  }) {
+    if (!data.reason.trim()) {
+      throw new Error(
+        'A dispensa de requisito exige justificativa detalhada registrada pela Secretaria.',
+      )
+    }
+    return pb.collection('requirement_waivers').create<RequirementWaiverRecord>({
+      ...data,
+      granted_at: new Date().toISOString(),
+    })
+  },
+
+  async delete(id: string) {
+    return pb.collection('requirement_waivers').delete(id)
+  },
+}
+
+// -------------------------------------------------------------
+// FEATURE 3: MÓDULO MÍNIMO DE CURSOS
+// -------------------------------------------------------------
+export const coursesService = {
+  async list(filter?: string) {
+    return pb.collection('courses').getFullList<CourseRecord>({
+      filter: filter || '',
+      sort: 'name',
+    })
+  },
+
+  async getById(id: string) {
+    return pb.collection('courses').getOne<CourseRecord>(id)
+  },
+
+  async getByCode(code: string) {
+    try {
+      return await pb.collection('courses').getFirstListItem<CourseRecord>(`code = "${code}"`)
+    } catch {
+      return null
+    }
+  },
+
+  async create(data: Partial<CourseRecord>) {
+    return pb.collection('courses').create<CourseRecord>({
+      is_active: data.is_active ?? true,
+      ...data,
+    })
+  },
+
+  async update(id: string, data: Partial<CourseRecord>) {
+    return pb.collection('courses').update<CourseRecord>(id, data)
+  },
+
+  // Classes (Turmas)
+  async listClasses(courseId?: string) {
+    const filter = courseId ? `course = "${courseId}"` : ''
+    return pb.collection('course_classes').getFullList<CourseClassRecord>({
+      filter,
+      sort: '-start_date',
+      expand: 'course',
+    })
+  },
+
+  async getOpenClasses(courseId?: string) {
+    const base = 'status = "aberta"'
+    const filter = courseId ? `${base} && course = "${courseId}"` : base
+    return pb.collection('course_classes').getFullList<CourseClassRecord>({
+      filter,
+      sort: 'start_date',
+      expand: 'course',
+    })
+  },
+
+  async getClassById(id: string) {
+    return pb.collection('course_classes').getOne<CourseClassRecord>(id, {
+      expand: 'course',
+    })
+  },
+
+  async createClass(data: Partial<CourseClassRecord>) {
+    return pb.collection('course_classes').create<CourseClassRecord>({
+      status: data.status || 'aberta',
+      ...data,
+    })
+  },
+
+  async updateClass(id: string, data: Partial<CourseClassRecord>) {
+    return pb.collection('course_classes').update<CourseClassRecord>(id, data)
+  },
+
+  // Enrollments (Inscrições)
+  async listEnrollments(classId?: string) {
+    const filter = classId ? `course_class = "${classId}"` : ''
+    return pb.collection('course_enrollments').getFullList<CourseEnrollmentRecord>({
+      filter,
+      sort: '-created',
+      expand: 'person,course_class,course',
+    })
+  },
+
+  async listEnrollmentsByPerson(personId: string) {
+    return pb.collection('course_enrollments').getFullList<CourseEnrollmentRecord>({
+      filter: `person = "${personId}"`,
+      sort: '-created',
+      expand: 'course_class,course,course_class.course',
+    })
+  },
+
+  async enrollPerson(data: {
+    course_class: string
+    course?: string
+    person: string
+    notes?: string
+  }) {
+    // Check if already enrolled in this class
+    const existing = await pb.collection('course_enrollments').getFullList<CourseEnrollmentRecord>({
+      filter: `course_class = "${data.course_class}" && person = "${data.person}"`,
+    })
+    if (existing.length > 0) {
+      if (existing[0].status === 'inscrito') {
+        throw new Error('Pessoa já está inscrita nesta turma.')
+      }
+      if (existing[0].status === 'concluido') {
+        throw new Error('Pessoa já concluiu este curso nesta turma.')
+      }
+      // Se estava desistente, reativa inscrição
+      return pb.collection('course_enrollments').update<CourseEnrollmentRecord>(existing[0].id, {
+        status: 'inscrito',
+        enrollment_date: new Date().toISOString(),
+      })
+    }
+
+    return pb.collection('course_enrollments').create<CourseEnrollmentRecord>({
+      course_class: data.course_class,
+      course: data.course,
+      person: data.person,
+      status: 'inscrito',
+      enrollment_date: new Date().toISOString(),
+      notes: data.notes || '',
+    })
+  },
+
+  async markEnrollmentCompleted(id: string, completedByName: string, notes?: string) {
+    return pb.collection('course_enrollments').update<CourseEnrollmentRecord>(id, {
+      status: 'concluido',
+      completion_date: new Date().toISOString(),
+      completed_by: completedByName || 'Secretaria',
+      notes,
+    })
+  },
+
+  async markEnrollmentDropped(id: string, notes?: string) {
+    return pb.collection('course_enrollments').update<CourseEnrollmentRecord>(id, {
+      status: 'desistente',
+      notes,
+    })
+  },
+
+  // Helper: Verifica status do C1 para uma pessoa (concluído via turma ou dispensado pela secretaria)
+  async checkC1Status(personId: string): Promise<{
+    completed: boolean
+    completionDate?: string
+    completedRecord?: CourseEnrollmentRecord
+    isEnrolled: boolean
+    activeEnrollment?: CourseEnrollmentRecord
+    isWaived: boolean
+    waiverRecord?: RequirementWaiverRecord
+    hasC1OrWaiver: boolean
+  }> {
+    try {
+      const enrollments = await pb
+        .collection('course_enrollments')
+        .getFullList<CourseEnrollmentRecord>({
+          filter: `person = "${personId}"`,
+          sort: '-created',
+          expand: 'course_class,course',
+        })
+
+      const completed = enrollments.find(
+        (e) =>
+          e.status === 'concluido' &&
+          (e.course === 'c1' ||
+            e.expand?.course?.code === 'c1' ||
+            /c1/i.test(e.expand?.course?.name || '') ||
+            /c1/i.test(e.expand?.course_class?.name || '')),
+      )
+
+      const activeEnr = enrollments.find(
+        (e) =>
+          e.status === 'inscrito' &&
+          (e.course === 'c1' ||
+            e.expand?.course?.code === 'c1' ||
+            /c1/i.test(e.expand?.course?.name || '') ||
+            /c1/i.test(e.expand?.course_class?.name || '')),
+      )
+
+      const waivers = await pb
+        .collection('requirement_waivers')
+        .getFullList<RequirementWaiverRecord>({
+          filter: `person = "${personId}"`,
+        })
+
+      const c1Waiver = waivers.find(
+        (w) =>
+          w.requirement_id === 'c1_concluido' ||
+          /c1/i.test(w.requirement_title) ||
+          /c1/i.test(w.reason),
+      )
+
+      const isCompleted = !!completed
+      const isWaived = !!c1Waiver
+      const hasC1OrWaiver = isCompleted || isWaived
+
+      return {
+        completed: isCompleted,
+        completionDate: completed?.completion_date,
+        completedRecord: completed,
+        isEnrolled: !!activeEnr,
+        activeEnrollment: activeEnr,
+        isWaived,
+        waiverRecord: c1Waiver,
+        hasC1OrWaiver,
+      }
+    } catch {
+      return {
+        completed: false,
+        isEnrolled: false,
+        isWaived: false,
+        hasC1OrWaiver: false,
+      }
+    }
+  },
+}
+
+// -------------------------------------------------------------
+// FEATURE 2: JORNADA "QUERO SERVIR" & PERFIL DE SERVIÇO
+// -------------------------------------------------------------
+export const volunteerProfilesService = {
+  async getByPerson(personId: string) {
+    try {
+      return await pb
+        .collection('volunteer_profiles')
+        .getFirstListItem<VolunteerProfileRecord>(`person = "${personId}"`, {
+          expand: 'person',
+        })
+    } catch {
+      return null
+    }
+  },
+
+  async list(filter?: string) {
+    return pb.collection('volunteer_profiles').getFullList<VolunteerProfileRecord>({
+      filter: filter || '',
+      sort: '-created',
+      expand: 'person',
+    })
+  },
+
+  async upsert(data: {
+    person: string
+    skills: string[]
+    interested_departments: string[]
+    availability: string
+    notes?: string
+    notify_when_c1_opens?: boolean
+  }) {
+    const existing = await this.getByPerson(data.person)
+    if (existing) {
+      return pb.collection('volunteer_profiles').update<VolunteerProfileRecord>(existing.id, {
+        skills: data.skills,
+        interested_departments: data.interested_departments,
+        availability: data.availability,
+        notes: data.notes,
+        notify_when_c1_opens: data.notify_when_c1_opens ?? false,
+      })
+    } else {
+      return pb.collection('volunteer_profiles').create<VolunteerProfileRecord>({
+        person: data.person,
+        skills: data.skills,
+        interested_departments: data.interested_departments,
+        availability: data.availability,
+        notes: data.notes,
+        notify_when_c1_opens: data.notify_when_c1_opens ?? false,
+      })
+    }
   },
 }

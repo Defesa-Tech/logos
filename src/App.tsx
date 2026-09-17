@@ -18,6 +18,8 @@ import FollowUp from './pages/FollowUp'
 import Frequentadores from './pages/Frequentadores'
 import IngressoMembro from './pages/IngressoMembro'
 import DepartamentosAtuacoes from './pages/DepartamentosAtuacoes'
+import { Courses } from './pages/Courses'
+import { QueroServir } from './pages/QueroServir'
 import Carteirinha from './pages/Carteirinha'
 import VerificarCarteirinha from './pages/VerificarCarteirinha'
 import MeuCadastro from './pages/MeuCadastro'
@@ -48,6 +50,8 @@ const App = () => (
             <Route path="/frequentadores" element={<Frequentadores />} />
             <Route path="/ingresso-membro" element={<IngressoMembro />} />
             <Route path="/departamentos" element={<DepartamentosAtuacoes />} />
+            <Route path="/cursos" element={<Courses />} />
+            <Route path="/quero-servir" element={<QueroServir />} />
             <Route path="/carteirinha" element={<Carteirinha />} />
             <Route path="/meu-cadastro" element={<MeuCadastro />} />
             <Route path="/atencao-ausencia" element={<AtencaoAusencia />} />

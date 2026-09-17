@@ -20,6 +20,8 @@ import {
   ArrowRight,
   Search,
   Lock,
+  AlertCircle,
+  ShieldAlert,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import {
@@ -28,6 +30,9 @@ import {
   personsService,
   overlapRulesService,
   activitiesService,
+  churchRequirementsService,
+  requirementWaiversService,
+  coursesService,
 } from '@/services/church'
 import type {
   DepartmentRecord,
@@ -37,6 +42,8 @@ import type {
   OverlapRuleRecord,
   RoleRequirement,
   UnitType,
+  ChurchRequirementRecord,
+  RequirementWaiverRecord,
 } from '@/types/church'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -67,12 +74,26 @@ export function DepartamentosAtuacoes() {
   const [assignments, setAssignments] = useState<AssignmentRecord[]>([])
   const [members, setMembers] = useState<PersonRecord[]>([])
   const [overlapRules, setOverlapRules] = useState<OverlapRuleRecord[]>([])
+  const [churchRequirements, setChurchRequirements] = useState<ChurchRequirementRecord[]>([])
+  const [waivers, setWaivers] = useState<RequirementWaiverRecord[]>([])
   const [loading, setLoading] = useState(true)
 
-  // Navigation tab: 'equipe' | 'unidades' | 'funcoes' | 'sobreposicoes'
-  const [activeTab, setActiveTab] = useState<'equipe' | 'unidades' | 'funcoes' | 'sobreposicoes'>(
-    'equipe',
-  )
+  // Feature 1: Layered requirements state for selected assignment
+  const [personC1Status, setPersonC1Status] = useState<{
+    completed: boolean
+    isWaived: boolean
+    hasC1OrWaiver: boolean
+    waiverRecord?: RequirementWaiverRecord
+  }>({
+    completed: false,
+    isWaived: false,
+    hasC1OrWaiver: false,
+  })
+
+  // Navigation tab: 'equipe' | 'unidades' | 'funcoes' | 'requisitos_igreja' | 'sobreposicoes'
+  const [activeTab, setActiveTab] = useState<
+    'equipe' | 'unidades' | 'funcoes' | 'requisitos_igreja' | 'sobreposicoes'
+  >('equipe')
   const [selectedDeptId, setSelectedDeptId] = useState<string>('all')
 
   // Modals state
@@ -127,6 +148,49 @@ export function DepartamentosAtuacoes() {
   })
   const [blockingOverlapError, setBlockingOverlapError] = useState<string | null>(null)
 
+  // Feature 1: Modal de Dispensa da Secretaria
+  const [isWaiverModalOpen, setIsWaiverModalOpen] = useState(false)
+  const [waiverForm, setWaiverForm] = useState<{
+    person: string
+    requirement_type: 'igreja' | 'departamento' | 'funcao'
+    requirement_id: string
+    requirement_title: string
+    reason: string
+  }>({
+    person: '',
+    requirement_type: 'igreja',
+    requirement_id: '',
+    requirement_title: '',
+    reason: '',
+  })
+
+  // Feature 1: Modal de Requisito de Unidade/Departamento
+  const [isDeptReqModalOpen, setIsDeptReqModalOpen] = useState(false)
+  const [deptReqForm, setDeptReqForm] = useState<{
+    deptId: string
+    title: string
+    description: string
+  }>({
+    deptId: '',
+    title: '',
+    description: '',
+  })
+
+  // Feature 1: Modal de Requisito de Igreja (Secretaria)
+  const [isChurchReqModalOpen, setIsChurchReqModalOpen] = useState(false)
+  const [churchReqForm, setChurchReqForm] = useState<{
+    id?: string
+    title: string
+    code: string
+    description: string
+    is_default: boolean
+  }>({
+    title: '',
+    code: '',
+    description: '',
+    is_default: false,
+  })
+
   const [isOverlapModalOpen, setIsOverlapModalOpen] = useState(false)
   const [overlapForm, setOverlapForm] = useState<{
     name: string
@@ -148,19 +212,24 @@ export function DepartamentosAtuacoes() {
   const loadData = async () => {
     try {
       setLoading(true)
-      const [allDepts, allRoles, allAssigns, allPersons, allOverlaps] = await Promise.all([
-        departmentsService.list(),
-        departmentsService.listRoles(),
-        assignmentsService.listActive(),
-        personsService.list('stage = "membro" || status = "member"'),
-        overlapRulesService.list(),
-      ])
+      const [allDepts, allRoles, allAssigns, allPersons, allOverlaps, allChurchReqs, allWaivers] =
+        await Promise.all([
+          departmentsService.list(),
+          departmentsService.listRoles(),
+          assignmentsService.listActive(),
+          personsService.list('stage = "membro" || status = "member"'),
+          overlapRulesService.list(),
+          churchRequirementsService.list(),
+          requirementWaiversService.list(),
+        ])
 
       setDepartments(allDepts)
       setRoles(allRoles)
       setAssignments(allAssigns)
       setMembers(allPersons)
       setOverlapRules(allOverlaps)
+      setChurchRequirements(allChurchReqs)
+      setWaivers(allWaivers)
     } catch {
       toast.error('Erro ao carregar dados da estrutura.')
     } finally {
@@ -329,6 +398,15 @@ export function DepartamentosAtuacoes() {
   // -------------------------------------------------------------
   // HANDLERS: ATRIBUIÇÃO DE EQUIPE (LÍDER & SECRETARIA)
   // -------------------------------------------------------------
+  const checkPersonC1 = async (personId: string) => {
+    if (!personId) {
+      setPersonC1Status({ completed: false, isWaived: false, hasC1OrWaiver: false })
+      return
+    }
+    const c1Info = await coursesService.checkC1Status(personId)
+    setPersonC1Status(c1Info)
+  }
+
   const handleRoleChangeInAssign = async (roleId: string) => {
     setAssignForm((prev) => ({
       ...prev,
@@ -350,6 +428,7 @@ export function DepartamentosAtuacoes() {
   const handlePersonChangeInAssign = async (personId: string) => {
     setAssignForm((prev) => ({ ...prev, person: personId }))
     setBlockingOverlapError(null)
+    await checkPersonC1(personId)
 
     if (personId && assignForm.role) {
       const check = await overlapRulesService.validateOverlap(personId, assignForm.role)
@@ -368,24 +447,66 @@ export function DepartamentosAtuacoes() {
     }
 
     const selectedRole = roles.find((r) => r.id === assignForm.role)
-    const reqs = selectedRole?.requirements || []
+    const dept = departments.find((d) => d.id === selectedRole?.department)
 
-    // Verify if all requirements are checked
-    const missingReqs = reqs.filter((r) => !assignForm.requirementsChecklist[r.id])
-    if (missingReqs.length > 0) {
+    // Feature 1: Requisitos em 3 camadas que se somam
+    // 1. Igreja: C1 Concluído (ou dispensado)
+    if (!personC1Status.hasC1OrWaiver) {
       toast.error(
-        `Preencha todos os requisitos obrigatórios antes de confirmar (${missingReqs[0].title}).`,
+        'Requisito Igreja não cumprido: Esta função exige C1 concluído ou dispensa registrada pela Secretaria.',
       )
       return
     }
 
-    // Build requirement checklist audit log
-    const auditChecklist = reqs.map((r) => ({
-      requirement_id: r.id,
-      title: r.title,
-      confirmed_by: currentPerson?.name || 'Secretaria',
-      confirmed_at: new Date().toISOString(),
-    }))
+    // 2. Departamento
+    const deptReqs = dept?.requirements || []
+    const missingDeptReqs = deptReqs.filter((r) => !assignForm.requirementsChecklist[r.id])
+    if (missingDeptReqs.length > 0) {
+      toast.error(
+        `Requisito do Departamento pendente: "${missingDeptReqs[0].title}". Marque o cumprimento antes de confirmar.`,
+      )
+      return
+    }
+
+    // 3. Função
+    const roleReqs = selectedRole?.requirements || []
+    const missingRoleReqs = roleReqs.filter((r) => !assignForm.requirementsChecklist[r.id])
+    if (missingRoleReqs.length > 0) {
+      toast.error(
+        `Requisito da Função pendente: "${missingRoleReqs[0].title}". Marque o cumprimento antes de confirmar.`,
+      )
+      return
+    }
+
+    // Build requirement checklist audit log somando as 3 camadas
+    const auditChecklist: any[] = [
+      {
+        requirement_id: 'c1_concluido',
+        title: personC1Status.isWaived
+          ? `C1 Dispensado pela Secretaria (${personC1Status.waiverRecord?.reason || 'Dispensa ministerial'})`
+          : 'C1 Concluído (Padrão Igreja)',
+        layer: 'igreja',
+        waived: personC1Status.isWaived,
+        confirmed_by: personC1Status.isWaived
+          ? personC1Status.waiverRecord?.granted_by || 'Secretaria'
+          : currentPerson?.name || 'Sistema/Secretaria',
+        confirmed_at: new Date().toISOString(),
+      },
+      ...deptReqs.map((r) => ({
+        requirement_id: r.id,
+        title: r.title,
+        layer: 'departamento',
+        confirmed_by: currentPerson?.name || 'Líder/Secretaria',
+        confirmed_at: new Date().toISOString(),
+      })),
+      ...roleReqs.map((r) => ({
+        requirement_id: r.id,
+        title: r.title,
+        layer: 'funcao',
+        confirmed_by: currentPerson?.name || 'Líder/Secretaria',
+        confirmed_at: new Date().toISOString(),
+      })),
+    ]
 
     try {
       await assignmentsService.create({
@@ -402,6 +523,126 @@ export function DepartamentosAtuacoes() {
       loadData()
     } catch (e: any) {
       toast.error(e.message || 'Erro ao alocar pessoa.')
+    }
+  }
+
+  // Feature 1: Handlers para Requisitos da Secretaria e Dispensas
+  const handleSaveChurchRequirement = async () => {
+    if (!permissions.isSecretaria) {
+      toast.error('Apenas a Secretaria define ou altera requisitos de nível Igreja.')
+      return
+    }
+    if (!churchReqForm.title.trim()) {
+      toast.error('Informe o título do requisito.')
+      return
+    }
+    try {
+      if (churchReqForm.id) {
+        await churchRequirementsService.update(churchReqForm.id, {
+          title: churchReqForm.title.trim(),
+          description: churchReqForm.description,
+        })
+        toast.success('Requisito de Igreja atualizado.')
+      } else {
+        await churchRequirementsService.create({
+          title: churchReqForm.title.trim(),
+          code: churchReqForm.code.trim() || churchReqForm.title.toLowerCase().replace(/\s+/g, '_'),
+          description: churchReqForm.description,
+          is_active: true,
+          is_default: churchReqForm.is_default,
+        })
+        toast.success('Requisito de nível Igreja criado com sucesso.')
+      }
+      setIsChurchReqModalOpen(false)
+      loadData()
+    } catch (e: any) {
+      toast.error(e.message || 'Erro ao salvar requisito de igreja.')
+    }
+  }
+
+  const handleCreateWaiver = async () => {
+    if (!permissions.isSecretaria) {
+      toast.error(
+        'Apenas a Secretaria pode registrar dispensas de requisitos (política da igreja).',
+      )
+      return
+    }
+    if (!waiverForm.person) {
+      toast.error('Selecione a pessoa a receber a dispensa.')
+      return
+    }
+    if (!waiverForm.reason.trim()) {
+      toast.error('A justificativa é obrigatória (ex.: formação equivalente em outra igreja).')
+      return
+    }
+    try {
+      await requirementWaiversService.create({
+        person: waiverForm.person,
+        requirement_type: waiverForm.requirement_type,
+        requirement_id: waiverForm.requirement_id || 'c1_concluido',
+        requirement_title: waiverForm.requirement_title || 'C1 Concluído',
+        reason: waiverForm.reason.trim(),
+        granted_by: currentPerson?.name ? `${currentPerson.name} (Secretaria)` : 'Secretaria Logos',
+      })
+      toast.success('Dispensa registrada formalmente com justificativa pela Secretaria.')
+      setIsWaiverModalOpen(false)
+      setWaiverForm({
+        person: '',
+        requirement_type: 'igreja',
+        requirement_id: '',
+        requirement_title: '',
+        reason: '',
+      })
+      loadData()
+      if (assignForm.person) {
+        await checkPersonC1(assignForm.person)
+      }
+    } catch (e: any) {
+      toast.error(e.message || 'Erro ao registrar dispensa.')
+    }
+  }
+
+  const handleAddDeptRequirement = async () => {
+    if (!deptReqForm.deptId || !deptReqForm.title.trim()) {
+      toast.error('Selecione a unidade e informe o requisito do departamento.')
+      return
+    }
+    const targetDept = departments.find((d) => d.id === deptReqForm.deptId)
+    if (!targetDept) return
+
+    const currentReqs = targetDept.requirements || []
+    const updated = [
+      ...currentReqs,
+      {
+        id: `dept_req_${Date.now()}`,
+        title: deptReqForm.title.trim(),
+        description: deptReqForm.description.trim(),
+      },
+    ]
+
+    try {
+      await departmentsService.update(deptReqForm.deptId, {
+        requirements: updated,
+      })
+      toast.success('Requisito do Departamento adicionado.')
+      setIsDeptReqModalOpen(false)
+      setDeptReqForm({ deptId: '', title: '', description: '' })
+      loadData()
+    } catch (e: any) {
+      toast.error(e.message || 'Erro ao adicionar requisito de departamento.')
+    }
+  }
+
+  const handleRemoveDeptRequirement = async (deptId: string, reqId: string) => {
+    const targetDept = departments.find((d) => d.id === deptId)
+    if (!targetDept) return
+    const updated = (targetDept.requirements || []).filter((r) => r.id !== reqId)
+    try {
+      await departmentsService.update(deptId, { requirements: updated })
+      toast.success('Requisito de departamento removido.')
+      loadData()
+    } catch (e: any) {
+      toast.error(e.message || 'Erro ao remover requisito.')
     }
   }
 
@@ -552,6 +793,46 @@ export function DepartamentosAtuacoes() {
             </Button>
           )}
 
+          {activeTab === 'requisitos_igreja' && (
+            <div className="flex items-center gap-2">
+              {permissions.isSecretaria && (
+                <>
+                  <Button
+                    onClick={() => {
+                      setWaiverForm({
+                        person: members[0]?.id || '',
+                        requirement_type: 'igreja',
+                        requirement_id: 'c1_concluido',
+                        requirement_title: 'C1 Concluído',
+                        reason: '',
+                      })
+                      setIsWaiverModalOpen(true)
+                    }}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-10 px-4 rounded-full shadow-sm"
+                  >
+                    <ShieldAlert className="w-4 h-4 mr-1.5" />
+                    Registrar Dispensa (Secretaria)
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setChurchReqForm({
+                        title: '',
+                        code: '',
+                        description: '',
+                        is_default: false,
+                      })
+                      setIsChurchReqModalOpen(true)
+                    }}
+                    className="bg-[#820AD1] hover:bg-[#7008B7] text-white font-bold text-xs h-10 px-4 rounded-full"
+                  >
+                    <Plus className="w-4 h-4 mr-1.5" />
+                    Novo Requisito Igreja
+                  </Button>
+                </>
+              )}
+            </div>
+          )}
+
           {activeTab === 'sobreposicoes' && permissions.canManageOverlaps && (
             <Button
               onClick={() => setIsOverlapModalOpen(true)}
@@ -597,6 +878,17 @@ export function DepartamentosAtuacoes() {
           }`}
         >
           Funções &amp; Requisitos ({roles.length})
+        </button>
+
+        <button
+          onClick={() => setActiveTab('requisitos_igreja')}
+          className={`px-4 py-2 rounded-full transition-all cursor-pointer ${
+            activeTab === 'requisitos_igreja'
+              ? 'bg-[#820AD1] text-white shadow-sm'
+              : 'text-gray-600 hover:bg-gray-100'
+          }`}
+        >
+          Requisitos em Camadas &amp; Dispensas ({churchRequirements.length + waivers.length})
         </button>
 
         <button
@@ -845,6 +1137,258 @@ export function DepartamentosAtuacoes() {
       )}
 
       {/* =====================================================================
+          TAB: REQUISITOS EM CAMADAS (3 NÍVEIS) & DISPENSAS DA SECRETARIA
+          ===================================================================== */}
+      {activeTab === 'requisitos_igreja' && (
+        <section className="bg-white rounded-3xl p-6 sm:p-7 shadow-sm border border-gray-100 space-y-6">
+          {/* Header Banner com a regra do usuário */}
+          <div className="p-4 sm:p-5 rounded-2xl bg-purple-50/70 border border-purple-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#820AD1]" />
+                <h3 className="font-extrabold text-[#191919] text-sm sm:text-base">
+                  Requisitos em 3 Camadas Que Se Somam
+                </h3>
+              </div>
+              <p className="text-xs text-gray-600 max-w-3xl">
+                Para qualquer função, o voluntário precisa cumprir cumulativamente:
+                <br />
+                <strong>1. Nível Igreja (Padrão):</strong> C1 concluído (definido pela Secretaria;
+                líder não pode remover).
+                <br />
+                <strong>2. Nível Departamento:</strong> Ex.: Entrevista com líder da Música
+                (definido por líder ou secretaria).
+                <br />
+                <strong>3. Nível Função:</strong> Ex.: Treinamento de mesa de som (definido por
+                líder ou secretaria).
+              </p>
+            </div>
+            <div className="shrink-0 p-3 bg-white rounded-xl border border-purple-200 text-xs">
+              <p className="font-bold text-[#820AD1] flex items-center gap-1.5">
+                <Lock className="w-3.5 h-3.5" /> Dispensa Exclusiva
+              </p>
+              <p className="text-[11px] text-gray-500 mt-0.5 max-w-xs">
+                Apenas a Secretaria registra dispensas com justificativa oficial auditada. O líder
+                vê, mas não pode criar nem remover.
+              </p>
+            </div>
+          </div>
+
+          {/* Camada 1: Nível Igreja */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-bold text-sm text-[#191919] flex items-center gap-2">
+                  <span className="px-2 py-0.5 rounded-full bg-purple-100 text-[#820AD1] text-[10px] uppercase font-bold">
+                    Nível 1 &bull; Igreja
+                  </span>
+                  <span>Requisitos Padrão da Igreja Defesa da Fé</span>
+                </h4>
+                <p className="text-xs text-gray-500">
+                  Gerenciados exclusivamente pela Secretaria. Exigidos para qualquer função em todos
+                  os departamentos.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {churchRequirements.map((cr) => (
+                <div
+                  key={cr.id}
+                  className="p-4 rounded-2xl border border-purple-200 bg-[#FBF9FE] flex items-start justify-between gap-3"
+                >
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <h5 className="font-bold text-sm text-[#191919]">{cr.title}</h5>
+                      {cr.is_default && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#820AD1] text-white">
+                          Padrão Universal
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-600">{cr.description}</p>
+                    <p className="text-[11px] text-[#820AD1] font-semibold">
+                      Código: {cr.code} &bull; Definido por: Secretaria Geral
+                    </p>
+                  </div>
+                  {cr.is_default && (
+                    <div
+                      className="p-2 bg-purple-100 rounded-xl text-[#820AD1] shrink-0"
+                      title="Requisito não removível por líderes"
+                    >
+                      <Lock className="w-4 h-4" />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Camada 2: Nível Departamento */}
+          <div className="space-y-3 pt-4 border-t border-gray-100">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h4 className="font-bold text-sm text-[#191919] flex items-center gap-2">
+                  <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[10px] uppercase font-bold">
+                    Nível 2 &bull; Departamento
+                  </span>
+                  <span>Requisitos por Unidade / Departamento</span>
+                </h4>
+                <p className="text-xs text-gray-500">
+                  Ex.: Entrevista com o líder da Música. Válidos para todas as funções daquela
+                  unidade.
+                </p>
+              </div>
+              {(permissions.isSecretaria || permissions.canManageRoles) && (
+                <Button
+                  onClick={() => {
+                    setDeptReqForm({
+                      deptId: departments[0]?.id || '',
+                      title: '',
+                      description: '',
+                    })
+                    setIsDeptReqModalOpen(true)
+                  }}
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full text-xs border-purple-200 text-purple-700 hover:bg-purple-50 h-8 self-start sm:self-auto"
+                >
+                  <Plus className="w-3.5 h-3.5 mr-1" />+ Requisito do Departamento
+                </Button>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {departments
+                .filter((d) => (d.requirements?.length || 0) > 0)
+                .map((dept) => (
+                  <div
+                    key={dept.id}
+                    className="p-4 rounded-2xl border border-gray-200 bg-[#F8F9FB] space-y-2"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-xs text-[#820AD1] uppercase tracking-wide">
+                        {dept.name}
+                      </span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 bg-gray-200 rounded-full text-gray-700">
+                        {dept.requirements?.length} requisito(s)
+                      </span>
+                    </div>
+
+                    <div className="space-y-1.5 pt-1">
+                      {dept.requirements?.map((req) => (
+                        <div
+                          key={req.id}
+                          className="flex items-center justify-between p-2.5 bg-white rounded-xl border border-gray-100 text-xs"
+                        >
+                          <div>
+                            <p className="font-bold text-gray-800">{req.title}</p>
+                            {req.description && (
+                              <p className="text-[11px] text-gray-500">{req.description}</p>
+                            )}
+                          </div>
+                          {(permissions.isSecretaria || permissions.canManageRoles) && (
+                            <button
+                              onClick={() => handleRemoveDeptRequirement(dept.id, req.id)}
+                              className="text-red-500 hover:text-red-700 p-1 cursor-pointer"
+                              title="Remover requisito"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              {departments.filter((d) => (d.requirements?.length || 0) > 0).length === 0 && (
+                <div className="col-span-2 py-6 text-center text-gray-400 text-xs border border-dashed border-gray-200 rounded-2xl">
+                  Nenhum departamento cadastrou requisitos específicos de unidade ainda.
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Camada 3: Dispensas da Secretaria (Auditoria de Exceções) */}
+          <div className="space-y-3 pt-4 border-t border-gray-100">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h4 className="font-bold text-sm text-[#191919] flex items-center gap-2">
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] uppercase font-bold">
+                    Dispensas Auditadas &bull; Secretaria
+                  </span>
+                  <span>Exceções Pastorais &amp; Formações Equivalentes</span>
+                </h4>
+                <p className="text-xs text-gray-500">
+                  Líderes visualizam o registro completo, mas não podem conceder nem remover
+                  dispensas.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              {waivers.length === 0 ? (
+                <div className="py-8 text-center text-gray-400 text-xs border border-dashed border-gray-200 rounded-2xl">
+                  Nenhuma dispensa concedida. Todos os membros seguem os requisitos integrais.
+                </div>
+              ) : (
+                waivers.map((w) => (
+                  <div
+                    key={w.id}
+                    className="p-4 rounded-2xl border border-emerald-100 bg-emerald-50/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-bold text-[#191919] text-sm">
+                          {w.expand?.person?.name || 'Membro'}
+                        </span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                          Dispensa: {w.requirement_title}
+                        </span>
+                        <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-800">
+                          Nível {w.requirement_type}
+                        </span>
+                      </div>
+                      <p className="text-gray-700 italic">&ldquo;{w.reason}&rdquo;</p>
+                      <div className="flex items-center gap-3 text-[11px] text-gray-500 pt-0.5 flex-wrap">
+                        <span>
+                          Concedido por: <strong>{w.granted_by}</strong>
+                        </span>
+                        <span>&bull;</span>
+                        <span>
+                          Data:{' '}
+                          {w.granted_at ? new Date(w.granted_at).toLocaleDateString('pt-BR') : '-'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {permissions.isSecretaria && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={async () => {
+                          if (
+                            confirm(`Deseja revogar esta dispensa de ${w.expand?.person?.name}?`)
+                          ) {
+                            await requirementWaiversService.delete(w.id)
+                            toast.success('Dispensa revogada.')
+                            loadData()
+                          }
+                        }}
+                        className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50 rounded-full h-8 font-bold self-end sm:self-auto"
+                      >
+                        Revogar Dispensa
+                      </Button>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* =====================================================================
           TAB 3: FUNÇÕES & REQUISITOS (LÍDER & SECRETARIA)
           ===================================================================== */}
       {activeTab === 'funcoes' && (
@@ -1068,22 +1612,138 @@ export function DepartamentosAtuacoes() {
               </div>
             )}
 
-            {/* Requirements Checklist (D18) */}
-            {selectedRoleRecord && (selectedRoleRecord.requirements?.length || 0) > 0 && (
-              <div className="p-4 bg-purple-50/50 border border-purple-200 rounded-2xl space-y-2.5">
+            {/* FEATURE 1: CHECKLIST COMPLETO SOMANDO OS 3 NÍVEIS + REGRA R8 */}
+            <div className="p-4 bg-purple-50/60 border border-purple-200 rounded-2xl space-y-3">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 font-bold text-[#820AD1]">
                   <ListCheck className="w-4 h-4" />
-                  <span>Checklist Obrigatório de Requisitos</span>
+                  <span>Checklist Cumulativo em 3 Camadas</span>
                 </div>
-                <p className="text-[11px] text-gray-500">
-                  Marque cada requisito cumprido. O sistema auditará formalmente seu nome e a data.
-                </p>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-[#820AD1]">
+                  Soma dos 3 Níveis
+                </span>
+              </div>
+              <p className="text-[11px] text-gray-500">
+                O sistema exige simultaneamente a regra de membro (R8), o requisito universal da
+                Igreja (C1), os requisitos da unidade e os da função específica.
+              </p>
 
-                <div className="space-y-2 pt-1">
-                  {selectedRoleRecord.requirements?.map((req) => (
+              {/* NÍVEL 1: IGREJA (C1) */}
+              <div className="p-3 bg-white rounded-xl border border-purple-100 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] uppercase font-bold text-purple-700">
+                    1. Nível Igreja (Padrão Universal)
+                  </span>
+                  <span className="text-[10px] text-gray-400">Política da Igreja</span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    {personC1Status.hasC1OrWaiver ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    ) : (
+                      <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                    )}
+                    <div>
+                      <p className="font-bold text-xs text-gray-800">C1 Concluído</p>
+                      <p className="text-[11px] text-gray-500">
+                        {personC1Status.completed
+                          ? 'Concluído na turma do curso C1'
+                          : personC1Status.isWaived
+                            ? `Dispensado pela Secretaria: "${personC1Status.waiverRecord?.reason}"`
+                            : 'Pendente — Exige conclusão de turma ou dispensa da Secretaria'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {personC1Status.hasC1OrWaiver ? (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                      {personC1Status.isWaived ? 'Dispensado' : 'Apto'}
+                    </span>
+                  ) : (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                      Bloqueante
+                    </span>
+                  )}
+                </div>
+
+                {!personC1Status.hasC1OrWaiver && (
+                  <div className="text-[11px] text-amber-800 bg-amber-50 p-2 rounded-lg border border-amber-200 mt-1">
+                    O C1 é obrigatório para qualquer função. Líderes não podem dispensar este
+                    requisito. Se houver caso excepcional de transferência, solicite a dispensa à
+                    Secretaria.
+                  </div>
+                )}
+              </div>
+
+              {/* NÍVEL 2: DEPARTAMENTO */}
+              {(() => {
+                const targetDept = departments.find((d) => d.id === selectedRoleRecord?.department)
+                const deptReqs = targetDept?.requirements || []
+                return (
+                  <div className="p-3 bg-white rounded-xl border border-blue-100 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] uppercase font-bold text-blue-700">
+                        2. Nível Departamento ({targetDept?.name || 'Unidade'})
+                      </span>
+                      <span className="text-[10px] text-gray-400">Líder ou Secretaria</span>
+                    </div>
+
+                    {deptReqs.length === 0 ? (
+                      <p className="text-[11px] text-gray-400 italic">
+                        Nenhum requisito adicional específico desta unidade.
+                      </p>
+                    ) : (
+                      deptReqs.map((req) => (
+                        <label
+                          key={req.id}
+                          className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-blue-50/40 cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={!!assignForm.requirementsChecklist[req.id]}
+                            onChange={(e) =>
+                              setAssignForm((prev) => ({
+                                ...prev,
+                                requirementsChecklist: {
+                                  ...prev.requirementsChecklist,
+                                  [req.id]: e.target.checked,
+                                },
+                              }))
+                            }
+                            className="rounded text-blue-600 focus:ring-blue-600"
+                          />
+                          <div>
+                            <span className="font-medium text-gray-800">{req.title}</span>
+                            {req.description && (
+                              <p className="text-[10px] text-gray-400">{req.description}</p>
+                            )}
+                          </div>
+                        </label>
+                      ))
+                    )}
+                  </div>
+                )
+              })()}
+
+              {/* NÍVEL 3: FUNÇÃO */}
+              <div className="p-3 bg-white rounded-xl border border-purple-100 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] uppercase font-bold text-[#820AD1]">
+                    3. Nível Função ({selectedRoleRecord?.name || 'Função'})
+                  </span>
+                  <span className="text-[10px] text-gray-400">Líder ou Secretaria</span>
+                </div>
+
+                {(selectedRoleRecord?.requirements || []).length === 0 ? (
+                  <p className="text-[11px] text-gray-400 italic">
+                    Nenhum treinamento ou requisito específico desta função.
+                  </p>
+                ) : (
+                  selectedRoleRecord?.requirements?.map((req) => (
                     <label
                       key={req.id}
-                      className="flex items-center gap-2 p-2 bg-white rounded-xl border border-purple-100 cursor-pointer hover:bg-purple-50/30 transition-colors"
+                      className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-purple-50/40 cursor-pointer"
                     >
                       <input
                         type="checkbox"
@@ -1101,10 +1761,10 @@ export function DepartamentosAtuacoes() {
                       />
                       <span className="font-medium text-gray-800">{req.title}</span>
                     </label>
-                  ))}
-                </div>
+                  ))
+                )}
               </div>
-            )}
+            </div>
 
             {/* Notes */}
             <div className="space-y-1.5">
@@ -1351,6 +2011,235 @@ export function DepartamentosAtuacoes() {
               className="bg-[#820AD1] hover:bg-[#7008B7] text-white font-bold text-xs rounded-full px-5"
             >
               Salvar Função
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* =====================================================================
+          MODAL: REGISTRAR DISPENSA (EXCLUSIVA DA SECRETARIA)
+          ===================================================================== */}
+      <Dialog open={isWaiverModalOpen} onOpenChange={setIsWaiverModalOpen}>
+        <DialogContent className="max-w-md rounded-3xl p-6">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-[#191919] flex items-center gap-2">
+              <ShieldAlert className="w-5 h-5 text-emerald-600" />
+              <span>Registrar Dispensa de Requisito</span>
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-3.5 pt-2 text-xs">
+            <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-900 text-[11px]">
+              <strong>Regra de Governança:</strong> O líder departamental não pode remover o
+              requisito padrão (C1 é política da igreja). Somente a Secretaria registra uma dispensa
+              com justificativa formal arquivada.
+            </div>
+
+            <div className="space-y-1">
+              <label className="font-bold text-gray-700">Membro a ser dispensado</label>
+              <Select
+                value={waiverForm.person}
+                onValueChange={(val) => setWaiverForm((prev) => ({ ...prev, person: val }))}
+              >
+                <SelectTrigger className="rounded-xl h-10 text-xs">
+                  <SelectValue placeholder="Selecione o membro..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {members.map((m) => (
+                    <SelectItem key={m.id} value={m.id}>
+                      {m.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1">
+              <label className="font-bold text-gray-700">Requisito a dispensar</label>
+              <Select
+                value={waiverForm.requirement_title}
+                onValueChange={(val) =>
+                  setWaiverForm((prev) => ({
+                    ...prev,
+                    requirement_title: val,
+                    requirement_id: val === 'C1 Concluído' ? 'c1_concluido' : val,
+                  }))
+                }
+              >
+                <SelectTrigger className="rounded-xl h-10 text-xs">
+                  <SelectValue placeholder="Selecione o requisito..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="C1 Concluído">C1 Concluído (Nível Igreja)</SelectItem>
+                  <SelectItem value="Entrevista de Liderança">Entrevista com o Líder</SelectItem>
+                  <SelectItem value="Treinamento Técnico">Treinamento Específico</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1">
+              <label className="font-bold text-gray-700">
+                Justificativa Formal Obrigatória (Secretaria)
+              </label>
+              <Textarea
+                placeholder="Ex.: Membro vindo por transferência da Igreja Batista Esperança, com certificado teológico de discipulado e formação equivalente comprovada."
+                value={waiverForm.reason}
+                onChange={(e) => setWaiverForm((prev) => ({ ...prev, reason: e.target.value }))}
+                className="rounded-xl text-xs"
+                rows={3}
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="pt-3">
+            <Button
+              variant="outline"
+              onClick={() => setIsWaiverModalOpen(false)}
+              className="rounded-full text-xs"
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleCreateWaiver}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-full px-5"
+            >
+              Confirmar Dispensa Oficial
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* =====================================================================
+          MODAL: REQUISITO DO DEPARTAMENTO (LÍDER & SECRETARIA)
+          ===================================================================== */}
+      <Dialog open={isDeptReqModalOpen} onOpenChange={setIsDeptReqModalOpen}>
+        <DialogContent className="max-w-md rounded-3xl p-6">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-[#191919]">
+              Novo Requisito de Departamento
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-3 pt-2 text-xs">
+            <div className="space-y-1">
+              <label className="font-bold text-gray-700">Departamento / Unidade</label>
+              <Select
+                value={deptReqForm.deptId}
+                onValueChange={(val) => setDeptReqForm((prev) => ({ ...prev, deptId: val }))}
+              >
+                <SelectTrigger className="rounded-xl h-10 text-xs">
+                  <SelectValue placeholder="Selecione a unidade..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {departments.map((d) => (
+                    <SelectItem key={d.id} value={d.id}>
+                      {d.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1">
+              <label className="font-bold text-gray-700">Título do Requisito</label>
+              <Input
+                placeholder="Ex.: Entrevista com o líder da Música"
+                value={deptReqForm.title}
+                onChange={(e) => setDeptReqForm((prev) => ({ ...prev, title: e.target.value }))}
+                className="rounded-xl text-xs h-10"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="font-bold text-gray-700">Descrição / Critério</label>
+              <Input
+                placeholder="Ex.: Alinhamento de testemunho e testemunho pastoral"
+                value={deptReqForm.description}
+                onChange={(e) =>
+                  setDeptReqForm((prev) => ({ ...prev, description: e.target.value }))
+                }
+                className="rounded-xl text-xs h-10"
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="pt-3">
+            <Button
+              variant="outline"
+              onClick={() => setIsDeptReqModalOpen(false)}
+              className="rounded-full text-xs"
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleAddDeptRequirement}
+              className="bg-[#820AD1] hover:bg-[#7008B7] text-white font-bold text-xs rounded-full px-5"
+            >
+              Salvar Requisito
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* =====================================================================
+          MODAL: REQUISITO DE NÍVEL IGREJA (SECRETARIA)
+          ===================================================================== */}
+      <Dialog open={isChurchReqModalOpen} onOpenChange={setIsChurchReqModalOpen}>
+        <DialogContent className="max-w-md rounded-3xl p-6">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-[#191919]">
+              Requisito Institucional de Nível Igreja
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-3 pt-2 text-xs">
+            <div className="space-y-1">
+              <label className="font-bold text-gray-700">Título</label>
+              <Input
+                placeholder="Ex.: C1 Concluído"
+                value={churchReqForm.title}
+                onChange={(e) => setChurchReqForm((prev) => ({ ...prev, title: e.target.value }))}
+                className="rounded-xl text-xs h-10"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="font-bold text-gray-700">Código interno</label>
+              <Input
+                placeholder="Ex.: c1_concluido"
+                value={churchReqForm.code}
+                onChange={(e) => setChurchReqForm((prev) => ({ ...prev, code: e.target.value }))}
+                className="rounded-xl text-xs h-10"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="font-bold text-gray-700">Descrição e Fundamento</label>
+              <Textarea
+                placeholder="Explique o propósito deste requisito universal..."
+                value={churchReqForm.description}
+                onChange={(e) =>
+                  setChurchReqForm((prev) => ({ ...prev, description: e.target.value }))
+                }
+                className="rounded-xl text-xs"
+                rows={3}
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="pt-3">
+            <Button
+              variant="outline"
+              onClick={() => setIsChurchReqModalOpen(false)}
+              className="rounded-full text-xs"
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleSaveChurchRequirement}
+              className="bg-[#820AD1] hover:bg-[#7008B7] text-white font-bold text-xs rounded-full px-5"
+            >
+              Salvar Requisito de Igreja
             </Button>
           </DialogFooter>
         </DialogContent>

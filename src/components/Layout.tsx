@@ -141,6 +141,24 @@ export default function Layout() {
           },
         ]
       : []),
+    // Jornada Quero Servir (Feature 2)
+    {
+      label: 'Quero Servir',
+      fullLabel: 'Quero Servir (Jornada Voluntariado)',
+      path: '/quero-servir',
+      icon: HeartHandshake,
+    },
+    // Cursos & Turmas C1 (Feature 3)
+    ...(permissions.isSecretaria || permissions.canManageAssignments
+      ? [
+          {
+            label: 'Cursos',
+            fullLabel: 'Cursos & Turmas C1',
+            path: '/cursos',
+            icon: Calendar,
+          },
+        ]
+      : []),
     // J7 Carteirinha Digital
     {
       label: 'Carteirinha',

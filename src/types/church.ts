@@ -99,6 +99,7 @@ export interface DepartmentRecord extends RecordModel {
   parent_unit?: string
   status?: UnitStatus
   order_index?: number
+  requirements?: RoleRequirement[] // Nível Departamento (Feature 1)
   expand?: {
     parent_unit?: DepartmentRecord
     subdepartments?: DepartmentRecord[]
@@ -127,8 +128,93 @@ export interface DepartmentRoleRecord extends RecordModel {
 export interface RequirementChecklistItem {
   requirement_id: string
   title: string
+  layer: 'igreja' | 'departamento' | 'funcao' // 3 níveis que se somam (Feature 1)
   confirmed_by: string
   confirmed_at: string
+  waiver_id?: string
+  waived?: boolean
+}
+
+// Feature 1: Requisitos de Igreja & Dispensas
+export interface ChurchRequirementRecord extends RecordModel {
+  title: string
+  code: string
+  description?: string
+  is_active?: boolean
+  is_default?: boolean // ex: "C1 concluído" para qualquer função
+  course_linked?: string
+  expand?: {
+    course_linked?: CourseRecord
+  }
+}
+
+export interface RequirementWaiverRecord extends RecordModel {
+  person: string
+  requirement_type: 'igreja' | 'departamento' | 'funcao'
+  requirement_id: string
+  requirement_title: string
+  reason: string
+  granted_by: string
+  granted_at: string
+  expand?: {
+    person?: PersonRecord
+  }
+}
+
+// Feature 3: Módulo mínimo de cursos
+export interface CourseRecord extends RecordModel {
+  name: string
+  code: string
+  description?: string
+  is_active?: boolean
+}
+
+export type CourseClassStatus = 'aberta' | 'fechada' | 'concluida'
+
+export interface CourseClassRecord extends RecordModel {
+  course: string
+  name: string
+  start_date: string
+  end_date: string
+  capacity?: number
+  status: CourseClassStatus
+  schedule_info?: string
+  location?: string
+  expand?: {
+    course?: CourseRecord
+    'course_enrollments(course_class)'?: CourseEnrollmentRecord[]
+  }
+}
+
+export type EnrollmentStatus = 'inscrito' | 'concluido' | 'desistente'
+
+export interface CourseEnrollmentRecord extends RecordModel {
+  course_class: string
+  course?: string
+  person: string
+  status: EnrollmentStatus
+  enrollment_date?: string
+  completion_date?: string
+  completed_by?: string
+  notes?: string
+  expand?: {
+    course_class?: CourseClassRecord
+    course?: CourseRecord
+    person?: PersonRecord
+  }
+}
+
+// Feature 2: Jornada "Quero servir" & Perfil de serviço
+export interface VolunteerProfileRecord extends RecordModel {
+  person: string
+  skills?: string[]
+  interested_departments?: string[]
+  availability?: string
+  notes?: string
+  notify_when_c1_opens?: boolean
+  expand?: {
+    person?: PersonRecord
+  }
 }
 
 export interface AssignmentRecord extends RecordModel {
