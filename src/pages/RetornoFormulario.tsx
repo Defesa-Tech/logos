@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import {
   Sparkles,
   CheckCircle2,
@@ -8,8 +8,12 @@ import {
   Church,
   ArrowRight,
   ShieldCheck,
+  Baby,
+  Users,
+  Compass,
+  ChevronLeft,
 } from 'lucide-react'
-import { personsService, churchSettingsService } from '@/services/church'
+import { personsService } from '@/services/church'
 import type { PersonRecord } from '@/types/church'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -25,14 +29,23 @@ import { toast } from 'sonner'
 import { PageTransition } from '@/components/MotionKit'
 
 export default function RetornoFormulario() {
-  const [step, setStep] = useState<'identify' | 'form' | 'success'>('identify')
+  const [step, setStep] = useState<'identify' | 'etapa1' | 'etapa2' | 'success'>('identify')
   const [phone, setPhone] = useState('')
   const [matchedPerson, setMatchedPerson] = useState<PersonRecord | null>(null)
   const [isSearching, setIsSearching] = useState(false)
 
-  // Form Fields
+  // Etapa 1: Dados Pessoais & Família (máximo 4 campos, tudo opcional exceto nome/fone)
+  // Microcopy: "Para lembrarmos do seu aniversário e indicar programações para sua família"
   const [birthDate, setBirthDate] = useState('')
+  const [neighborhood, setNeighborhood] = useState('')
+  const [howMet, setHowMet] = useState('')
+  const [hasChildren, setHasChildren] = useState(false)
+  const [childrenInfo, setChildrenInfo] = useState('')
+
+  // Etapa 2: Endereço & Caminho da Membresia / Batismo (máximo 4 campos)
+  // Microcopy: "Para aproximar você da comunhão, células e caminho da membresia"
   const [address, setAddress] = useState('')
+  const [interestInMembership, setInterestInMembership] = useState(false)
   const [hasBaptism, setHasBaptism] = useState(false)
   const [baptismDate, setBaptismDate] = useState('')
   const [baptismLocation, setBaptismLocation] = useState<'defesa_da_fe' | 'outra_igreja'>(
@@ -41,7 +54,7 @@ export default function RetornoFormulario() {
   const [baptismChurchName, setBaptismChurchName] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Identify person by phone (R3)
+  // Identify person by phone (R3) & Pré-preenchimento
   const handleIdentify = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!phone.trim()) return
@@ -55,13 +68,21 @@ export default function RetornoFormulario() {
       }
 
       setMatchedPerson(found)
+      // Pré-preenchimento com dados existentes para NUNCA re-perguntar o que já foi informado
       setBirthDate(found.birth_date ? found.birth_date.slice(0, 10) : '')
+      setNeighborhood(found.neighborhood || '')
+      setHowMet(found.how_met_details || found.how_found || found.how_met || '')
+      setHasChildren(!!found.has_children)
+      setChildrenInfo(found.children_info || '')
+
       setAddress(found.address || '')
+      setInterestInMembership(!!found.interest_in_membership)
       setHasBaptism(!!found.baptism_date)
       setBaptismDate(found.baptism_date ? found.baptism_date.slice(0, 10) : '')
       setBaptismLocation(found.baptism_location || 'defesa_da_fe')
       setBaptismChurchName(found.baptism_church_name || '')
-      setStep('form')
+
+      setStep('etapa1')
     } catch {
       toast.error('Erro ao buscar cadastro.')
     } finally {
@@ -70,7 +91,7 @@ export default function RetornoFormulario() {
   }
 
   // Update cadastro existente sem criar senha (J4)
-  const handleSubmitForm = async (e: React.FormEvent) => {
+  const handleFinalSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!matchedPerson) return
 
@@ -78,11 +99,18 @@ export default function RetornoFormulario() {
       setIsSubmitting(true)
       await personsService.update(matchedPerson.id, {
         birth_date: birthDate ? new Date(birthDate).toISOString() : undefined,
+        neighborhood: neighborhood.trim() || undefined,
+        how_met_details: howMet.trim() || undefined,
+        has_children: hasChildren,
+        children_info: hasChildren && childrenInfo.trim() ? childrenInfo.trim() : undefined,
         address: address.trim() || undefined,
+        interest_in_membership: interestInMembership,
         baptism_date: hasBaptism && baptismDate ? new Date(baptismDate).toISOString() : undefined,
         baptism_location: hasBaptism ? baptismLocation : undefined,
         baptism_church_name:
           hasBaptism && baptismLocation === 'outra_igreja' ? baptismChurchName.trim() : undefined,
+        full_form_completed: true,
+        full_form_date: new Date().toISOString(),
       })
 
       toast.success('Cadastro completado com sucesso!')
@@ -103,12 +131,12 @@ export default function RetornoFormulario() {
             L
           </div>
           <span className="text-[10px] font-bold uppercase tracking-wider text-[#820AD1] block">
-            Jornada J4 &bull; Retorno ao Culto
+            Jornada J4 &bull; Coleta Progressiva
           </span>
-          <h1 className="text-2xl font-extrabold text-[#191919]">Complete Seu Cadastro</h1>
+          <h1 className="text-2xl font-extrabold text-[#191919]">Conte Mais Sobre Você</h1>
           <p className="text-xs text-gray-500 max-w-sm mx-auto">
-            É uma alegria ter você conosco novamente na Igreja Defesa da Fé! Complete seus dados sem
-            precisar criar senha.
+            Pedimos seus dados na proporção do seu vínculo conosco. Tudo é opcional e você pode
+            completar em etapas curtas!
           </p>
         </div>
 
@@ -117,7 +145,7 @@ export default function RetornoFormulario() {
           <form onSubmit={handleIdentify} className="space-y-4 pt-2 text-xs">
             <div className="space-y-1">
               <Label className="font-semibold text-gray-700">
-                Informe o seu Telefone / WhatsApp cadastrado no culto
+                Informe o seu WhatsApp cadastrado no culto
               </Label>
               <Input
                 required
@@ -127,8 +155,8 @@ export default function RetornoFormulario() {
                 className="h-11 rounded-2xl bg-[#F0F1F5] border-transparent text-sm font-semibold"
               />
               <p className="text-[10px] text-gray-400">
-                Utilizamos seu telefone para localizar sua presença anterior sem duplicar o
-                cadastro.
+                Localizamos sua presença anterior para pré-preencher seus dados e nunca re-perguntar
+                o que você já respondeu.
               </p>
             </div>
 
@@ -137,110 +165,256 @@ export default function RetornoFormulario() {
               disabled={isSearching}
               className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-11 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all"
             >
-              {isSearching ? 'Localizando...' : 'Continuar &rarr;'}
+              {isSearching ? 'Localizando cadastro...' : 'Continuar &rarr;'}
             </Button>
           </form>
         )}
 
-        {/* STEP 2: COMPLETE DATA */}
-        {step === 'form' && matchedPerson && (
-          <form onSubmit={handleSubmitForm} className="space-y-4 text-xs">
+        {/* ETAPA 1 DE 2: ANIVERSÁRIO, BAIRRO E FAMÍLIA (Máx 4 campos) */}
+        {step === 'etapa1' && matchedPerson && (
+          <div className="space-y-5 text-xs">
+            {/* Header com indicador de progresso */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-[#820AD1] text-xs">
+                  Etapa 1 de 2: Você e Família
+                </span>
+                <span className="text-[10px] text-gray-400">50% concluído</span>
+              </div>
+              <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                <div className="bg-[#820AD1] h-full w-1/2 rounded-full transition-all" />
+              </div>
+            </div>
+
             <div className="bg-[#F7EEFD] p-3.5 rounded-2xl border border-purple-200">
               <p className="font-bold text-[#820AD1] text-sm">Olá, {matchedPerson.name}!</p>
-              <p className="text-[11px] text-[#820AD1]/80 mt-0.5">
-                Localizamos sua visita anterior. Por favor, complete os campos abaixo:
+              <p className="text-[11px] text-[#820AD1]/90 mt-0.5">
+                Microcopy de propósito: Solicitamos estas informações para lembrarmos do seu
+                aniversário e indicar programações para sua família.
               </p>
             </div>
 
-            <div className="space-y-1">
-              <Label className="font-semibold text-gray-700">Data de Nascimento</Label>
-              <Input
-                type="date"
-                required
-                value={birthDate}
-                onChange={(e) => setBirthDate(e.target.value)}
-                className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent"
-              />
-            </div>
-
-            <div className="space-y-1">
-              <Label className="font-semibold text-gray-700">Endereço Residencial</Label>
-              <Input
-                required
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                placeholder="Rua, número, bairro e cidade"
-                className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent"
-              />
-            </div>
-
-            {/* Baptism Details */}
-            <div className="p-3.5 rounded-2xl bg-[#F8F9FB] border border-gray-100 space-y-3">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={hasBaptism}
-                  onChange={(e) => setHasBaptism(e.target.checked)}
-                  className="rounded text-[#820AD1] focus:ring-[#820AD1]"
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                setStep('etapa2')
+              }}
+              className="space-y-4"
+            >
+              {/* Campo 1: Data de nascimento */}
+              <div className="space-y-1">
+                <div className="flex justify-between items-center">
+                  <Label className="font-semibold text-gray-700">Data de Nascimento</Label>
+                  <span className="text-[10px] text-[#820AD1]">Para comemorarmos seu dia</span>
+                </div>
+                <Input
+                  type="date"
+                  value={birthDate}
+                  onChange={(e) => setBirthDate(e.target.value)}
+                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent"
                 />
-                <span className="font-semibold text-gray-800">
-                  Já fui batizado nas águas (em qualquer igreja evangélica)
-                </span>
-              </label>
+              </div>
 
-              {hasBaptism && (
-                <div className="space-y-3 pt-2 border-t border-gray-200">
-                  <div className="space-y-1">
-                    <Label className="font-semibold text-gray-700">Data do Batismo</Label>
+              {/* Campo 2: Bairro */}
+              <div className="space-y-1">
+                <div className="flex justify-between items-center">
+                  <Label className="font-semibold text-gray-700">Seu Bairro / Região</Label>
+                  <span className="text-[10px] text-gray-400">Para grupos próximos</span>
+                </div>
+                <Input
+                  value={neighborhood}
+                  onChange={(e) => setNeighborhood(e.target.value)}
+                  placeholder="Ex: Pinheiros, Vila Madalena..."
+                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent"
+                />
+              </div>
+
+              {/* Campo 3: Como conheceu */}
+              <div className="space-y-1">
+                <div className="flex justify-between items-center">
+                  <Label className="font-semibold text-gray-700">
+                    Como conheceu a Defesa da Fé?
+                  </Label>
+                  <span className="text-[10px] text-gray-400">Opcional</span>
+                </div>
+                <Input
+                  value={howMet}
+                  onChange={(e) => setHowMet(e.target.value)}
+                  placeholder="Ex: Amigo, Instagram, convite da família..."
+                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent"
+                />
+              </div>
+
+              {/* Campo 4: Filhos */}
+              <div className="p-3.5 rounded-2xl bg-[#F8F9FB] border border-gray-100 space-y-2.5">
+                <label className="flex items-center gap-2 cursor-pointer font-bold text-gray-800">
+                  <input
+                    type="checkbox"
+                    checked={hasChildren}
+                    onChange={(e) => setHasChildren(e.target.checked)}
+                    className="rounded text-[#820AD1] focus:ring-[#820AD1]"
+                  />
+                  <span>Tenho filhos</span>
+                </label>
+
+                {hasChildren && (
+                  <div className="space-y-1 pt-1">
+                    <div className="flex justify-between items-center">
+                      <Label className="text-[11px] font-semibold text-gray-600">
+                        Nomes e idades dos filhos
+                      </Label>
+                      <span className="text-[10px] text-[#820AD1]">Para o Ministério Kids</span>
+                    </div>
                     <Input
-                      type="date"
-                      value={baptismDate}
-                      onChange={(e) => setBaptismDate(e.target.value)}
+                      value={childrenInfo}
+                      onChange={(e) => setChildrenInfo(e.target.value)}
+                      placeholder="Ex: Mariana (6 anos) e Davi (9 anos)"
                       className="h-9 rounded-2xl bg-white border-gray-200"
                     />
                   </div>
+                )}
+              </div>
 
-                  <div className="space-y-1">
-                    <Label className="font-semibold text-gray-700">Onde foi batizado?</Label>
-                    <Select
-                      value={baptismLocation}
-                      onValueChange={(val) =>
-                        setBaptismLocation(val as 'defesa_da_fe' | 'outra_igreja')
-                      }
-                    >
-                      <SelectTrigger className="h-9 rounded-2xl bg-white border-gray-200">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white rounded-2xl shadow-xl">
-                        <SelectItem value="defesa_da_fe">Igreja Defesa da Fé</SelectItem>
-                        <SelectItem value="outra_igreja">Em outra denominação / igreja</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+              <Button
+                type="submit"
+                className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-11 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all"
+              >
+                Avançar para Etapa 2 &rarr;
+              </Button>
+            </form>
+          </div>
+        )}
 
-                  {baptismLocation === 'outra_igreja' && (
+        {/* ETAPA 2 DE 2: ENDEREÇO & CAMINHO DA MEMBRESIA (Máx 4 campos) */}
+        {step === 'etapa2' && matchedPerson && (
+          <div className="space-y-5 text-xs">
+            {/* Indicador de progresso */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-[#820AD1] text-xs">
+                  Etapa 2 de 2: Comunhão &amp; Membresia
+                </span>
+                <span className="text-[10px] text-gray-400">100%</span>
+              </div>
+              <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                <div className="bg-[#820AD1] h-full w-full rounded-full transition-all" />
+              </div>
+            </div>
+
+            <div className="bg-[#F7EEFD] p-3.5 rounded-2xl border border-purple-200">
+              <p className="text-[11px] text-[#820AD1]/90">
+                Microcopy de propósito: Para aproximar você do caminho da membresia, grupos pequenos
+                e comunhão bíblica.
+              </p>
+            </div>
+
+            <form onSubmit={handleFinalSubmit} className="space-y-4">
+              {/* Campo 1: Endereço */}
+              <div className="space-y-1">
+                <div className="flex justify-between items-center">
+                  <Label className="font-semibold text-gray-700">Endereço Residencial</Label>
+                  <span className="text-[10px] text-gray-400">Opcional</span>
+                </div>
+                <Input
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="Rua, número e complemento"
+                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent"
+                />
+              </div>
+
+              {/* Campo 2: Interesse em membresia */}
+              <div className="p-3 bg-purple-50/50 rounded-2xl border border-purple-100">
+                <label className="flex items-center gap-2 cursor-pointer font-bold text-gray-800">
+                  <input
+                    type="checkbox"
+                    checked={interestInMembership}
+                    onChange={(e) => setInterestInMembership(e.target.checked)}
+                    className="rounded text-[#820AD1] focus:ring-[#820AD1]"
+                  />
+                  <span>Tenho interesse em ser membro da Defesa da Fé</span>
+                </label>
+              </div>
+
+              {/* Campo 3 & 4: Batismo nas águas */}
+              <div className="p-3.5 rounded-2xl bg-[#F8F9FB] border border-gray-100 space-y-3">
+                <label className="flex items-center gap-2 cursor-pointer font-bold text-gray-800">
+                  <input
+                    type="checkbox"
+                    checked={hasBaptism}
+                    onChange={(e) => setHasBaptism(e.target.checked)}
+                    className="rounded text-[#820AD1] focus:ring-[#820AD1]"
+                  />
+                  <span>Já sou batizado nas águas (em qualquer igreja evangélica)</span>
+                </label>
+
+                {hasBaptism && (
+                  <div className="space-y-3 pt-2 border-t border-gray-200">
                     <div className="space-y-1">
-                      <Label className="font-semibold text-gray-700">Nome da Igreja</Label>
+                      <Label className="font-semibold text-gray-700">Data do Batismo</Label>
                       <Input
-                        value={baptismChurchName}
-                        onChange={(e) => setBaptismChurchName(e.target.value)}
-                        placeholder="Ex: Igreja Presbiteriana de Curitiba"
+                        type="date"
+                        value={baptismDate}
+                        onChange={(e) => setBaptismDate(e.target.value)}
                         className="h-9 rounded-2xl bg-white border-gray-200"
                       />
                     </div>
-                  )}
-                </div>
-              )}
-            </div>
 
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-11 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all"
-            >
-              {isSubmitting ? 'Salvando...' : 'Atualizar Meu Cadastro'}
-            </Button>
-          </form>
+                    <div className="space-y-1">
+                      <Label className="font-semibold text-gray-700">Onde foi batizado?</Label>
+                      <Select
+                        value={baptismLocation}
+                        onValueChange={(val) =>
+                          setBaptismLocation(val as 'defesa_da_fe' | 'outra_igreja')
+                        }
+                      >
+                        <SelectTrigger className="h-9 rounded-2xl bg-white border-gray-200">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white rounded-2xl shadow-xl">
+                          <SelectItem value="defesa_da_fe">Igreja Defesa da Fé</SelectItem>
+                          <SelectItem value="outra_igreja">
+                            Em outra denominação / igreja
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {baptismLocation === 'outra_igreja' && (
+                      <div className="space-y-1">
+                        <Label className="font-semibold text-gray-700">Nome da Igreja</Label>
+                        <Input
+                          value={baptismChurchName}
+                          onChange={(e) => setBaptismChurchName(e.target.value)}
+                          placeholder="Ex: Igreja Presbiteriana Central"
+                          className="h-9 rounded-2xl bg-white border-gray-200"
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setStep('etapa1')}
+                  className="rounded-full h-11 px-4 border-gray-200 text-gray-600 font-bold"
+                >
+                  <ChevronLeft className="w-4 h-4 mr-1" />
+                  Voltar
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex-1 bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-11 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all"
+                >
+                  {isSubmitting ? 'Salvando...' : 'Concluir Meu Cadastro'}
+                </Button>
+              </div>
+            </form>
+          </div>
         )}
 
         {/* STEP 3: SUCCESS */}

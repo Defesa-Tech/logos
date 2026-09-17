@@ -9,6 +9,9 @@ import {
   ArrowRight,
   Shield,
   HelpCircle,
+  MapPin,
+  Users,
+  Compass,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import {
@@ -17,9 +20,20 @@ import {
   cultosService,
   stageHistoryService,
   churchSettingsService,
+  familiesService,
 } from '@/services/church'
-import type { PersonRecord, CultoRecord, PresenceRecord } from '@/types/church'
+import type { PersonRecord, CultoRecord, PresenceRecord, FamilyRecord } from '@/types/church'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { toast } from 'sonner'
 import { PageTransition } from '@/components/MotionKit'
 
@@ -34,20 +48,37 @@ export default function Frequentadores() {
   const { user, permissions } = useAuth()
 
   const [candidates, setCandidates] = useState<Candidate[]>([])
+  const [families, setFamilies] = useState<FamilyRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [settings, setSettings] = useState({
     weeksRequired: 3,
     windowWeeks: 8,
   })
 
+  // Modal de Virada para Frequentador com Coleta Progressiva
+  // Tabela: Endereço, núcleo familiar, se já é batizado e interesse em ser membro ou ser batizado
+  // Microcopy: "Aproximar do caminho da membresia"
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false)
+  const [selectedCandidate, setSelectedCandidate] = useState<Candidate | null>(null)
+  const [address, setAddress] = useState('')
+  const [familyId, setFamilyId] = useState<string>('none')
+  const [hasBaptism, setHasBaptism] = useState(false)
+  const [baptismDate, setBaptismDate] = useState('')
+  const [interestInMembership, setInterestInMembership] = useState(false)
+  const [interestInBaptism, setInterestInBaptism] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const loadData = async () => {
     try {
       setLoading(true)
-      const [settingsMap, allPersons, allCultos] = await Promise.all([
+      const [settingsMap, allPersons, allCultos, allFamilies] = await Promise.all([
         churchSettingsService.getMap(),
         personsService.list('stage = "visitante" || status = "visitor"'),
         cultosService.list(),
+        familiesService.list(),
       ])
+
+      setFamilies(allFamilies)
 
       const reqWeeks = parseInt(settingsMap.r4_frequentador_weeks_required || '3', 10)
       const winWeeks = parseInt(settingsMap.r4_frequentador_window_weeks || '8', 10)
@@ -72,7 +103,6 @@ export default function Frequentadores() {
         const weekKeys = new Set(
           validPres.map((pr) => {
             const d = new Date(pr.created)
-            // Get week number approximation: year + '-' + week
             const startOfYear = new Date(d.getFullYear(), 0, 1)
             const pastDays = Math.floor((d.getTime() - startOfYear.getTime()) / 86400000)
             const weekNum = Math.ceil((pastDays + startOfYear.getDay() + 1) / 7)
@@ -103,28 +133,56 @@ export default function Frequentadores() {
     loadData()
   }, [])
 
+  // Abrir modal com pré-preenchimento (NUNCA pedir de novo o que já foi informado)
+  const openConfirmModal = (cand: Candidate) => {
+    const p = cand.person
+    setSelectedCandidate(cand)
+    setAddress(p.address || (p.neighborhood ? `Bairro ${p.neighborhood}` : ''))
+    setFamilyId(p.family || 'none')
+    setHasBaptism(!!p.baptism_date)
+    setBaptismDate(p.baptism_date ? p.baptism_date.slice(0, 10) : '')
+    setInterestInMembership(!!p.interest_in_membership)
+    setInterestInBaptism(!!p.interest_in_baptism)
+    setConfirmModalOpen(true)
+  }
+
   // Confirm Frequentador (R5: Líder do Boas-Vindas ou Secretaria)
-  const handleConfirm = async (cand: Candidate) => {
+  const handleConfirmWithData = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedCandidate) return
+
     try {
-      // Update stage to 'frequentador'
-      await personsService.update(cand.person.id, {
+      setIsSubmitting(true)
+      const p = selectedCandidate.person
+
+      // Update person record with progressive collection data
+      await personsService.update(p.id, {
         stage: 'frequentador',
         status: 'attender',
+        address: address.trim() || undefined,
+        family: familyId !== 'none' ? familyId : undefined,
+        baptism_date: hasBaptism && baptismDate ? new Date(baptismDate).toISOString() : undefined,
+        interest_in_membership: interestInMembership,
+        interest_in_baptism: interestInBaptism,
       })
 
       // Record stage history
       await stageHistoryService.recordChange({
-        person: cand.person.id,
+        person: p.id,
         from_stage: 'visitante',
         to_stage: 'frequentador',
         author_name: user?.name || 'Líder de Boas-Vindas',
-        reason: `Regra R4 atingida: ${cand.distinctWeeksCount} semanas distintas em ${settings.windowWeeks} semanas. Confirmado pelo Líder.`,
+        reason: `Regra R4 atingida (${selectedCandidate.distinctWeeksCount} semanas distintas em ${settings.windowWeeks} semanas). Confirmado com coleta progressiva de endereço e aproximação de membresia.`,
       })
 
-      toast.success(`${cand.person.name} agora é oficialmente Frequentador!`)
+      toast.success(`${p.name} agora é oficialmente Frequentador!`)
+      setConfirmModalOpen(false)
+      setSelectedCandidate(null)
       loadData()
     } catch {
       toast.error('Erro ao confirmar transição para frequentador.')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -146,15 +204,16 @@ export default function Frequentadores() {
             <span className="w-2 h-2 rounded-full bg-[#820AD1]" />
             <span>Jornada J5</span>
             <span className="text-gray-300">/</span>
-            <span>Regras R4 & R5</span>
+            <span>Regras R4 & R5 &bull; Coleta Progressiva</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191919]">
             Virada para Frequentador
           </h1>
           <p className="text-xs sm:text-sm text-gray-500 mt-1 max-w-2xl font-normal">
             Regra R4: presença em <strong>{settings.weeksRequired} semanas diferentes</strong>{' '}
-            dentro de uma janela de <strong>{settings.windowWeeks} semanas</strong> (somente cultos
-            regulares). O sistema sugere e o Líder de Boas-Vindas confirma (R5).
+            dentro de <strong>{settings.windowWeeks} semanas</strong>. Na confirmação (R5),
+            coletamos progressivamente endereço, família, batismo e interesse em membresia
+            ("aproximar do caminho da membresia").
           </p>
         </div>
 
@@ -204,6 +263,7 @@ export default function Frequentadores() {
                     <p className="text-[11px] text-gray-500 mt-0.5">
                       Telefone: {cand.person.phone || cand.person.whatsapp || 'Sem telefone'} &bull;{' '}
                       {cand.regularCultosPresences.length} cultos regulares registrados
+                      {cand.person.neighborhood && ` &bull; Bairro: ${cand.person.neighborhood}`}
                     </p>
                   </div>
                 </div>
@@ -220,7 +280,7 @@ export default function Frequentadores() {
                   <Button
                     size="sm"
                     disabled={!permissions.canConfirmFrequentador}
-                    onClick={() => handleConfirm(cand)}
+                    onClick={() => openConfirmModal(cand)}
                     className="bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-9 px-4 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all cursor-pointer"
                     title={
                       !permissions.canConfirmFrequentador
@@ -277,6 +337,129 @@ export default function Frequentadores() {
           )}
         </div>
       </section>
+
+      {/* MODAL COLETA PROGRESSIVA: VIRADA PARA FREQUENTADOR */}
+      <Dialog open={confirmModalOpen} onOpenChange={setConfirmModalOpen}>
+        <DialogContent className="sm:max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border-gray-100 max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="border-b border-gray-100 pb-3">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#820AD1] bg-purple-50 px-2.5 py-0.5 rounded-full">
+                Jornada J5 &bull; Coleta Progressiva
+              </span>
+            </div>
+            <DialogTitle className="text-xl font-bold text-[#191919]">
+              Confirmar Frequentador: {selectedCandidate?.person.name}
+            </DialogTitle>
+          </DialogHeader>
+
+          <form onSubmit={handleConfirmWithData} className="space-y-4 pt-2 text-xs">
+            <div className="p-3 bg-purple-50 rounded-2xl border border-purple-100 text-[11px] text-[#820AD1] space-y-1">
+              <strong>Microcopy de Propósito:</strong>
+              <p>
+                Solicitamos estes dados para aproximar a pessoa da comunhão bíblica, grupos pequenos
+                e do caminho da membresia. Campos opcionais.
+              </p>
+            </div>
+
+            {/* Campo 1: Endereço */}
+            <div className="space-y-1">
+              <div className="flex justify-between items-center">
+                <Label className="font-semibold text-gray-700">Endereço Residencial</Label>
+                <span className="text-[10px] text-gray-400">Opcional</span>
+              </div>
+              <Input
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="Rua, número, bairro..."
+                className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent"
+              />
+            </div>
+
+            {/* Campo 2: Núcleo Familiar */}
+            <div className="space-y-1">
+              <div className="flex justify-between items-center">
+                <Label className="font-semibold text-gray-700">Núcleo Familiar</Label>
+                <span className="text-[10px] text-gray-400">Vínculo na igreja</span>
+              </div>
+              <Select value={familyId} onValueChange={setFamilyId}>
+                <SelectTrigger className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent font-medium">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-white rounded-2xl shadow-xl">
+                  <SelectItem value="none">Nenhum núcleo vinculado ainda</SelectItem>
+                  {families.map((f) => (
+                    <SelectItem key={f.id} value={f.id}>
+                      Família {f.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Campo 3: Já é batizado? */}
+            <div className="p-3.5 rounded-2xl bg-[#F8F9FB] border border-gray-100 space-y-2.5">
+              <label className="flex items-center gap-2 cursor-pointer font-bold text-gray-800">
+                <input
+                  type="checkbox"
+                  checked={hasBaptism}
+                  onChange={(e) => setHasBaptism(e.target.checked)}
+                  className="rounded text-[#820AD1] focus:ring-[#820AD1]"
+                />
+                <span>Já é batizado(a) nas águas</span>
+              </label>
+
+              {hasBaptism && (
+                <div className="space-y-1 pt-1">
+                  <Label className="text-[11px] font-semibold text-gray-600">
+                    Data aproximada do batismo
+                  </Label>
+                  <Input
+                    type="date"
+                    value={baptismDate}
+                    onChange={(e) => setBaptismDate(e.target.value)}
+                    className="h-9 rounded-2xl bg-white border-gray-200"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Campo 4: Interesse em Membresia ou Batismo */}
+            <div className="space-y-2 p-3 bg-purple-50/50 rounded-2xl border border-purple-100">
+              <Label className="font-bold text-gray-800 block">
+                Caminho da Membresia (Interesses Declarados):
+              </Label>
+              <label className="flex items-center gap-2 cursor-pointer text-gray-700">
+                <input
+                  type="checkbox"
+                  checked={interestInMembership}
+                  onChange={(e) => setInterestInMembership(e.target.checked)}
+                  className="rounded text-[#820AD1] focus:ring-[#820AD1]"
+                />
+                <span>Tem interesse em se tornar membro oficial</span>
+              </label>
+              {!hasBaptism && (
+                <label className="flex items-center gap-2 cursor-pointer text-gray-700">
+                  <input
+                    type="checkbox"
+                    checked={interestInBaptism}
+                    onChange={(e) => setInterestInBaptism(e.target.checked)}
+                    className="rounded text-[#820AD1] focus:ring-[#820AD1]"
+                  />
+                  <span>Deseja ser batizado(a) nas águas</span>
+                </label>
+              )}
+            </div>
+
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-11 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all mt-2"
+            >
+              {isSubmitting ? 'Salvando...' : 'Efetivar Virada para Frequentador'}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </PageTransition>
   )
 }

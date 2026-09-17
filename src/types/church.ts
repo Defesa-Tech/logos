@@ -26,8 +26,17 @@ export interface PersonRecord extends RecordModel {
   family_role?: FamilyRole
   user?: string
   address?: string
+  neighborhood?: string
   how_found?: string
   how_met?: string
+  how_met_details?: string
+  has_children?: boolean
+  children_info?: string
+  interest_in_membership?: boolean
+  interest_in_baptism?: boolean
+  marital_status?: 'solteiro' | 'casado' | 'viuvo' | 'divorciado' | 'uniao_estavel'
+  app_invited?: boolean
+  app_downloaded?: boolean
   contact_authorized?: boolean
   contact_auth_date?: string
   contact_auth_by?: string

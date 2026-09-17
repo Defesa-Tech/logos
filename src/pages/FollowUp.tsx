@@ -13,6 +13,9 @@ import {
   ChevronRight,
   Send,
   Calendar,
+  ExternalLink,
+  Edit3,
+  Copy,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { followUpService, personsService } from '@/services/church'
@@ -48,6 +51,11 @@ export default function FollowUp() {
   const [taskNotes, setTaskNotes] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  // WhatsApp Message Composer Modal (Modelo pronto e editável com link do app per D13)
+  const [whatsappDialogOpen, setWhatsappDialogOpen] = useState(false)
+  const [taskForWhatsapp, setTaskForWhatsapp] = useState<FollowUpTaskRecord | null>(null)
+  const [whatsappText, setWhatsappText] = useState('')
+
   // Redistribution Dialog (Líder Boas-Vindas)
   const [redistributeDialogOpen, setRedistributeDialogOpen] = useState(false)
   const [taskToReassign, setTaskToReassign] = useState<FollowUpTaskRecord | null>(null)
@@ -68,6 +76,52 @@ export default function FollowUp() {
   useEffect(() => {
     loadTasks()
   }, [])
+
+  // Gerar modelo de mensagem pré-configurado e caloroso (soando como convite, não marketing)
+  const openWhatsappComposer = (task: FollowUpTaskRecord) => {
+    setTaskForWhatsapp(task)
+    const person = task.expand?.person
+    const firstName = person?.name ? person.name.split(' ')[0] : 'amigo(a)'
+    const volunteerName = user?.name ? user.name.split(' ')[0] : 'da equipe de Boas-Vindas'
+    const appUrl = window.location.origin
+
+    // Modelo acolhedor de acordo com a especificação do usuário
+    const defaultTemplate = `Oi, ${firstName}! Aqui é o(a) ${volunteerName}, da Igreja Defesa da Fé. Foi muito bom ter você conosco no culto! Espero que tenha se sentido acolhido(a).
+
+Se quiser acompanhar a programação da igreja e nossas atividades, nosso aplicativo web é este link:
+${appUrl}
+
+Qualquer dúvida ou se precisar de oração, estou por aqui!`
+
+    setWhatsappText(defaultTemplate)
+    setWhatsappDialogOpen(true)
+  }
+
+  // Enviar via link wa.me
+  const handleSendViaWhatsApp = () => {
+    if (!taskForWhatsapp) return
+    const person = taskForWhatsapp.expand?.person
+    const rawPhone = (person?.whatsapp || person?.phone || '').replace(/\D/g, '')
+
+    if (!rawPhone) {
+      toast.error('Pessoa sem telefone cadastrado.')
+      return
+    }
+
+    // Prefixo Brasil 55 se não tiver
+    const fullPhone = rawPhone.length <= 11 ? `55${rawPhone}` : rawPhone
+    const encoded = encodeURIComponent(whatsappText)
+    const waUrl = `https://wa.me/${fullPhone}?text=${encoded}`
+
+    window.open(waUrl, '_blank')
+    toast.success('Abrindo WhatsApp com a mensagem personalizada!')
+    setWhatsappDialogOpen(false)
+
+    // Abre modal para já registrar o resultado se desejar
+    setSelectedTask(taskForWhatsapp)
+    setTaskResult('mensagem_enviada')
+    setActionDialogOpen(true)
+  }
 
   const handleCompleteTask = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -144,8 +198,9 @@ export default function FollowUp() {
             Follow-up de Visitantes
           </h1>
           <p className="text-xs sm:text-sm text-gray-500 mt-1 max-w-2xl font-normal">
-            Cada cadastro ou retorno gera tarefa com prazo de 48 horas. O voluntário registra o
-            resultado e o Líder de Boas-Vindas redistribui tarefas pendentes.
+            No follow-up da 1ª visita, envie a mensagem pessoal acolhedora com o link do app da
+            igreja (D13 revisada). Anote o que surgir espontaneamente na conversa, sem sensação de
+            ficha.
           </p>
         </div>
 
@@ -207,6 +262,7 @@ export default function FollowUp() {
           filteredTasks.map((task) => {
             const person = task.expand?.person
             const overdue = isOverdue(task.due_date, task.status)
+            const hasPhone = !!(person?.whatsapp || person?.phone)
 
             return (
               <div
@@ -245,12 +301,17 @@ export default function FollowUp() {
                       >
                         {task.status === 'concluida' ? 'Concluída' : 'Aberta'}
                       </span>
+                      {person?.contact_preference && (
+                        <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
+                          Prefere: {person.contact_preference}
+                        </span>
+                      )}
                     </div>
 
                     <p className="text-xs text-gray-600">
                       Contato:{' '}
                       <strong className="text-[#191919]">
-                        {person?.phone || person?.whatsapp || 'Sem telefone'}
+                        {person?.whatsapp || person?.phone || 'Sem telefone'}
                       </strong>{' '}
                       &bull; Responsável:{' '}
                       <strong className="text-[#820AD1]">
@@ -273,17 +334,31 @@ export default function FollowUp() {
                 {/* Actions */}
                 <div className="flex items-center gap-2 self-end md:self-center flex-shrink-0">
                   {task.status === 'aberta' && (
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        setSelectedTask(task)
-                        setActionDialogOpen(true)
-                      }}
-                      className="bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-9 px-4 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all"
-                    >
-                      <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
-                      Registrar Resultado
-                    </Button>
+                    <>
+                      {/* WhatsApp Model Button (D13: Link do app enviado pelo Boas-Vindas via WhatsApp) */}
+                      {hasPhone && (
+                        <Button
+                          size="sm"
+                          onClick={() => openWhatsappComposer(task)}
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs h-9 px-3.5 rounded-full font-bold shadow-xs active:scale-95 transition-all flex items-center gap-1.5"
+                        >
+                          <Send className="w-3.5 h-3.5" />
+                          <span>WhatsApp com Link do App</span>
+                        </Button>
+                      )}
+
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          setSelectedTask(task)
+                          setActionDialogOpen(true)
+                        }}
+                        className="bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-9 px-4 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
+                        Registrar Resultado
+                      </Button>
+                    </>
                   )}
 
                   {/* Leader can redistribute overdue tasks */}
@@ -307,6 +382,75 @@ export default function FollowUp() {
           })
         )}
       </div>
+
+      {/* WHATSAPP MESSAGE COMPOSER MODAL (EDITÁVEL ANTES DE ENVIAR) */}
+      <Dialog open={whatsappDialogOpen} onOpenChange={setWhatsappDialogOpen}>
+        <DialogContent className="sm:max-w-lg bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border-gray-100">
+          <DialogHeader className="border-b border-gray-100 pb-3">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full">
+                Modelo Boas-Vindas &bull; WhatsApp
+              </span>
+            </div>
+            <DialogTitle className="text-xl font-bold text-[#191919]">
+              Mensagem para {taskForWhatsapp?.expand?.person?.name}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 pt-2 text-xs">
+            <div className="p-3 bg-purple-50 rounded-2xl border border-purple-100 text-[11px] text-[#820AD1]">
+              <strong>Dica de Tom (CX Logos):</strong> Mensagem pessoal, calorosa e com tom de
+              convite, nunca de marketing. O link do aplicativo da igreja é entregue de forma
+              natural para quem deseja acompanhar a programação.
+            </div>
+
+            <div className="space-y-1">
+              <div className="flex justify-between items-center">
+                <Label className="font-semibold text-gray-700">
+                  Texto da Mensagem (Você pode editar antes de enviar)
+                </Label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(whatsappText)
+                    toast.success('Texto copiado para a área de transferência!')
+                  }}
+                  className="text-[11px] text-[#820AD1] font-bold hover:underline flex items-center gap-1"
+                >
+                  <Copy className="w-3 h-3" />
+                  Copiar
+                </button>
+              </div>
+
+              <Textarea
+                rows={8}
+                value={whatsappText}
+                onChange={(e) => setWhatsappText(e.target.value)}
+                className="rounded-2xl bg-[#F0F1F5] border-transparent font-sans text-xs leading-relaxed focus:bg-white focus:border-[#820AD1]"
+              />
+            </div>
+
+            <div className="flex items-center gap-2 pt-1">
+              <Button
+                type="button"
+                onClick={handleSendViaWhatsApp}
+                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-11 rounded-full shadow-md active:scale-95 transition-all flex items-center justify-center gap-2"
+              >
+                <Send className="w-4 h-4" />
+                <span>Abrir no WhatsApp Web/App (wa.me)</span>
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setWhatsappDialogOpen(false)}
+                className="text-xs text-gray-500 rounded-full h-11 px-4 hover:bg-gray-100"
+              >
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* REGISTER RESULT DIALOG */}
       <Dialog open={actionDialogOpen} onOpenChange={setActionDialogOpen}>
@@ -345,12 +489,17 @@ export default function FollowUp() {
             </div>
 
             <div className="space-y-1">
-              <Label className="font-semibold text-gray-700">Relato / Notas do Cuidado</Label>
+              <div className="flex justify-between items-center">
+                <Label className="font-semibold text-gray-700">
+                  Relato / Notas do Cuidado (Acolhimento)
+                </Label>
+                <span className="text-[10px] text-gray-400">Sem sensação de ficha</span>
+              </div>
               <Textarea
-                rows={3}
+                rows={4}
                 value={taskNotes}
                 onChange={(e) => setTaskNotes(e.target.value)}
-                placeholder="Ex: Visitante agradeceu o acolhimento e virá no próximo domingo com a família..."
+                placeholder="Anote o que surgir espontaneamente na conversa (ex: quem convidou, se veio com família, pedidos de oração)..."
                 className="rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
               />
             </div>

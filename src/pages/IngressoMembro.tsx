@@ -10,6 +10,8 @@ import {
   Send,
   Building,
   AlertTriangle,
+  Camera,
+  HeartHandshake,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { personsService, stageHistoryService, invitesService } from '@/services/church'
@@ -38,7 +40,10 @@ export default function IngressoMembro() {
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedPerson, setSelectedPerson] = useState<PersonRecord | null>(null)
 
-  // Form Fields
+  // Coleta progressiva do ingresso como membro:
+  // Tabela: Foto, data e local do batismo, estado civil e documentos que o rol exigir
+  // Microcopy: "Registro oficial e carteirinha"
+  // Regras R6 (Batismo obrigatório) e R7 (Forma de ingresso) mantidas intactas!
   const [hasBaptism, setHasBaptism] = useState(false)
   const [baptismDate, setBaptismDate] = useState('')
   const [baptismLocation, setBaptismLocation] = useState<'defesa_da_fe' | 'outra_igreja'>(
@@ -48,7 +53,11 @@ export default function IngressoMembro() {
   const [ingressForm, setIngressForm] = useState<
     'batismo' | 'profissao_de_fe' | 'transferencia' | 'aclamacao' | 'jurisdicao'
   >('batismo')
+  const [maritalStatus, setMaritalStatus] = useState<
+    'solteiro' | 'casado' | 'viuvo' | 'divorciado' | 'uniao_estavel'
+  >('solteiro')
   const [ingressDate, setIngressDate] = useState(new Date().toISOString().slice(0, 10))
+  const [cardPhotoUrl, setCardPhotoUrl] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const loadCandidates = async () => {
@@ -72,18 +81,20 @@ export default function IngressoMembro() {
 
   const openIngressModal = (p: PersonRecord) => {
     setSelectedPerson(p)
-    // Pre-fill existing baptism info if present
+    // Pré-preenchimento com dados existentes (NUNCA pedir de novo o que já temos)
     const baptized = !!p.baptism_date
     setHasBaptism(baptized)
     setBaptismDate(p.baptism_date ? p.baptism_date.slice(0, 10) : '')
     setBaptismLocation(p.baptism_location || 'defesa_da_fe')
     setBaptismChurchName(p.baptism_church_name || '')
     setIngressForm(p.ingress_form || 'batismo')
+    setMaritalStatus(p.marital_status || 'solteiro')
+    setCardPhotoUrl(p.card_photo_url || '')
     setIngressDate(new Date().toISOString().slice(0, 10))
     setModalOpen(true)
   }
 
-  // Handle member ingress per J6 & R6
+  // Handle member ingress per J6, R6 & R7
   const handleIngress = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!selectedPerson) return
@@ -107,7 +118,7 @@ export default function IngressoMembro() {
       // Generate provisional membership number (ex: MAT-0005)
       const provNumber = `MAT-${Math.floor(1000 + Math.random() * 9000)}`
 
-      // 1. Update person record to membro
+      // 1. Update person record to membro com os dados da coleta progressiva
       await personsService.update(selectedPerson.id, {
         stage: 'membro',
         status: 'member',
@@ -116,8 +127,12 @@ export default function IngressoMembro() {
         baptism_church_name: baptismLocation === 'outra_igreja' ? baptismChurchName.trim() : '',
         ingress_date: new Date(ingressDate).toISOString(),
         ingress_form: ingressForm,
+        marital_status: maritalStatus,
         provisional_number: selectedPerson.provisional_number || provNumber,
-        card_photo_status: selectedPerson.card_photo_status || 'pendente',
+        card_photo_status: cardPhotoUrl.trim()
+          ? 'aprovada'
+          : selectedPerson.card_photo_status || 'pendente',
+        card_photo_url: cardPhotoUrl.trim() || selectedPerson.card_photo_url || undefined,
       })
 
       // 2. Record in stage_history
@@ -128,11 +143,11 @@ export default function IngressoMembro() {
         from_stage: selectedPerson.stage || 'frequentador',
         to_stage: 'membro',
         author_name: user?.name || 'Secretaria',
-        reason: `Ingresso oficial por ${ingressForm}. Batismo comprovado (${originName} em ${baptismDate}). Matrícula provisória: ${provNumber}.`,
+        reason: `Ingresso oficial por ${ingressForm}. Batismo comprovado (${originName} em ${baptismDate}). Estado civil: ${maritalStatus}. Matrícula provisória: ${provNumber}.`,
       })
 
       // 3. Generate app invite link per J6
-      const invite = await invitesService.create({
+      await invitesService.create({
         email: selectedPerson.email || undefined,
         whatsapp: selectedPerson.whatsapp || selectedPerson.phone || undefined,
         role: 'member',
@@ -140,7 +155,7 @@ export default function IngressoMembro() {
       })
 
       toast.success(
-        `${selectedPerson.name} ingressou como Membro com sucesso! Matrícula: ${provNumber}. Convite para o app gerado.`,
+        `${selectedPerson.name} ingressou como Membro com sucesso! Matrícula: ${provNumber}. Convite do app gerado.`,
       )
       setModalOpen(false)
       loadCandidates()
@@ -160,14 +175,14 @@ export default function IngressoMembro() {
             <span className="w-2 h-2 rounded-full bg-[#820AD1]" />
             <span>Jornada J6</span>
             <span className="text-gray-300">/</span>
-            <span>Exclusivo Secretaria (Regras R6 & R7)</span>
+            <span>Exclusivo Secretaria (Regras R6 & R7 &bull; Coleta Progressiva)</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191919]">
             Ingresso como Membro
           </h1>
           <p className="text-xs sm:text-sm text-gray-500 mt-1 max-w-2xl font-normal">
-            A Secretaria registra o batismo e oficializa o ingresso na membresia gerando matrícula
-            provisória e convite para o app. <strong>Regra R6:</strong> sem batismo, o ingresso é
+            No ingresso oficial na membresia, coletamos os dados formais: foto, dados do batismo,
+            estado civil e forma de ingresso. <strong>Regra R6:</strong> sem batismo, o ingresso é
             estritamente bloqueado.
           </p>
         </div>
@@ -185,7 +200,7 @@ export default function IngressoMembro() {
               Frequentadores e Visitantes para Ingresso
             </h2>
             <p className="text-xs text-gray-500 mt-0.5">
-              Clique em &quot;Ingressar como Membro&quot; para registrar batismo e matrícula
+              Clique em &quot;Ingressar como Membro&quot; para registrar batismo, foto e matrícula
             </p>
           </div>
           <span className="text-xs font-bold text-gray-400">{candidates.length} pessoa(s)</span>
@@ -254,13 +269,13 @@ export default function IngressoMembro() {
         </div>
       </section>
 
-      {/* MODAL INGRESSO DE MEMBRO (J6 & R6) */}
+      {/* MODAL INGRESSO DE MEMBRO (J6, R6 & R7 &bull; COLETA PROGRESSIVA) */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent className="sm:max-w-lg bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border-gray-100 max-h-[90vh] overflow-y-auto">
           <DialogHeader className="border-b border-gray-100 pb-3">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-[#F7EEFD] text-[#820AD1]">
-                Jornada J6 &bull; Secretaria
+                Jornada J6 &bull; Secretaria &bull; Coleta Progressiva
               </span>
             </div>
             <DialogTitle className="text-xl font-bold text-[#191919]">
@@ -269,6 +284,12 @@ export default function IngressoMembro() {
           </DialogHeader>
 
           <form onSubmit={handleIngress} className="space-y-4 pt-2 text-xs">
+            {/* Microcopy de Propósito */}
+            <div className="p-3 bg-purple-50 rounded-2xl border border-purple-100 text-[11px] text-[#820AD1]">
+              <strong>Microcopy de Propósito:</strong>
+              <p>Registro oficial e emissão de carteirinha com validação eclesiástica.</p>
+            </div>
+
             {/* REGRA R6 BLOCKING BOX */}
             <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 space-y-2">
               <div className="flex items-center gap-2 text-amber-900 font-bold">
@@ -341,34 +362,59 @@ export default function IngressoMembro() {
               </div>
             )}
 
-            {/* DADOS DE INGRESSO (R7) */}
-            <div className="space-y-3 pt-2">
-              <div className="space-y-1">
-                <Label className="font-semibold text-gray-700">Forma de Ingresso (R7) *</Label>
-                <Select
-                  value={ingressForm}
-                  onValueChange={(val) =>
-                    setIngressForm(
-                      val as
-                        | 'batismo'
-                        | 'profissao_de_fe'
-                        | 'transferencia'
-                        | 'aclamacao'
-                        | 'jurisdicao',
-                    )
-                  }
-                >
-                  <SelectTrigger className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent font-semibold">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white rounded-2xl shadow-xl">
-                    <SelectItem value="batismo">Batismo nas águas</SelectItem>
-                    <SelectItem value="profissao_de_fe">Profissão de Fé</SelectItem>
-                    <SelectItem value="transferencia">Carta de Transferência</SelectItem>
-                    <SelectItem value="aclamacao">Aclamação / Testemunho</SelectItem>
-                    <SelectItem value="jurisdicao">Jurisdição / Reintegração</SelectItem>
-                  </SelectContent>
-                </Select>
+            {/* DADOS DE INGRESSO (R7 & COLETA PROGRESSIVA) */}
+            <div className="space-y-3 pt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label className="font-semibold text-gray-700">Forma de Ingresso (R7) *</Label>
+                  <Select
+                    value={ingressForm}
+                    onValueChange={(val) =>
+                      setIngressForm(
+                        val as
+                          | 'batismo'
+                          | 'profissao_de_fe'
+                          | 'transferencia'
+                          | 'aclamacao'
+                          | 'jurisdicao',
+                      )
+                    }
+                  >
+                    <SelectTrigger className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent font-semibold">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white rounded-2xl shadow-xl">
+                      <SelectItem value="batismo">Batismo nas águas</SelectItem>
+                      <SelectItem value="profissao_de_fe">Profissão de Fé</SelectItem>
+                      <SelectItem value="transferencia">Carta de Transferência</SelectItem>
+                      <SelectItem value="aclamacao">Aclamação / Testemunho</SelectItem>
+                      <SelectItem value="jurisdicao">Jurisdição / Reintegração</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="font-semibold text-gray-700">Estado Civil *</Label>
+                  <Select
+                    value={maritalStatus}
+                    onValueChange={(val) =>
+                      setMaritalStatus(
+                        val as 'solteiro' | 'casado' | 'viuvo' | 'divorciado' | 'uniao_estavel',
+                      )
+                    }
+                  >
+                    <SelectTrigger className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent font-semibold">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white rounded-2xl shadow-xl">
+                      <SelectItem value="solteiro">Solteiro(a)</SelectItem>
+                      <SelectItem value="casado">Casado(a)</SelectItem>
+                      <SelectItem value="viuvo">Viúvo(a)</SelectItem>
+                      <SelectItem value="divorciado">Divorciado(a)</SelectItem>
+                      <SelectItem value="uniao_estavel">União Estável</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <div className="space-y-1">
@@ -378,6 +424,22 @@ export default function IngressoMembro() {
                   required
                   value={ingressDate}
                   onChange={(e) => setIngressDate(e.target.value)}
+                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent"
+                />
+              </div>
+
+              {/* Foto da Carteirinha Digital */}
+              <div className="space-y-1">
+                <div className="flex justify-between items-center">
+                  <Label className="font-semibold text-gray-700">
+                    Foto para Carteirinha Digital
+                  </Label>
+                  <span className="text-[10px] text-gray-400">Opcional no momento</span>
+                </div>
+                <Input
+                  placeholder="URL da foto homologada ou foto oficial"
+                  value={cardPhotoUrl}
+                  onChange={(e) => setCardPhotoUrl(e.target.value)}
                   className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent"
                 />
               </div>

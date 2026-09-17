@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-17T01:29:45.396Z",
+  "generatedAt": "2026-09-17T01:44:28.814Z",
   "collections": [
     {
       "name": "users",
@@ -364,6 +364,61 @@
           "required": false,
           "system": false,
           "selectValues": ["whatsapp", "ligacao", "nenhum"]
+        },
+        {
+          "name": "neighborhood",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "has_children",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "children_info",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "how_met_details",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "interest_in_membership",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "interest_in_baptism",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "marital_status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["solteiro", "casado", "viuvo", "divorciado", "uniao_estavel"]
+        },
+        {
+          "name": "app_invited",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "app_downloaded",
+          "type": "bool",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [

@@ -22,8 +22,8 @@ O sistema **Logos** foi concebido para atender às necessidades práticas e ecle
 - **D10 (MVP)**: O visitante também pode ser registrado por um voluntário da equipe de **Boas-Vindas**, com busca rápida prévia por telefone para evitar duplicidades.
 - **D11 (MVP)**: O QR Code é **fixo** (impresso nos bancos/tótens), e a presença é associada automaticamente ao culto pela **agenda da igreja** e sua respectiva janela de horário.
 - **D12 (MVP)**: O número de **telefone** identifica a pessoa e une registros vindos do QR Code de autoatendimento e do balcão de Boas-Vindas.
-- **D13 (MVP)**: A tela de confirmação do QR Code oferece link opcional para baixar o app da igreja e convite opcional ao formulário de retorno completo ("Quer nos contar um pouco mais sobre você?").
-- **D14 (MVP)**: O convite ao formulário completo reaparece automaticamente na 2ª e na 3ª visita caso ainda não tenha sido preenchido pelo visitante.
+- **D13 (MVP — Revisada: Princípio CX de Coleta Progressiva e Vínculo Proporcional)**: A distribuição de convites e coleta de dados respeita rigorosamente o momento do visitante: "pedir compromisso na proporção do vínculo". Na **1ª visita**, a tela de confirmação exibe APENAS os horários dos cultos da semana e a preferência de contato — SEM link do app e SEM convite ao formulário completo (evitando sobrecarga para quem está sentada no banco antes do culto). O **link do app** é oferecido no **follow-up pós-1ª visita via WhatsApp** pelo voluntário do Boas-Vindas em mensagem pessoal. Na **2ª visita**, a tela de confirmação traz o formulário "Conte mais sobre você" como **AÇÃO PRINCIPAL** e o link do app como ação secundária. Da **3ª visita em diante**, a página oferece apenas o que ainda não foi atendido ou preenchido, sem repetir convites já concluídos.
+- **D14 (MVP)**: O convite ao formulário "Conte mais sobre você" é a ação principal na 2ª visita e segue disponível em visitas subsequentes caso ainda não tenha sido preenchido, nunca repetindo perguntas ou dados já informados.
 - **D15 (MVP)**: O líder do departamento e a secretaria têm permissão para colocar e retirar pessoas das funções.
 - **D16 (MVP)**: Cada unidade departamental nasce, por padrão, com duas vagas de liderança: **líder** e **vice-líder**.
 - **D17 (MVP)**: Lideranças adicionais além de líder e vice-líder (ex.: segundo vice, coordenador geral) só a Secretaria pode adicionar.
@@ -117,7 +117,10 @@ Em atendimento à decisão **D8**, o Logos é um aplicativo único e mobile-firs
 ### 1. Visitante (Página Web Pública, sem login, via QR Code no celular)
 
 - Formulário curto e ultraleve (Nome, WhatsApp, e-mail opcional, autorização de contato explícita desmarcada).
-- Confirmação acolhedora com horários dos cultos, canais digitais da Defesa da Fé, atalho para o WhatsApp da igreja, convite ao formulário completo e link secundário para download do app.
+- Confirmação acolhedora calibrada por momento da pessoa:
+  - **1ª visita**: APENAS horários dos cultos da semana e confirmação da preferência de contato. Sem link do app e sem formulário longo. Foco total em acolhimento sem sobrecarga.
+  - **2ª visita**: Formulário progressivo "Conte mais sobre você" como ação principal; link do app como ação secundária.
+  - **3ª visita em diante**: Somente o que ainda falta preencher/atender (sem repetir convites concluídos).
 
 ### 2. Frequentador (Link web sem login, celular)
 
@@ -204,21 +207,48 @@ Permitir que qualquer pessoa registre sua presença no culto em menos de 10 segu
      └─ NÃO ──► Apenas salva/atualiza dados cadastrais (sem presença)
               │
               ▼
-    [Tela de Confirmação Acolhedora]
-     ├─ Agradecimento nominal neutro
-     ├─ Horários dos cultos e redes da igreja
-     ├─ Link WhatsApp da igreja
-     ├─ Link opcional de download do app
-     └─ Convite ao formulário completo (1ª, 2ª e 3ª visitas, se pendente)
+    [Tela de Confirmação Acolhedora Conforme Momento - D13]
+     ├─ 1ª Visita:
+     │    ├─ Agradecimento nominal acolhedor
+     │    ├─ APENAS Horários dos cultos da semana
+     │    ├─ Preferência de contato registrada
+     │    └─ (SEM link de app e SEM formulário longo)
+     │
+     ├─ Follow-up pós-1ª visita (via WhatsApp pelo Boas-Vindas):
+     │    └─ Mensagem pessoal com link do app web da igreja
+     │
+     ├─ 2ª Visita:
+     │    ├─ Ação principal: Formulário "Conte mais sobre você" (Data nasc., Bairro, Como conheceu, Filhos)
+     │    └─ Ação secundária: Link do app da igreja
+     │
+     └─ 3ª Visita em diante:
+          └─ Apenas o que ainda falta (sem repetir convites concluídos)
 ```
+
+### Tabela de Coleta Progressiva de Dados
+
+| Momento                      | Canal                  | O que pedir / oferecer                                                                                                                                                 | Microcopy de propósito                                                       |
+| ---------------------------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| **1ª visita**                | Página do QR Code      | Nome, telefone/WhatsApp, autorização de contato; e-mail opcional. Na confirmação: APENAS horários dos cultos e preferência de contato.                                 | "Para te dar as boas-vindas"                                                 |
+| **Follow-up pós-1ª visita**  | WhatsApp (Boas-Vindas) | Nada de formulário na conversa; o voluntário anota o que surgir espontaneamente (ex.: quem convidou, família) e envia modelo pessoal com link do app.                  | Acolhimento, sem sensação de ficha                                           |
+| **2ª visita**                | Página do QR Code      | Formulário "Conte mais sobre você" como ação principal; link do app como secundária. Pede: Data de nascimento, bairro, como conheceu a igreja, se tem filhos e idades. | "Para lembrarmos do seu aniversário e indicar programações para sua família" |
+| **Virada para frequentador** | App / Link web         | Endereço residencial, núcleo familiar, se já é batizado e interesse em membresia ou batismo.                                                                           | Aproximar do caminho da membresia                                            |
+| **Ingresso como membro**     | Secretaria Oficial     | Foto, data e local do batismo, estado civil, forma de ingresso e documentos do rol.                                                                                    | Registro oficial e carteirinha                                               |
+
+### Regras de Interface da Coleta Progressiva (Obrigatórias)
+
+1. **Máximo de 5 campos por etapa**: se precisar de mais, dividir em telas/passos curtos com indicador de progresso claro.
+2. **Tudo opcional antes da membresia**, exceto nome e telefone (identificador único R3). Um formulário parcialmente preenchido vale mais que um abandonado.
+3. **Microcopy de propósito ao lado de campos sensíveis**, explicitando por que a igreja solicita aquela informação.
+4. **NUNCA pedir de novo o que já foi informado**: formulários devem ser pré-preenchidos com os dados que o sistema já possui (ex.: se o Boas-Vindas anotou filhos, o formulário já exibe pré-carregado).
 
 ### Regras de Negócio e Casos de Borda
 
-1. **Primeira visita, telefone novo**: Cria cadastro de visitante e associa presença ao culto da agenda em andamento. Tela de confirmação exibe link do app e convite ao formulário completo.
+1. **Primeira visita, telefone novo**: Cria cadastro de visitante e associa presença ao culto da agenda em andamento. Tela de confirmação exibe **estritamente horários da semana e preferência de contato**, sem link de app e sem formulário longo.
 2. **Retorno pelo mesmo aparelho**: Aparelho identificado via token/armazenamento local. Exibe saudação calorosa e botão de confirmação com 1 clique. O link _"Não é você?"_ limpa a identificação local e abre o formulário vazio.
 3. **Presença já registrada no mesmo culto**: O sistema identifica que a pessoa já está presente no culto atual e exibe confirmação informativa, não duplicando o registro.
-4. **Segunda ou terceira visita sem formulário completo (D14)**: Após a confirmação da presença, exibe novamente o convite para responder o formulário completo.
-5. **Formulário completo já respondido anteriormente**: Não exibe mais o convite; mantém somente os horários, atalho de WhatsApp e link secundário do app.
+4. **Segunda visita (D13 revisada)**: Exibe a confirmação de presença com destaque principal para o formulário "Conte mais sobre você" (aniversário, bairro, filhos, como conheceu) e link secundário do app.
+5. **Terceira visita em diante**: Mostra apenas o que ainda não foi atendido ou preenchido. Se já preencheu o formulário completo, mostra apenas acolhimento e horários/app.
 6. **Preenchimento repetido com telefone já existente**: Localiza o registro anterior pelo número e vincula a presença; nunca cria duplicata de pessoa com o mesmo telefone.
 7. **Mesmo telefone com e-mail novo ou variação no nome**: Não sobrescreve os dados existentes bruscamente; registra um apontamento de **divergência cadastral** (`divergences`) para análise e conciliação pela Secretaria.
 8. **Mesmo telefone com nome manifestamente diferente**: Se for submetido um nome diferente da pessoa titular do telefone, cria um novo cadastro de visitante marcado com a tag `"possivel_familiar"` e vincula a divergência para a Secretaria revisar a árvore familiar.

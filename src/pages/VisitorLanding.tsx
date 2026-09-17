@@ -16,6 +16,11 @@ import {
   User,
   Clock,
   RotateCcw,
+  Baby,
+  MapPin,
+  HelpCircle,
+  Check,
+  ArrowRight,
 } from 'lucide-react'
 import {
   personsService,
@@ -25,7 +30,7 @@ import {
   activitiesService,
   divergencesService,
 } from '@/services/church'
-import type { CultoRecord, PersonRecord, PresenceRecord } from '@/types/church'
+import type { CultoRecord, PersonRecord } from '@/types/church'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
@@ -45,10 +50,10 @@ export default function VisitorLanding() {
 
   // Active Culto based on schedule & tolerance (D11)
   const [activeCulto, setActiveCulto] = useState<CultoRecord | null>(null)
-  const [allCultos, setAllCultos] = useState<CultoRecord[]>([])
-  const [loadingInitial, setLoadingInitial] = useState(true)
+  const [, setAllCultos] = useState<CultoRecord[]>([])
+  const [, setLoadingInitial] = useState(true)
 
-  // Form fields (short & light for low mobile signal)
+  // 1st Visit Form fields (short & light for low mobile signal)
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
@@ -57,13 +62,24 @@ export default function VisitorLanding() {
     'whatsapp',
   )
 
-  // Submission state
+  // Submission state & confirmation
   const [submitting, setSubmitting] = useState(false)
   const [confirmed, setConfirmed] = useState(false)
   const [confirmedPerson, setConfirmedPerson] = useState<PersonRecord | null>(null)
   const [alreadyRegisteredToday, setAlreadyRegisteredToday] = useState(false)
   const [visitCount, setVisitCount] = useState<number>(1)
-  const [showFullFormInvite, setShowFullFormInvite] = useState(false)
+
+  // Progressive Form: "Conte mais sobre você" (2ª visita principal ou 3ª pendente)
+  const [showProgressiveModal, setShowProgressiveModal] = useState(false)
+  const [savingProgressive, setSavingProgressive] = useState(false)
+  const [progressiveSuccess, setProgressiveSuccess] = useState(false)
+
+  // Progressive Fields (pre-filled if known, max 5 fields per step)
+  const [progressiveBirthDate, setProgressiveBirthDate] = useState('')
+  const [progressiveNeighborhood, setProgressiveNeighborhood] = useState('')
+  const [progressiveHowMet, setProgressiveHowMet] = useState('')
+  const [progressiveHasChildren, setProgressiveHasChildren] = useState(false)
+  const [progressiveChildrenInfo, setProgressiveChildrenInfo] = useState('')
 
   // Format Phone (Mascara brasileira)
   const formatPhone = (val: string) => {
@@ -72,6 +88,15 @@ export default function VisitorLanding() {
     if (raw.length <= 6) return `(${raw.slice(0, 2)}) ${raw.slice(2)}`
     if (raw.length <= 10) return `(${raw.slice(0, 2)}) ${raw.slice(2, 6)}-${raw.slice(6)}`
     return `(${raw.slice(0, 2)}) ${raw.slice(2, 7)}-${raw.slice(7, 11)}`
+  }
+
+  // Pre-fill progressive form from person record
+  const prefillProgressiveForm = (person: PersonRecord) => {
+    setProgressiveBirthDate(person.birth_date ? person.birth_date.slice(0, 10) : '')
+    setProgressiveNeighborhood(person.neighborhood || person.address || '')
+    setProgressiveHowMet(person.how_met_details || person.how_found || person.how_met || '')
+    setProgressiveHasChildren(!!person.has_children)
+    setProgressiveChildrenInfo(person.children_info || '')
   }
 
   // Check device recognition on mount
@@ -146,18 +171,12 @@ export default function VisitorLanding() {
         }
       }
 
-      // Check visit count and full form status (D14)
+      // Check visit count and full form status
       const allPresences = await presencesService.listByPerson(person.id)
       const totalVisits = allPresences.length + 1
       setVisitCount(totalVisits)
 
-      // D14: Invite to full form appears on 1st, 2nd and 3rd visits if not completed yet
-      if (!person.full_form_completed && totalVisits <= 3) {
-        setShowFullFormInvite(true)
-      } else {
-        setShowFullFormInvite(false)
-      }
-
+      prefillProgressiveForm(person)
       setConfirmedPerson(person)
       setConfirmed(true)
     } catch {
@@ -273,7 +292,7 @@ export default function VisitorLanding() {
           })
         }
       } else {
-        // Completely new visitor
+        // Completely new visitor (1ª visita)
         targetPerson = await personsService.create({
           name: cleanName,
           phone: cleanPhone,
@@ -288,12 +307,12 @@ export default function VisitorLanding() {
           how_found: 'QR Code no Culto',
         })
 
-        // Generate follow-up 48h task
+        // Generate follow-up 48h task for volunteer
         await followUpService.create({
           person: targetPerson.id,
           responsible_name: 'Equipe de Boas-Vindas',
           status: 'aberta',
-          notes: 'Visitante registrou presença pelo QR Code.',
+          notes: 'Visitante registrou presença de 1ª vez pelo QR Code.',
         })
 
         await activitiesService.create({
@@ -328,18 +347,12 @@ export default function VisitorLanding() {
         }
       }
 
-      // Check visit count & full form status
+      // Check visit count
       const allPresences = await presencesService.listByPerson(targetPerson.id)
       const totalVisits = allPresences.length + 1
       setVisitCount(totalVisits)
 
-      // D14 rule: Show full form invite on 1st, 2nd, 3rd visits if not completed yet
-      if (!targetPerson.full_form_completed && totalVisits <= 3) {
-        setShowFullFormInvite(true)
-      } else {
-        setShowFullFormInvite(false)
-      }
-
+      prefillProgressiveForm(targetPerson)
       setConfirmedPerson(targetPerson)
       setConfirmed(true)
     } catch {
@@ -349,11 +362,56 @@ export default function VisitorLanding() {
     }
   }
 
+  // Handle Progressive Form submission ("Conte mais sobre você")
+  const handleSaveProgressive = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!confirmedPerson) return
+
+    try {
+      setSavingProgressive(true)
+      const updateData: Partial<PersonRecord> = {
+        full_form_completed: true,
+        full_form_date: new Date().toISOString(),
+      }
+
+      if (progressiveBirthDate) {
+        updateData.birth_date = new Date(progressiveBirthDate).toISOString()
+      }
+      if (progressiveNeighborhood.trim()) {
+        updateData.neighborhood = progressiveNeighborhood.trim()
+        if (!confirmedPerson.address) {
+          updateData.address = progressiveNeighborhood.trim()
+        }
+      }
+      if (progressiveHowMet.trim()) {
+        updateData.how_met_details = progressiveHowMet.trim()
+        updateData.how_found = progressiveHowMet.trim()
+      }
+      updateData.has_children = progressiveHasChildren
+      if (progressiveHasChildren && progressiveChildrenInfo.trim()) {
+        updateData.children_info = progressiveChildrenInfo.trim()
+      }
+
+      const updated = await personsService.update(confirmedPerson.id, updateData)
+      setConfirmedPerson(updated)
+      setProgressiveSuccess(true)
+      toast.success('Obrigado por compartilhar! Suas informações foram salvas com carinho.')
+    } catch {
+      toast.error('Erro ao salvar informações adicionais.')
+    } finally {
+      setSavingProgressive(false)
+    }
+  }
+
   // -------------------------------------------------------------
-  // VIEW 1: TELA DE CONFIRMAÇÃO ACOLHEDORA (NEUTRA & LGPD)
+  // VIEW 1: TELA DE CONFIRMAÇÃO ACOLHEDORA (D13 REVISADA POR MOMENTO)
   // -------------------------------------------------------------
   if (confirmed && confirmedPerson) {
     const firstName = confirmedPerson.name.split(' ')[0]
+    const isFirstVisit = visitCount === 1
+    const isSecondVisit = visitCount === 2
+    const isThirdOrMore = visitCount >= 3
+    const fullFormPending = !confirmedPerson.full_form_completed && !progressiveSuccess
 
     return (
       <PageTransition className="min-h-screen bg-[#F8F9FB] flex flex-col justify-center items-center p-4 sm:p-6 text-[#191919]">
@@ -370,75 +428,286 @@ export default function VisitorLanding() {
               Igreja Defesa da Fé
             </span>
             <h1 className="text-2xl font-black text-[#191919]">
-              Presença Confirmada, {firstName}!
+              {isFirstVisit
+                ? `Que alegria ter você, ${firstName}!`
+                : `Presença Confirmada, ${firstName}!`}
             </h1>
             <p className="text-xs text-gray-500 leading-relaxed max-w-xs mx-auto">
               {alreadyRegisteredToday
-                ? 'Sua presença já estava confirmada no culto de hoje. Que bom ter você conosco!'
+                ? 'Sua presença já estava confirmada no culto de hoje. Bom culto!'
                 : activeCulto
-                  ? `Que alegria adorar a Deus com você no ${activeCulto.name}.`
-                  : 'Seu cadastro foi recebido com sucesso pela nossa equipe.'}
+                  ? `Que bênção adorar a Deus com você no ${activeCulto.name}.`
+                  : 'Sua presença foi acolhida com sucesso pela nossa equipe.'}
             </p>
           </div>
 
-          {/* D13/D14: Convite ao Formulário Completo (se 1ª, 2ª ou 3ª visita e não preenchido) */}
-          {showFullFormInvite && (
-            <div className="p-4 bg-purple-50/70 border border-purple-200 rounded-2xl text-left space-y-3">
-              <div className="flex items-start gap-2.5">
-                <Sparkles className="w-5 h-5 text-[#820AD1] shrink-0 mt-0.5" />
-                <div className="space-y-1">
-                  <p className="font-bold text-xs text-[#820AD1]">
-                    Quer nos contar um pouco mais sobre você?
-                  </p>
-                  <p className="text-[11px] text-purple-900 leading-relaxed">
-                    Ajude-nos a orar por você e saber seus pedidos ou interesse em estudos bíblicos.
+          {/* MOMENTO 1: 1ª VISITA */}
+          {/* D13: APENAS horários dos cultos da semana e preferência de contato. */}
+          {/* SEM link do app e SEM formulário longo ("pedir compromisso na proporção do vínculo") */}
+          {isFirstVisit && (
+            <div className="space-y-4">
+              {/* Preferência de Contato Confirmada */}
+              <div className="p-3 bg-purple-50/70 border border-purple-100 rounded-2xl text-left flex items-start gap-2.5">
+                <Check className="w-4 h-4 text-[#820AD1] shrink-0 mt-0.5" />
+                <div className="text-xs">
+                  <p className="font-bold text-[#820AD1]">Preferência de contato registrada</p>
+                  <p className="text-gray-600 text-[11px] mt-0.5">
+                    {confirmedPerson.contact_preference === 'whatsapp'
+                      ? 'Entraremos em contato via WhatsApp com uma mensagem de boas-vindas.'
+                      : confirmedPerson.contact_preference === 'ligacao'
+                        ? 'Nossa equipe ligará para você durante a semana para te acolher.'
+                        : 'Respeitamos sua opção de não receber mensagens pastorais.'}
                   </p>
                 </div>
               </div>
 
-              <div className="pt-1 flex gap-2">
-                <Link to="/retorno" className="flex-1">
-                  <Button className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-9 rounded-full font-bold shadow-xs">
-                    Preencher agora &rarr;
-                  </Button>
-                </Link>
-                <Button
-                  variant="ghost"
-                  onClick={() => setShowFullFormInvite(false)}
-                  className="text-xs text-purple-700 hover:bg-purple-100/50 rounded-full h-9 px-3"
+              {/* Horários dos Cultos da Semana */}
+              <div className="p-4 bg-[#F8F9FB] rounded-2xl border border-gray-100 text-left space-y-2.5">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-gray-700">
+                  <Calendar className="w-4 h-4 text-[#820AD1]" />
+                  <span>Nossos Cultos Durante a Semana</span>
+                </div>
+                <div className="space-y-1.5 text-xs text-gray-600">
+                  <div className="flex justify-between items-center py-1 border-b border-gray-200/50">
+                    <span className="font-semibold text-gray-800">Culto da Palavra</span>
+                    <span className="text-[11px] text-gray-500">Domingo &bull; 10h00</span>
+                  </div>
+                  <div className="flex justify-between items-center py-1 border-b border-gray-200/50">
+                    <span className="font-semibold text-gray-800">Culto de Doutrina</span>
+                    <span className="text-[11px] text-gray-500">Quarta &bull; 19h30</span>
+                  </div>
+                  <div className="flex justify-between items-center py-1">
+                    <span className="font-semibold text-gray-800">
+                      Encontro de Jovens &amp; Famílias
+                    </span>
+                    <span className="text-[11px] text-gray-500">Sábado &bull; 18h00</span>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-[11px] text-gray-400 italic">
+                Aproveite o culto! Nossa equipe de Boas-Vindas está à disposição para o que você
+                precisar.
+              </p>
+            </div>
+          )}
+
+          {/* MOMENTO 2: 2ª VISITA (OU 3ª COM FORMULÁRIO PENDENTE) */}
+          {/* D13: Formulário "Conte mais sobre você" como AÇÃO PRINCIPAL; link do app como secundária */}
+          {(isSecondVisit || (isThirdOrMore && fullFormPending)) && fullFormPending && (
+            <div className="space-y-4">
+              {!showProgressiveModal ? (
+                <div className="p-5 bg-gradient-to-br from-purple-50 via-white to-purple-50/40 border-2 border-[#820AD1]/30 rounded-3xl text-left space-y-3.5 shadow-sm">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-[#820AD1] text-white flex items-center justify-center shrink-0 shadow-xs">
+                      <Sparkles className="w-5 h-5" />
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-[#820AD1] bg-purple-100/70 px-2.5 py-0.5 rounded-full">
+                        Ação Principal &bull; 2ª Visita
+                      </span>
+                      <h2 className="font-extrabold text-sm text-[#191919]">
+                        Conte mais sobre você
+                      </h2>
+                      <p className="text-[11px] text-gray-600 leading-relaxed">
+                        Para lembrarmos do seu aniversário e indicar programações especiais para sua
+                        família.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="pt-1">
+                    <Button
+                      onClick={() => setShowProgressiveModal(true)}
+                      className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-11 rounded-full font-bold shadow-md shadow-[#820AD1]/25 cursor-pointer active:scale-95 transition-all flex items-center justify-center gap-1.5"
+                    >
+                      <span>Preencher em 1 minuto</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                /* Progressive Form Inline (<= 5 campos, indicador de progresso, microcopys de propósito) */
+                <form
+                  onSubmit={handleSaveProgressive}
+                  className="p-5 bg-white border border-purple-200 rounded-3xl text-left space-y-4 shadow-md text-xs"
                 >
-                  Pular
-                </Button>
+                  <div className="flex items-center justify-between border-b border-gray-100 pb-2.5">
+                    <div>
+                      <span className="text-[10px] font-black uppercase text-[#820AD1] tracking-wider">
+                        Passo Único &bull; 4 campos rápidos
+                      </span>
+                      <h3 className="font-bold text-[#191919] text-sm">Conte mais sobre você</h3>
+                    </div>
+                    <span className="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
+                      Tudo opcional
+                    </span>
+                  </div>
+
+                  {/* Microcopy de propósito geral */}
+                  <div className="p-2.5 bg-[#F7EEFD] rounded-xl text-[11px] text-[#820AD1] flex items-center gap-2">
+                    <Heart className="w-4 h-4 shrink-0" />
+                    <span>
+                      Pedimos apenas para lembrarmos do seu aniversário e indicar programações para
+                      sua família.
+                    </span>
+                  </div>
+
+                  {/* Campo 1: Data de Nascimento */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center">
+                      <label className="font-bold text-gray-700">Data de Nascimento</label>
+                      <span className="text-[10px] text-[#820AD1]">Para seu aniversário</span>
+                    </div>
+                    <Input
+                      type="date"
+                      value={progressiveBirthDate}
+                      onChange={(e) => setProgressiveBirthDate(e.target.value)}
+                      className="h-10 rounded-2xl bg-[#F8F9FB] border-gray-200"
+                    />
+                  </div>
+
+                  {/* Campo 2: Bairro */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center">
+                      <label className="font-bold text-gray-700">Seu Bairro / Região</label>
+                      <span className="text-[10px] text-gray-400">Para células próximas</span>
+                    </div>
+                    <Input
+                      placeholder="Ex: Centro, Pinheiros, Vila Nova..."
+                      value={progressiveNeighborhood}
+                      onChange={(e) => setProgressiveNeighborhood(e.target.value)}
+                      className="h-10 rounded-2xl bg-[#F8F9FB] border-gray-200"
+                    />
+                  </div>
+
+                  {/* Campo 3: Como conheceu a igreja */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center">
+                      <label className="font-bold text-gray-700">Como conheceu a igreja?</label>
+                      <span className="text-[10px] text-gray-400">Opcional</span>
+                    </div>
+                    <Input
+                      placeholder="Ex: Convite de amigo, Instagram, mora perto..."
+                      value={progressiveHowMet}
+                      onChange={(e) => setProgressiveHowMet(e.target.value)}
+                      className="h-10 rounded-2xl bg-[#F8F9FB] border-gray-200"
+                    />
+                  </div>
+
+                  {/* Campo 4: Filhos e idades */}
+                  <div className="p-3 bg-[#F8F9FB] rounded-2xl border border-gray-100 space-y-2.5">
+                    <label className="flex items-center gap-2 cursor-pointer font-bold text-gray-800">
+                      <input
+                        type="checkbox"
+                        checked={progressiveHasChildren}
+                        onChange={(e) => setProgressiveHasChildren(e.target.checked)}
+                        className="rounded text-[#820AD1] focus:ring-[#820AD1]"
+                      />
+                      <span>Tenho filhos</span>
+                    </label>
+
+                    {progressiveHasChildren && (
+                      <div className="space-y-1 pt-1">
+                        <div className="flex justify-between items-center">
+                          <label className="text-[11px] font-semibold text-gray-600">
+                            Nome e idades dos filhos
+                          </label>
+                          <span className="text-[10px] text-[#820AD1]">Para o Ministério Kids</span>
+                        </div>
+                        <Input
+                          placeholder="Ex: Pedro (5 anos) e Clara (8 anos)"
+                          value={progressiveChildrenInfo}
+                          onChange={(e) => setProgressiveChildrenInfo(e.target.value)}
+                          className="h-9 rounded-2xl bg-white border-gray-200"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Botões */}
+                  <div className="flex gap-2 pt-1">
+                    <Button
+                      type="submit"
+                      disabled={savingProgressive}
+                      className="flex-1 bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all"
+                    >
+                      {savingProgressive ? 'Salvando...' : 'Salvar e Concluir'}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() => setShowProgressiveModal(false)}
+                      className="text-xs text-gray-500 hover:bg-gray-100 rounded-full h-10 px-3"
+                    >
+                      Depois
+                    </Button>
+                  </div>
+                </form>
+              )}
+
+              {/* Ação secundária na 2ª visita: Link do app */}
+              <div className="pt-2 border-t border-gray-100">
+                <Link
+                  to="/"
+                  className="flex items-center justify-center gap-1.5 text-xs text-gray-500 hover:text-[#820AD1] py-1 font-semibold"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Acessar o aplicativo web da igreja (secundário)</span>
+                </Link>
               </div>
             </div>
           )}
 
-          {/* Horários dos Cultos da Semana */}
-          <div className="p-4 bg-[#F8F9FB] rounded-2xl border border-gray-100 text-left space-y-2.5">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-gray-700">
-              <Calendar className="w-4 h-4 text-[#820AD1]" />
-              <span>Programação Semanal Defesa da Fé</span>
+          {/* SUCESSO DO FORMULÁRIO PROGRESSIVO OU JÁ PREENCHIDO ANTERIORMENTE */}
+          {(!fullFormPending || progressiveSuccess) && !isFirstVisit && (
+            <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-left space-y-1.5">
+              <div className="flex items-center gap-2 text-emerald-800 font-bold text-xs">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <span>Cadastro Acolhido e Atualizado</span>
+              </div>
+              <p className="text-[11px] text-emerald-900 leading-relaxed">
+                Já temos suas informações para comunhão e ministérios da família. Não se preocupe,
+                não voltaremos a pedir estes dados!
+              </p>
             </div>
-            <div className="space-y-1.5 text-xs text-gray-600">
-              <div className="flex justify-between items-center py-1 border-b border-gray-200/50">
-                <span className="font-semibold text-gray-800">Culto da Palavra</span>
-                <span className="text-[11px] text-gray-500">Domingo &bull; 10h00</span>
+          )}
+
+          {/* MOMENTO 3: 3ª VISITA EM DIANTE (SÓ O QUE AINDA NÃO FOI FEITO) */}
+          {isThirdOrMore && (
+            <div className="space-y-3 pt-1 text-left">
+              <div className="p-4 bg-[#F8F9FB] rounded-2xl border border-gray-100 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-xs text-gray-800">
+                    Sua Caminhada na Defesa da Fé
+                  </span>
+                  <span className="text-[10px] font-bold uppercase bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full">
+                    {visitCount}ª Visita
+                  </span>
+                </div>
+                <p className="text-[11px] text-gray-600">
+                  {fullFormPending
+                    ? 'Ainda não completou sua ficha? Você pode nos contar mais sobre sua família quando quiser.'
+                    : 'Você já completou seus dados básicos! Em breve você poderá dar o próximo passo para Frequentador ou Membro.'}
+                </p>
               </div>
-              <div className="flex justify-between items-center py-1 border-b border-gray-200/50">
-                <span className="font-semibold text-gray-800">Culto de Doutrina</span>
-                <span className="text-[11px] text-gray-500">Quarta &bull; 19h30</span>
-              </div>
-              <div className="flex justify-between items-center py-1">
-                <span className="font-semibold text-gray-800">
-                  Encontro de Jovens &amp; Famílias
-                </span>
-                <span className="text-[11px] text-gray-500">Sábado &bull; 18h00</span>
-              </div>
+
+              {/* Oferecer app se ainda não visitou o app */}
+              <Link
+                to="/"
+                className="flex items-center justify-between p-3 rounded-2xl bg-white border border-gray-200 hover:border-[#820AD1] transition-colors text-xs font-semibold text-gray-700"
+              >
+                <div className="flex items-center gap-2">
+                  <Download className="w-4 h-4 text-[#820AD1]" />
+                  <span>Acessar portal web da igreja</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+              </Link>
             </div>
-          </div>
+          )}
 
           {/* Social Links & WhatsApp Shortcut */}
-          <div className="space-y-2.5 pt-1">
+          <div className="space-y-2 pt-1">
             <a
               href="https://wa.me/5511999999999?text=Olá!%20Estou%20visitando%20a%20Igreja%20Defesa%20da%20Fé."
               target="_blank"
@@ -448,15 +717,6 @@ export default function VisitorLanding() {
               <MessageCircle className="w-4 h-4 text-emerald-600" />
               <span>Salvar WhatsApp da Igreja</span>
             </a>
-
-            {/* D13: Link opcional em posição secundária para baixar o app */}
-            <Link
-              to="/"
-              className="flex items-center justify-center gap-1.5 text-xs text-gray-500 hover:text-[#820AD1] py-1 font-semibold"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Conhecer o aplicativo web da igreja (opcional)</span>
-            </Link>
           </div>
 
           <div className="pt-2 text-[10px] text-gray-400">
@@ -518,7 +778,7 @@ export default function VisitorLanding() {
   }
 
   // -------------------------------------------------------------
-  // VIEW 3: FORMULÁRIO CURTO & LEVE (USO COM UMA MÃO)
+  // VIEW 3: FORMULÁRIO CURTO & LEVE (USO COM UMA MÃO NO BANCO)
   // -------------------------------------------------------------
   return (
     <PageTransition className="min-h-screen bg-[#F8F9FB] flex flex-col justify-center items-center p-4 sm:p-6 text-[#191919]">
@@ -539,10 +799,13 @@ export default function VisitorLanding() {
           </p>
         </div>
 
-        {/* Short Form */}
+        {/* Short Form (<= 5 campos, propósito explícito) */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1">
-            <label className="text-xs font-bold text-gray-700">Seu Nome Completo *</label>
+            <div className="flex justify-between items-center">
+              <label className="text-xs font-bold text-gray-700">Seu Nome Completo *</label>
+              <span className="text-[10px] text-[#820AD1]">Para te dar as boas-vindas</span>
+            </div>
             <Input
               placeholder="Ex.: Lucas Silveira"
               value={name}
@@ -553,7 +816,10 @@ export default function VisitorLanding() {
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-bold text-gray-700">Seu WhatsApp (com DDD) *</label>
+            <div className="flex justify-between items-center">
+              <label className="text-xs font-bold text-gray-700">Seu WhatsApp (com DDD) *</label>
+              <span className="text-[10px] text-gray-400">Identificador no culto</span>
+            </div>
             <Input
               type="tel"
               inputMode="numeric"
