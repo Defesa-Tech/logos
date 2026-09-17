@@ -20,6 +20,13 @@ import {
   ExternalLink,
   ChevronDown,
   Sparkles,
+  Calendar,
+  HeartHandshake,
+  UserCheck,
+  Briefcase,
+  CreditCard,
+  User,
+  AlertTriangle,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { personsService, activitiesService } from '@/services/church'
@@ -39,7 +46,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { useRealtime } from '@/hooks/use-realtime'
 
 export default function Layout() {
-  const { user, role, logout, canAccessAll, setIsLoginModalOpen } = useAuth()
+  const { user, role, logout, canAccessAll, setIsLoginModalOpen, permissions } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -96,9 +103,67 @@ export default function Layout() {
 
   const navItems = [
     { label: 'Início', fullLabel: 'Visão Geral', path: '/', icon: LayoutDashboard },
-    { label: 'Pessoas', fullLabel: 'Pessoas & Membros', path: '/pessoas', icon: Users },
+    // J1/J2 Cultos & Presença
+    { label: 'Cultos', fullLabel: 'Cultos & Presenças (J1/J2)', path: '/cultos', icon: Calendar },
+    // J3 Follow-up
+    {
+      label: 'Follow-up',
+      fullLabel: 'Follow-up de Visitantes (J3)',
+      path: '/follow-up',
+      icon: HeartHandshake,
+    },
+    // J5 Frequentadores
+    {
+      label: 'Frequentador',
+      fullLabel: 'Virada Frequentador (J5)',
+      path: '/frequentadores',
+      icon: GitFork,
+    },
+    // J6 Ingresso de Membro (Secretaria)
+    ...(permissions.canChangeStage
+      ? [
+          {
+            label: 'Ingresso',
+            fullLabel: 'Ingresso de Membro (J6)',
+            path: '/ingresso-membro',
+            icon: UserCheck,
+          },
+        ]
+      : []),
+    // J9 Atuações & Saída
+    ...(permissions.canManageAssignments
+      ? [
+          {
+            label: 'Atuações',
+            fullLabel: 'Departamentos & Atuações (J9)',
+            path: '/departamentos',
+            icon: Briefcase,
+          },
+        ]
+      : []),
+    // J7 Carteirinha Digital
+    {
+      label: 'Carteirinha',
+      fullLabel: 'Carteirinha Digital (J7)',
+      path: '/carteirinha',
+      icon: CreditCard,
+    },
+    // J8 Meu Cadastro
+    { label: 'Meu Cadastro', fullLabel: 'Meu Cadastro (J8)', path: '/meu-cadastro', icon: User },
+    // R10 Atenção por ausência
+    ...(permissions.canViewAll || permissions.isBoasVindasLider
+      ? [
+          {
+            label: 'Atenção R10',
+            fullLabel: 'Atenção por Ausência (R10)',
+            path: '/atencao-ausencia',
+            icon: AlertTriangle,
+          },
+        ]
+      : []),
+    // General Base
+    { label: 'Pessoas', fullLabel: 'Base Geral de Pessoas', path: '/pessoas', icon: Users },
     { label: 'Famílias', fullLabel: 'Núcleos Familiares', path: '/familias', icon: HomeIcon },
-    { label: 'Jornada', fullLabel: 'Jornada & Pipeline', path: '/jornada', icon: GitFork },
     ...(canAccessAll
       ? [
           {

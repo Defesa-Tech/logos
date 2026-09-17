@@ -28,6 +28,9 @@ import {
   familiesService,
   invitesService,
   activitiesService,
+  cultosService,
+  presencesService,
+  followUpService,
 } from '@/services/church'
 import { LogIn, LogOut } from 'lucide-react'
 import type { PersonRecord, FamilyRecord, InviteRecord, ActivityRecord } from '@/types/church'
@@ -70,6 +73,8 @@ export default function Index() {
   const [families, setFamilies] = useState<FamilyRecord[]>([])
   const [invites, setInvites] = useState<InviteRecord[]>([])
   const [activities, setActivities] = useState<ActivityRecord[]>([])
+  const [todayPresencesCount, setTodayPresencesCount] = useState(0)
+  const [openFollowUpsCount, setOpenFollowUpsCount] = useState(0)
   const [loading, setLoading] = useState(true)
 
   // Report meeting modal state
@@ -106,16 +111,25 @@ export default function Index() {
   const loadDashboardData = async () => {
     try {
       setLoading(true)
-      const [personsData, familiesData, invitesData, activitiesData] = await Promise.all([
-        personsService.list(),
-        familiesService.list(),
-        invitesService.list(),
-        activitiesService.list(10),
-      ])
+      const [personsData, familiesData, invitesData, activitiesData, cultosData, followUpsData] =
+        await Promise.all([
+          personsService.list(),
+          familiesService.list(),
+          invitesService.list(),
+          activitiesService.list(10),
+          cultosService.getOpenCultos(),
+          followUpService.list('status = "aberta"'),
+        ])
       setPersons(personsData)
       setFamilies(familiesData)
       setInvites(invitesData)
       setActivities(activitiesData.items)
+      setOpenFollowUpsCount(followUpsData.length)
+
+      if (cultosData.length > 0) {
+        const pres = await presencesService.listByCulto(cultosData[0].id)
+        setTodayPresencesCount(pres.length + (cultosData[0].anonymous_count || 0))
+      }
     } catch {
       toast.error('Erro ao carregar dados do painel.')
     } finally {
@@ -270,30 +284,30 @@ export default function Index() {
                 </p>
               </div>
 
-              {/* Quick stats mini-row inside hero */}
+              {/* Quick stats mini-row inside hero — Culto & Follow-up indicators */}
               <div className="grid grid-cols-3 gap-3 sm:gap-4 bg-white/10 backdrop-blur-md p-3.5 sm:p-4 rounded-2xl border border-white/15">
+                <div className="text-center">
+                  <span className="text-[10px] uppercase font-bold text-purple-200 block">
+                    Culto Hoje
+                  </span>
+                  <span className="text-lg sm:text-xl font-black tabular-nums">
+                    {showValues ? <AnimatedCounter value={todayPresencesCount} /> : '••'}
+                  </span>
+                </div>
+                <div className="text-center border-x border-white/15 px-2">
+                  <span className="text-[10px] uppercase font-bold text-purple-200 block">
+                    Follow-ups
+                  </span>
+                  <span className="text-lg sm:text-xl font-black tabular-nums">
+                    {showValues ? <AnimatedCounter value={openFollowUpsCount} /> : '••'}
+                  </span>
+                </div>
                 <div className="text-center">
                   <span className="text-[10px] uppercase font-bold text-purple-200 block">
                     Membros
                   </span>
                   <span className="text-lg sm:text-xl font-black tabular-nums">
                     {showValues ? <AnimatedCounter value={membersCount} /> : '••'}
-                  </span>
-                </div>
-                <div className="text-center border-x border-white/15 px-2">
-                  <span className="text-[10px] uppercase font-bold text-purple-200 block">
-                    Lares
-                  </span>
-                  <span className="text-lg sm:text-xl font-black tabular-nums">
-                    {showValues ? <AnimatedCounter value={families.length} /> : '••'}
-                  </span>
-                </div>
-                <div className="text-center">
-                  <span className="text-[10px] uppercase font-bold text-purple-200 block">
-                    Convites
-                  </span>
-                  <span className="text-lg sm:text-xl font-black tabular-nums">
-                    {showValues ? <AnimatedCounter value={pendingInvitesCount} /> : '••'}
                   </span>
                 </div>
               </div>
@@ -310,28 +324,28 @@ export default function Index() {
           Ações Rápidas
         </h2>
         <div className="grid grid-cols-4 sm:grid-cols-6 gap-3 sm:gap-4">
-          {/* Shortcut 1: Pessoas */}
-          <Link to="/pessoas" className="nu-action-btn group">
+          {/* Shortcut 1: Culto & Presenças */}
+          <Link to="/cultos" className="nu-action-btn group">
             <div className="nu-action-circle group-hover:bg-[#F7EEFD] group-hover:text-[#820AD1] transition-all">
               <Users className="w-5 h-5" strokeWidth={2} />
             </div>
-            <span className="nu-action-label">Pessoas</span>
+            <span className="nu-action-label">Cultos &amp; J1</span>
           </Link>
 
-          {/* Shortcut 2: Jornada */}
-          <Link to="/jornada" className="nu-action-btn group">
+          {/* Shortcut 2: Follow-up */}
+          <Link to="/follow-up" className="nu-action-btn group">
+            <div className="nu-action-circle group-hover:bg-[#F7EEFD] group-hover:text-[#820AD1] transition-all">
+              <HeartHandshake className="w-5 h-5" strokeWidth={2} />
+            </div>
+            <span className="nu-action-label">Follow-up</span>
+          </Link>
+
+          {/* Shortcut 3: Frequentador */}
+          <Link to="/frequentadores" className="nu-action-btn group">
             <div className="nu-action-circle group-hover:bg-[#F7EEFD] group-hover:text-[#820AD1] transition-all">
               <GitFork className="w-5 h-5" strokeWidth={2} />
             </div>
-            <span className="nu-action-label">Jornada</span>
-          </Link>
-
-          {/* Shortcut 3: Famílias */}
-          <Link to="/familias" className="nu-action-btn group">
-            <div className="nu-action-circle group-hover:bg-[#F7EEFD] group-hover:text-[#820AD1] transition-all">
-              <HomeIcon className="w-5 h-5" strokeWidth={2} />
-            </div>
-            <span className="nu-action-label">Famílias</span>
+            <span className="nu-action-label">Virada R4</span>
           </Link>
 
           {/* Shortcut 4: QR Recepção */}

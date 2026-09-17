@@ -13,6 +13,16 @@ import Journey from './pages/Journey'
 import Secretary from './pages/Secretary'
 import VisitorLanding from './pages/VisitorLanding'
 import ClaimInvite from './pages/ClaimInvite'
+import Cultos from './pages/Cultos'
+import FollowUp from './pages/FollowUp'
+import Frequentadores from './pages/Frequentadores'
+import IngressoMembro from './pages/IngressoMembro'
+import DepartamentosAtuacoes from './pages/DepartamentosAtuacoes'
+import Carteirinha from './pages/Carteirinha'
+import VerificarCarteirinha from './pages/VerificarCarteirinha'
+import MeuCadastro from './pages/MeuCadastro'
+import AtencaoAusencia from './pages/AtencaoAusencia'
+import RetornoFormulario from './pages/RetornoFormulario'
 
 const App = () => (
   <BrowserRouter>
@@ -23,14 +33,24 @@ const App = () => (
         <Routes>
           {/* Public landing for visitors / QR Code */}
           <Route path="/visitante-cadastro" element={<VisitorLanding />} />
+          <Route path="/retorno-cadastro" element={<RetornoFormulario />} />
 
           {/* Public onboarding invite claim */}
           <Route path="/convite/:token" element={<ClaimInvite />} />
+          <Route path="/verificar-carteirinha/:id" element={<VerificarCarteirinha />} />
 
           {/* Authenticated / Main layout */}
           <Route element={<Layout />}>
             <Route path="/" element={<Index />} />
             <Route path="/dashboard" element={<Index />} />
+            <Route path="/cultos" element={<Cultos />} />
+            <Route path="/follow-up" element={<FollowUp />} />
+            <Route path="/frequentadores" element={<Frequentadores />} />
+            <Route path="/ingresso-membro" element={<IngressoMembro />} />
+            <Route path="/departamentos" element={<DepartamentosAtuacoes />} />
+            <Route path="/carteirinha" element={<Carteirinha />} />
+            <Route path="/meu-cadastro" element={<MeuCadastro />} />
+            <Route path="/atencao-ausencia" element={<AtencaoAusencia />} />
             <Route path="/pessoas" element={<People />} />
             <Route path="/familias" element={<Families />} />
             <Route path="/jornada" element={<Journey />} />

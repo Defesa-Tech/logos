@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-16T00:05:00.967Z",
+  "generatedAt": "2026-09-17T00:33:24.736Z",
   "collections": [
     {
       "name": "users",
@@ -202,6 +202,131 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "stage",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["visitante", "frequentador", "membro", "desligado"]
+        },
+        {
+          "name": "phone",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "address",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "how_found",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "contact_authorized",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "contact_auth_date",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "contact_auth_by",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "no_contact",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "refuses_contact",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "baptism_date",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "baptism_location",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["defesa_da_fe", "outra_igreja"]
+        },
+        {
+          "name": "baptism_church_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ingress_date",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ingress_form",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["batismo", "profissao_de_fe", "transferencia", "aclamacao", "jurisdicao"]
+        },
+        {
+          "name": "provisional_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "rol_number",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "card_photo_status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["sem_foto", "pendente", "aprovada", "nova_foto"]
+        },
+        {
+          "name": "card_photo_url",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "exit_reason",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["mudanca", "transferencia", "falecimento", "pedido_proprio", "outro"]
+        },
+        {
+          "name": "anonymized",
+          "type": "bool",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
@@ -341,6 +466,514 @@
         }
       ],
       "indexes": ["CREATE INDEX idx_activities_created ON activities (created DESC)"]
+    },
+    {
+      "name": "stage_history",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "person",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "persons"
+        },
+        {
+          "name": "from_stage",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["inicio", "visitante", "frequentador", "membro", "desligado"]
+        },
+        {
+          "name": "to_stage",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["visitante", "frequentador", "membro", "desligado"]
+        },
+        {
+          "name": "date",
+          "type": "date",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "author_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_stage_history_person ON stage_history (person, created DESC)"]
+    },
+    {
+      "name": "departments",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "name",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE UNIQUE INDEX idx_departments_code ON departments (code)"]
+    },
+    {
+      "name": "department_roles",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "department",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "departments"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "level",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["voluntario", "lider"]
+        },
+        {
+          "name": "permissions",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_dep_roles_dept ON department_roles (department)"]
+    },
+    {
+      "name": "assignments",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "",
+        "update": "",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "person",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "persons"
+        },
+        {
+          "name": "role",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "department_roles"
+        },
+        {
+          "name": "start_date",
+          "type": "date",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "end_date",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["ativa", "encerrada", "pausada"]
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_assignments_person ON assignments (person, status)",
+        "CREATE INDEX idx_assignments_role ON assignments (role)"
+      ]
+    },
+    {
+      "name": "cultos",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "",
+        "update": "",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "name",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "date_time",
+          "type": "date",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "is_regular",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["aberto", "arquivado"]
+        },
+        {
+          "name": "anonymous_count",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_cultos_date ON cultos (date_time DESC)"]
+    },
+    {
+      "name": "presences",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "",
+        "update": "",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "culto",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "cultos"
+        },
+        {
+          "name": "person",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "persons"
+        },
+        {
+          "name": "modality",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["presencial", "online"]
+        },
+        {
+          "name": "presence_type",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["primeira_visita", "retorno", "membro_regular"]
+        },
+        {
+          "name": "registered_by_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_presences_culto ON presences (culto)",
+        "CREATE INDEX idx_presences_person ON presences (person)"
+      ]
+    },
+    {
+      "name": "follow_up_tasks",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "",
+        "update": "",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "person",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "persons"
+        },
+        {
+          "name": "responsible_person",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "persons"
+        },
+        {
+          "name": "responsible_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "due_date",
+          "type": "date",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["aberta", "concluida", "cancelada"]
+        },
+        {
+          "name": "result",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "pendente",
+            "mensagem_enviada",
+            "conversou",
+            "sem_resposta",
+            "nao_quer_contato"
+          ]
+        },
+        {
+          "name": "completed_at",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_followup_status ON follow_up_tasks (status, due_date)",
+        "CREATE INDEX idx_followup_person ON follow_up_tasks (person)"
+      ]
+    },
+    {
+      "name": "church_settings",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "key",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE UNIQUE INDEX idx_settings_key ON church_settings (key)"]
     }
   ]
 }

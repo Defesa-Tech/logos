@@ -15,8 +15,14 @@ import {
   X,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
-import { personsService, familiesService } from '@/services/church'
-import type { PersonRecord, FamilyRecord, PersonStatus, FamilyRole } from '@/types/church'
+import { personsService, familiesService, stageHistoryService } from '@/services/church'
+import type {
+  PersonRecord,
+  FamilyRecord,
+  PersonStatus,
+  FamilyRole,
+  StageHistoryRecord,
+} from '@/types/church'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -49,6 +55,7 @@ export default function People() {
   // Selected person sheet
   const [selectedPerson, setSelectedPerson] = useState<PersonRecord | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [stageHistoryList, setStageHistoryList] = useState<StageHistoryRecord[]>([])
 
   // Create / Edit person dialog
   const [formDialogOpen, setFormDialogOpen] = useState(false)
@@ -386,9 +393,15 @@ export default function People() {
                   <tr
                     key={person.id}
                     className="hover:bg-[#F8F9FB] transition-colors cursor-pointer group"
-                    onClick={() => {
+                    onClick={async () => {
                       setSelectedPerson(person)
                       setSheetOpen(true)
+                      try {
+                        const hist = await stageHistoryService.listByPerson(person.id)
+                        setStageHistoryList(hist)
+                      } catch {
+                        setStageHistoryList([])
+                      }
                     }}
                   >
                     {/* Name + Avatar */}
@@ -506,9 +519,15 @@ export default function People() {
                         <Button
                           size="sm"
                           variant="ghost"
-                          onClick={() => {
+                          onClick={async () => {
                             setSelectedPerson(person)
                             setSheetOpen(true)
+                            try {
+                              const hist = await stageHistoryService.listByPerson(person.id)
+                              setStageHistoryList(hist)
+                            } catch {
+                              setStageHistoryList([])
+                            }
                           }}
                           className="h-8 px-3 rounded-full text-xs text-[#820AD1] hover:bg-[#F7EEFD] font-bold"
                         >
@@ -551,9 +570,15 @@ export default function People() {
             return (
               <div
                 key={p.id}
-                onClick={() => {
+                onClick={async () => {
                   setSelectedPerson(p)
                   setSheetOpen(true)
+                  try {
+                    const hist = await stageHistoryService.listByPerson(p.id)
+                    setStageHistoryList(hist)
+                  } catch {
+                    setStageHistoryList([])
+                  }
                 }}
                 className="nu-list-item"
               >
@@ -756,6 +781,40 @@ export default function People() {
                       {selectedPerson.notes}
                     </p>
                   </>
+                )}
+
+                {/* Stage History */}
+                <h4 className="text-[10px] font-bold uppercase tracking-wider text-gray-400 pt-1">
+                  Histórico de Mudança de Estágio (Data, Autor, Motivo)
+                </h4>
+                {stageHistoryList.length === 0 ? (
+                  <p className="p-3 bg-[#F8F9FB] rounded-2xl text-gray-400 text-[11px]">
+                    Nenhuma mudança de estágio registrada ainda.
+                  </p>
+                ) : (
+                  <div className="space-y-2 bg-[#F8F9FB] p-3 rounded-2xl border border-gray-100">
+                    {stageHistoryList.map((h) => (
+                      <div
+                        key={h.id}
+                        className="text-[11px] border-b border-gray-200/50 pb-2 last:border-0 last:pb-0"
+                      >
+                        <div className="flex items-center justify-between font-bold text-[#820AD1]">
+                          <span>
+                            {h.from_stage || 'Início'} &rarr; {h.to_stage}
+                          </span>
+                          <span className="text-[10px] text-gray-400 font-normal">
+                            {new Date(h.date || h.created).toLocaleDateString('pt-BR')}
+                          </span>
+                        </div>
+                        <p className="text-gray-600 mt-0.5">
+                          Autor: <strong>{h.author_name || 'Sistema'}</strong>
+                        </p>
+                        {h.reason && (
+                          <p className="text-gray-500 italic mt-0.5">Motivo: {h.reason}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 )}
 
                 {/* Admin actions */}
