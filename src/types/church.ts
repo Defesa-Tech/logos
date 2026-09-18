@@ -273,12 +273,17 @@ export interface CultoRecord extends RecordModel {
   status: 'aberto' | 'arquivado'
   anonymous_count?: number
   notes?: string
+  // Recorrência semanal
+  is_recurrent?: boolean
+  recurrence_days?: number[] // 0=Domingo, 1=Segunda, ..., 6=Sábado
+  recurrence_start_time?: string // "18:00"
+  recurrence_end_time?: string // "20:00"
 }
 
 export type PresenceOrigin = 'qr_code' | 'boas_vindas' | 'autoatendimento' | 'secretaria'
 
 export interface PresenceRecord extends RecordModel {
-  culto: string
+  culto?: string // Opcional: nulo ou vazio para presenças sem evento (órfãs)
   person: string
   modality: 'presencial' | 'online'
   presence_type: 'primeira_visita' | 'retorno' | 'membro_regular'
@@ -286,6 +291,7 @@ export interface PresenceRecord extends RecordModel {
   notes?: string
   origin?: PresenceOrigin
   device_token?: string
+  is_orphan?: boolean
   expand?: {
     culto?: CultoRecord
     person?: PersonRecord

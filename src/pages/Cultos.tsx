@@ -15,6 +15,10 @@ import {
   ArrowLeftRight,
   Shield,
   Filter,
+  AlertCircle,
+  Repeat,
+  Trash2,
+  Link as LinkIcon,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import {
@@ -23,6 +27,7 @@ import {
   personsService,
   followUpService,
   stageHistoryService,
+  DEFAULT_TOLERANCES_BY_TYPE,
 } from '@/services/church'
 import type { CultoRecord, PresenceRecord, PersonRecord } from '@/types/church'
 import { Button } from '@/components/ui/button'
@@ -71,6 +76,12 @@ export default function Cultos() {
   const [presenceToMove, setPresenceToMove] = useState<PresenceRecord | null>(null)
   const [targetCultoId, setTargetCultoId] = useState('')
 
+  // Presenças sem evento (órfãs) - Pendência de secretaria
+  const [orphanPresences, setOrphanPresences] = useState<PresenceRecord[]>([])
+  const [linkOrphanModalOpen, setLinkOrphanModalOpen] = useState(false)
+  const [orphanToLink, setOrphanToLink] = useState<PresenceRecord | null>(null)
+  const [linkTargetCultoId, setLinkTargetCultoId] = useState('')
+
   // Create Culto/Evento Modal
   const [createCultoOpen, setCreateCultoOpen] = useState(false)
   const [cultoName, setCultoName] = useState('Culto da Palavra')
@@ -78,8 +89,13 @@ export default function Cultos() {
   const [cultoDate, setCultoDate] = useState(new Date().toISOString().slice(0, 16))
   const [cultoEndDate, setCultoEndDate] = useState('')
   const [cultoTolBefore, setCultoTolBefore] = useState(60)
-  const [cultoTolAfter, setCultoTolAfter] = useState(45)
+  const [cultoTolAfter, setCultoTolAfter] = useState(0)
   const [cultoIsRegular, setCultoIsRegular] = useState(true)
+  // Recorrência semanal
+  const [cultoIsRecurrent, setCultoIsRecurrent] = useState(false)
+  const [cultoRecurrenceDays, setCultoRecurrenceDays] = useState<number[]>([0])
+  const [cultoRecurrenceStartTime, setCultoRecurrenceStartTime] = useState('18:00')
+  const [cultoRecurrenceEndTime, setCultoRecurrenceEndTime] = useState('20:00')
 
   // Realtime subscription for presences
   useRealtime<PresenceRecord>('presences', (e) => {
@@ -93,6 +109,13 @@ export default function Cultos() {
         setPresences((prev) => prev.filter((p) => p.id !== e.record.id))
       }
     }
+    // Atualizar órfãs se for relevante
+    if (!e.record.culto || e.record.is_orphan) {
+      presencesService
+        .listOrphans()
+        .then(setOrphanPresences)
+        .catch(() => {})
+    }
   })
 
   const loadCultos = async () => {
@@ -105,6 +128,9 @@ export default function Cultos() {
         const open = list.find((c) => c.status === 'aberto') || list[0]
         setSelectedCulto(open)
       }
+      // Carregar presenças sem evento (órfãs)
+      const orphans = await presencesService.listOrphans()
+      setOrphanPresences(orphans)
     } catch {
       toast.error('Erro ao carregar cultos.')
     } finally {
@@ -317,6 +343,39 @@ export default function Cultos() {
     }
   }
 
+  // Vincular presença órfã a um evento da agenda
+  const handleLinkOrphan = async () => {
+    if (!orphanToLink || !linkTargetCultoId) return
+    try {
+      await presencesService.linkToCulto(orphanToLink.id, linkTargetCultoId)
+      toast.success('Presença vinculada ao evento com sucesso!')
+      setLinkOrphanModalOpen(false)
+      setOrphanToLink(null)
+      setLinkTargetCultoId('')
+      // Recarregar órfãs e lista do culto atual
+      const orphans = await presencesService.listOrphans()
+      setOrphanPresences(orphans)
+      if (selectedCulto) {
+        const updated = await presencesService.listByCulto(selectedCulto.id)
+        setPresences(updated)
+      }
+    } catch {
+      toast.error('Erro ao vincular presença.')
+    }
+  }
+
+  // Descartar/Ignorar presença órfã
+  const handleDeleteOrphan = async (id: string) => {
+    if (!confirm('Deseja descartar este registro de presença órfã?')) return
+    try {
+      await presencesService.delete(id)
+      toast.success('Registro de presença descartado.')
+      setOrphanPresences((prev) => prev.filter((p) => p.id !== id))
+    } catch {
+      toast.error('Erro ao descartar presença.')
+    }
+  }
+
   // Create new Culto / Evento da Agenda
   const handleCreateCulto = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -331,11 +390,15 @@ export default function Cultos() {
         event_type: (cultoEventType as any) || 'outro',
         date_time: startDate.toISOString(),
         end_time: endDate.toISOString(),
-        tolerance_minutes_before: Number(cultoTolBefore) || 60,
-        tolerance_minutes_after: Number(cultoTolAfter) || 45,
+        tolerance_minutes_before: Number(cultoTolBefore),
+        tolerance_minutes_after: Number(cultoTolAfter),
         is_regular: cultoIsRegular,
         status: 'aberto',
         anonymous_count: 0,
+        is_recurrent: cultoIsRecurrent,
+        recurrence_days: cultoIsRecurrent ? cultoRecurrenceDays : undefined,
+        recurrence_start_time: cultoIsRecurrent ? cultoRecurrenceStartTime : undefined,
+        recurrence_end_time: cultoIsRecurrent ? cultoRecurrenceEndTime : undefined,
       })
       setCultos([created, ...cultos])
       setSelectedCulto(created)
@@ -400,6 +463,93 @@ export default function Cultos() {
         </div>
       </div>
 
+      {/* ALERTA DE PRESENÇAS ÓRFÃS / SEM EVENTO NA AGENDA (Secretaria) */}
+      {orphanPresences.length > 0 && permissions.canManageAssignments && (
+        <div className="bg-amber-50/90 border border-amber-200/90 rounded-3xl p-5 shadow-sm space-y-3">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
+                <AlertCircle className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm font-bold text-amber-900">
+                    {orphanPresences.length}{' '}
+                    {orphanPresences.length === 1
+                      ? 'Presença sem evento correspondente'
+                      : 'Presenças sem evento correspondente'}
+                  </h3>
+                  <span className="text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full bg-amber-200/70 text-amber-900">
+                    Ação Necessária
+                  </span>
+                </div>
+                <p className="text-xs text-amber-700 mt-0.5 leading-relaxed">
+                  Pessoas registraram presença pelo QR Code quando não havia evento ativo na agenda.
+                  Isso é um sinal de que a agenda pode estar desatualizada. Vincule manualmente a um
+                  evento ou descarte.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="divide-y divide-amber-200/60 bg-white/70 rounded-2xl border border-amber-200/50 overflow-hidden text-xs">
+            {orphanPresences.map((orphan) => {
+              const person = orphan.expand?.person
+              return (
+                <div
+                  key={orphan.id}
+                  className="p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-white/90"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-full bg-amber-100 text-amber-800 font-bold flex items-center justify-center text-[11px]">
+                      {person?.name ? person.name.slice(0, 2).toUpperCase() : 'PS'}
+                    </div>
+                    <div>
+                      <span className="font-bold text-gray-900">
+                        {person?.name || 'Pessoa Registrada'}
+                      </span>
+                      <span className="text-gray-500 text-[11px] ml-2">
+                        WhatsApp: {person?.phone || person?.whatsapp || 'Sem número'} &bull;
+                        Registrado às{' '}
+                        {new Date(orphan.created).toLocaleTimeString('pt-BR', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}{' '}
+                        ({new Date(orphan.created).toLocaleDateString('pt-BR')})
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 self-end sm:self-auto">
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        setOrphanToLink(orphan)
+                        setLinkTargetCultoId(selectedCulto?.id || '')
+                        setLinkOrphanModalOpen(true)
+                      }}
+                      className="h-8 text-xs bg-[#820AD1] hover:bg-[#7008B7] text-white rounded-full font-bold px-3 shadow-xs cursor-pointer"
+                    >
+                      <LinkIcon className="w-3.5 h-3.5 mr-1" />
+                      Vincular a Evento
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleDeleteOrphan(orphan.id)}
+                      className="h-8 text-xs text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full px-2 cursor-pointer"
+                      title="Descartar este registro"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Select Culto Bar */}
       <div className="bg-white rounded-3xl p-4 sm:p-5 border border-gray-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
@@ -424,6 +574,7 @@ export default function Cultos() {
                 <SelectContent className="bg-white rounded-2xl shadow-xl">
                   {cultos.map((c) => (
                     <SelectItem key={c.id} value={c.id}>
+                      {c.is_recurrent ? '🔁 ' : ''}
                       {c.name} — {new Date(c.date_time).toLocaleDateString('pt-BR')} (
                       {c.status === 'aberto' ? '● Aberto' : 'Arquivado'})
                     </SelectItem>
@@ -436,6 +587,12 @@ export default function Cultos() {
 
         {selectedCulto && (
           <div className="flex items-center gap-3 self-end md:self-center">
+            {selectedCulto.is_recurrent && (
+              <span className="text-xs px-2.5 py-1 rounded-full font-bold bg-purple-50 text-[#820AD1] border border-purple-200 flex items-center gap-1">
+                <Repeat className="w-3 h-3" />
+                Recorrente ({selectedCulto.recurrence_start_time || 'Horário fixo'})
+              </span>
+            )}
             <span
               className={`text-xs px-3 py-1 rounded-full font-bold ${
                 selectedCulto.status === 'aberto'
@@ -850,6 +1007,58 @@ export default function Cultos() {
         </DialogContent>
       </Dialog>
 
+      {/* VINCULAR PRESENÇA ÓRFÃ A EVENTO (Secretaria) */}
+      <Dialog open={linkOrphanModalOpen} onOpenChange={setLinkOrphanModalOpen}>
+        <DialogContent className="sm:max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border-gray-100">
+          <DialogHeader className="border-b border-gray-100 pb-3">
+            <DialogTitle className="text-lg font-bold text-[#191919]">
+              Vincular Presença a um Evento da Agenda
+            </DialogTitle>
+            <p className="text-xs text-gray-500">
+              Corrija o registro atribuindo-o ao culto ou evento correspondente (inclusive passado).
+            </p>
+          </DialogHeader>
+
+          {orphanToLink && (
+            <div className="space-y-4 pt-2 text-xs">
+              <div className="p-3 bg-purple-50 rounded-2xl border border-purple-100">
+                <span className="font-bold text-purple-900 block">
+                  {orphanToLink.expand?.person?.name || 'Pessoa'}
+                </span>
+                <span className="text-[11px] text-purple-700">
+                  Data/Hora do escaneamento:{' '}
+                  {new Date(orphanToLink.created).toLocaleString('pt-BR')}
+                </span>
+              </div>
+
+              <div className="space-y-1">
+                <Label className="font-semibold text-gray-700">Evento de Destino</Label>
+                <Select value={linkTargetCultoId} onValueChange={setLinkTargetCultoId}>
+                  <SelectTrigger className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent">
+                    <SelectValue placeholder="Selecione o evento para vincular" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white rounded-2xl shadow-xl">
+                    {cultos.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.name} ({new Date(c.date_time).toLocaleDateString('pt-BR')} - {c.status})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <Button
+                onClick={handleLinkOrphan}
+                disabled={!linkTargetCultoId}
+                className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#820AD1]/20"
+              >
+                Confirmar Vinculação
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
       {/* CREATE CULTO MODAL */}
       <Dialog open={createCultoOpen} onOpenChange={setCreateCultoOpen}>
         <DialogContent className="sm:max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border-gray-100 max-h-[90vh] overflow-y-auto">
@@ -870,26 +1079,56 @@ export default function Cultos() {
                 value={cultoEventType}
                 onValueChange={(val) => {
                   setCultoEventType(val)
-                  if (val === 'culto_domingo' && cultoName === 'Culto da Palavra')
+                  // Aplicar tolerância e duração padrão de acordo com o tipo
+                  const def = DEFAULT_TOLERANCES_BY_TYPE[val] || DEFAULT_TOLERANCES_BY_TYPE.outro
+                  setCultoTolBefore(def.before)
+                  setCultoTolAfter(def.after)
+
+                  if (val === 'culto_domingo') {
                     setCultoName('Culto da Palavra (Domingo)')
-                  if (val === 'culto_quarta' && cultoName === 'Culto da Palavra')
+                    setCultoRecurrenceDays([0])
+                    setCultoRecurrenceStartTime('18:00')
+                    setCultoRecurrenceEndTime('20:00')
+                  } else if (val === 'culto_quarta') {
                     setCultoName('Culto de Doutrina (Quarta)')
-                  if (val === 'estudo_biblico') setCultoName('Estudo Bíblico')
-                  if (val === 'conferencia') setCultoName('Conferência')
-                  if (val === 'vigilia') setCultoName('Vigília de Oração')
-                  if (val === 'congresso') setCultoName('Congresso')
+                    setCultoRecurrenceDays([3])
+                    setCultoRecurrenceStartTime('19:30')
+                    setCultoRecurrenceEndTime('21:00')
+                  } else if (val === 'estudo_biblico') {
+                    setCultoName('Estudo Bíblico')
+                    setCultoRecurrenceDays([6])
+                    setCultoRecurrenceStartTime('16:00')
+                    setCultoRecurrenceEndTime('18:00')
+                  } else if (val === 'conferencia') {
+                    setCultoName('Conferência')
+                    setCultoIsRecurrent(false)
+                  } else if (val === 'vigilia') {
+                    setCultoName('Vigília de Oração')
+                    setCultoIsRecurrent(false)
+                  } else if (val === 'congresso') {
+                    setCultoName('Congresso')
+                    setCultoIsRecurrent(false)
+                  }
                 }}
               >
                 <SelectTrigger className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-white rounded-2xl shadow-xl">
-                  <SelectItem value="culto_domingo">Culto de Domingo</SelectItem>
-                  <SelectItem value="culto_quarta">Culto de Quarta</SelectItem>
-                  <SelectItem value="estudo_biblico">Estudo Bíblico</SelectItem>
-                  <SelectItem value="conferencia">Conferência</SelectItem>
-                  <SelectItem value="vigilia">Vigília</SelectItem>
-                  <SelectItem value="congresso">Congresso</SelectItem>
+                  <SelectItem value="culto_domingo">
+                    Culto de Domingo (Padrão: 60min antes até o fim)
+                  </SelectItem>
+                  <SelectItem value="culto_quarta">
+                    Culto de Quarta (Padrão: 60min antes até o fim)
+                  </SelectItem>
+                  <SelectItem value="estudo_biblico">
+                    Estudo Bíblico (Padrão: 45min antes até o fim)
+                  </SelectItem>
+                  <SelectItem value="conferencia">
+                    Conferência de Dia Inteiro (Padrão: 90min antes)
+                  </SelectItem>
+                  <SelectItem value="vigilia">Vigília (Padrão: 60min antes)</SelectItem>
+                  <SelectItem value="congresso">Congresso (Padrão: 90min antes)</SelectItem>
                   <SelectItem value="outro">Outro Evento / Celebração Especial</SelectItem>
                 </SelectContent>
               </Select>
@@ -906,9 +1145,101 @@ export default function Cultos() {
               />
             </div>
 
+            {/* Recorrência Semanal */}
+            <div className="p-3 bg-purple-50/70 border border-purple-200/80 rounded-2xl space-y-2.5">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={cultoIsRecurrent}
+                  onChange={(e) => setCultoIsRecurrent(e.target.checked)}
+                  className="rounded text-[#820AD1] focus:ring-[#820AD1]"
+                />
+                <span className="font-bold text-purple-900 flex items-center gap-1.5">
+                  <Repeat className="w-3.5 h-3.5" />
+                  Evento Recorrente Semanal (rotina automática)
+                </span>
+              </label>
+              <p className="text-[11px] text-purple-700 leading-tight">
+                Gera automaticamente a janela de aceite de presença toda semana, sem depender de
+                cadastro manual antes de cada culto.
+              </p>
+
+              {cultoIsRecurrent && (
+                <div className="space-y-2 pt-1 border-t border-purple-200/60">
+                  <div className="space-y-1">
+                    <Label className="text-[11px] font-semibold text-gray-700">
+                      Dias da Semana
+                    </Label>
+                    <div className="flex gap-1 flex-wrap">
+                      {[
+                        { day: 0, label: 'Dom' },
+                        { day: 1, label: 'Seg' },
+                        { day: 2, label: 'Ter' },
+                        { day: 3, label: 'Qua' },
+                        { day: 4, label: 'Qui' },
+                        { day: 5, label: 'Sex' },
+                        { day: 6, label: 'Sáb' },
+                      ].map((d) => {
+                        const selected = cultoRecurrenceDays.includes(d.day)
+                        return (
+                          <button
+                            type="button"
+                            key={d.day}
+                            onClick={() => {
+                              if (selected) {
+                                setCultoRecurrenceDays(
+                                  cultoRecurrenceDays.filter((x) => x !== d.day),
+                                )
+                              } else {
+                                setCultoRecurrenceDays([...cultoRecurrenceDays, d.day])
+                              }
+                            }}
+                            className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all ${
+                              selected
+                                ? 'bg-[#820AD1] text-white shadow-xs'
+                                : 'bg-white text-gray-600 border border-gray-200 hover:border-purple-300'
+                            }`}
+                          >
+                            {d.label}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1">
+                      <Label className="text-[11px] font-semibold text-gray-700">
+                        Horário Início
+                      </Label>
+                      <Input
+                        type="time"
+                        value={cultoRecurrenceStartTime}
+                        onChange={(e) => setCultoRecurrenceStartTime(e.target.value)}
+                        className="h-9 rounded-xl bg-white border-gray-200"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-[11px] font-semibold text-gray-700">
+                        Horário Término
+                      </Label>
+                      <Input
+                        type="time"
+                        value={cultoRecurrenceEndTime}
+                        onChange={(e) => setCultoRecurrenceEndTime(e.target.value)}
+                        className="h-9 rounded-xl bg-white border-gray-200"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
-                <Label className="font-semibold text-gray-700">Início Previsto *</Label>
+                <Label className="font-semibold text-gray-700">
+                  {cultoIsRecurrent ? 'Data de Início da Recorrência *' : 'Início Previsto *'}
+                </Label>
                 <Input
                   type="datetime-local"
                   required
@@ -931,23 +1262,31 @@ export default function Cultos() {
 
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
-                <Label className="font-semibold text-gray-700">Tolerância Antes (min)</Label>
+                <div className="flex items-center justify-between">
+                  <Label className="font-semibold text-gray-700">Tolerância Antes</Label>
+                  <span className="text-[10px] text-[#820AD1] font-bold">padrão: 60 min</span>
+                </div>
                 <Input
                   type="number"
                   min="0"
                   value={cultoTolBefore}
                   onChange={(e) => setCultoTolBefore(Number(e.target.value))}
+                  placeholder="Minutos antes do início"
                   className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
                 />
               </div>
 
               <div className="space-y-1">
-                <Label className="font-semibold text-gray-700">Tolerância Depois (min)</Label>
+                <div className="flex items-center justify-between">
+                  <Label className="font-semibold text-gray-700">Tolerância Após Término</Label>
+                  <span className="text-[10px] text-gray-500">padrão: 0 min</span>
+                </div>
                 <Input
                   type="number"
                   min="0"
                   value={cultoTolAfter}
                   onChange={(e) => setCultoTolAfter(Number(e.target.value))}
+                  placeholder="Minutos após o fim"
                   className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
                 />
               </div>
@@ -971,7 +1310,7 @@ export default function Cultos() {
               type="submit"
               className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#820AD1]/20 mt-2"
             >
-              Criar e Abrir Evento na Agenda
+              Criar e Salvar Evento na Agenda
             </Button>
           </form>
         </DialogContent>

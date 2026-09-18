@@ -117,6 +117,20 @@ export const stageHistoryService = {
   },
 }
 
+// Tolerâncias padrão configuráveis por tipo de evento (D11 refinado)
+export const DEFAULT_TOLERANCES_BY_TYPE: Record<
+  string,
+  { before: number; after: number; defaultDurationHours: number }
+> = {
+  culto_domingo: { before: 60, after: 0, defaultDurationHours: 2 },
+  culto_quarta: { before: 60, after: 0, defaultDurationHours: 1.5 },
+  estudo_biblico: { before: 45, after: 0, defaultDurationHours: 1.5 },
+  conferencia: { before: 90, after: 0, defaultDurationHours: 8 },
+  vigilia: { before: 60, after: 0, defaultDurationHours: 5 },
+  congresso: { before: 90, after: 0, defaultDurationHours: 10 },
+  outro: { before: 60, after: 0, defaultDurationHours: 2 },
+}
+
 export const cultosService = {
   async list() {
     return pb.collection('cultos').getFullList<CultoRecord>({
@@ -131,8 +145,89 @@ export const cultosService = {
     })
   },
 
-  // Find all active events/cultos within tolerance window (D11 general agenda)
-  async getActiveEventsNow(): Promise<CultoRecord[]> {
+  // Obtém tolerâncias efetivas considerando o tipo de evento e customizações
+  getEventTolerances(event: Partial<CultoRecord>) {
+    const typeDef =
+      DEFAULT_TOLERANCES_BY_TYPE[event.event_type || 'outro'] || DEFAULT_TOLERANCES_BY_TYPE.outro
+    const tolBefore =
+      event.tolerance_minutes_before !== undefined && event.tolerance_minutes_before !== null
+        ? event.tolerance_minutes_before
+        : typeDef.before
+    const tolAfter =
+      event.tolerance_minutes_after !== undefined && event.tolerance_minutes_after !== null
+        ? event.tolerance_minutes_after
+        : typeDef.after
+    return { tolBefore, tolAfter, defaultDurationHours: typeDef.defaultDurationHours }
+  },
+
+  // Calcula se um evento pontual ou recorrente está ativo agora no momento 'targetDate'
+  isEventActiveAt(
+    c: CultoRecord,
+    targetDate: Date = new Date(),
+  ): { isActive: boolean; effectiveStartTime: Date; effectiveEndTime: Date } {
+    const { tolBefore, tolAfter, defaultDurationHours } = this.getEventTolerances(c)
+    const nowTime = targetDate.getTime()
+
+    // 1. Caso Recorrente
+    if (
+      c.is_recurrent &&
+      c.recurrence_days &&
+      c.recurrence_days.length > 0 &&
+      c.recurrence_start_time
+    ) {
+      const currentDay = targetDate.getDay() // 0=Dom, 1=Seg, ..., 6=Sab
+      if (c.recurrence_days.includes(currentDay)) {
+        const [startH, startM] = c.recurrence_start_time.split(':').map(Number)
+        const effectiveStart = new Date(targetDate)
+        effectiveStart.setHours(startH || 0, startM || 0, 0, 0)
+
+        let effectiveEnd: Date
+        if (c.recurrence_end_time) {
+          const [endH, endM] = c.recurrence_end_time.split(':').map(Number)
+          effectiveEnd = new Date(targetDate)
+          effectiveEnd.setHours(endH || 0, endM || 0, 0, 0)
+        } else {
+          effectiveEnd = new Date(effectiveStart.getTime() + defaultDurationHours * 3600000)
+        }
+
+        const windowStart = effectiveStart.getTime() - tolBefore * 60000
+        const windowEnd = effectiveEnd.getTime() + tolAfter * 60000
+
+        if (nowTime >= windowStart && nowTime <= windowEnd) {
+          return {
+            isActive: true,
+            effectiveStartTime: effectiveStart,
+            effectiveEndTime: effectiveEnd,
+          }
+        }
+      }
+    }
+
+    // 2. Caso Evento Específico por Data (ou base de data_time)
+    if (c.date_time) {
+      const start = new Date(c.date_time)
+      const end = c.end_time
+        ? new Date(c.end_time)
+        : new Date(start.getTime() + defaultDurationHours * 3600000)
+      const windowStart = start.getTime() - tolBefore * 60000
+      const windowEnd = end.getTime() + tolAfter * 60000
+
+      if (nowTime >= windowStart && nowTime <= windowEnd) {
+        return { isActive: true, effectiveStartTime: start, effectiveEndTime: end }
+      }
+    }
+
+    return {
+      isActive: false,
+      effectiveStartTime: new Date(c.date_time || targetDate),
+      effectiveEndTime: new Date(c.end_time || targetDate),
+    }
+  },
+
+  // Retorna todos os eventos em andamento na agenda agora (pontuais e recorrentes)
+  async getActiveEventsNow(
+    targetDate: Date = new Date(),
+  ): Promise<Array<CultoRecord & { effectiveStartTime: Date; effectiveEndTime: Date }>> {
     try {
       const openEvents = await pb.collection('cultos').getFullList<CultoRecord>({
         filter: 'status = "aberto"',
@@ -140,37 +235,56 @@ export const cultosService = {
       })
       if (openEvents.length === 0) return []
 
-      const now = new Date().getTime()
-      const matchingEvents: CultoRecord[] = []
+      const active: Array<CultoRecord & { effectiveStartTime: Date; effectiveEndTime: Date }> = []
 
       for (const c of openEvents) {
-        const start = new Date(c.date_time).getTime()
-        const tolBefore = (c.tolerance_minutes_before ?? 60) * 60000
-        const tolAfter = (c.tolerance_minutes_after ?? 60) * 60000
-        const end = c.end_time ? new Date(c.end_time).getTime() : start + 2 * 3600000
-
-        if (now >= start - tolBefore && now <= end + tolAfter) {
-          matchingEvents.push(c)
+        const check = this.isEventActiveAt(c, targetDate)
+        if (check.isActive) {
+          active.push({
+            ...c,
+            effectiveStartTime: check.effectiveStartTime,
+            effectiveEndTime: check.effectiveEndTime,
+          })
         }
       }
 
-      return matchingEvents
+      return active
     } catch {
       return []
     }
   },
 
-  // Find currently active culto within tolerance window (D11) - backwards-compatible helper
-  async getActiveCultoNow(): Promise<CultoRecord | null> {
+  // Regra de Desambiguação Automática (D11):
+  // Quando múltiplos eventos tiverem janelas coincidentes, escolhe automaticamente
+  // o evento cujo horário de início é o mais próximo do momento do registro.
+  // Empates/ambiguidades restantes podem ser corrigidos depois pela Secretaria na lista.
+  async resolveTargetEventAuto(targetDate: Date = new Date()): Promise<CultoRecord | null> {
     try {
-      const activeEvents = await this.getActiveEventsNow()
-      if (activeEvents.length > 0) {
+      const activeEvents = await this.getActiveEventsNow(targetDate)
+      if (activeEvents.length === 0) {
+        return null
+      }
+      if (activeEvents.length === 1) {
         return activeEvents[0]
       }
-      return null
+
+      // Desambiguação automática: ordenar pela menor distância absoluta entre início e o momento do registro
+      const targetTime = targetDate.getTime()
+      activeEvents.sort((a, b) => {
+        const diffA = Math.abs(a.effectiveStartTime.getTime() - targetTime)
+        const diffB = Math.abs(b.effectiveStartTime.getTime() - targetTime)
+        return diffA - diffB
+      })
+
+      return activeEvents[0]
     } catch {
       return null
     }
+  },
+
+  // Helper de compatibilidade
+  async getActiveCultoNow(): Promise<CultoRecord | null> {
+    return this.resolveTargetEventAuto()
   },
 
   async getById(id: string) {
@@ -207,13 +321,37 @@ export const presencesService = {
     })
   },
 
-  async create(data: Partial<PresenceRecord>) {
-    return pb.collection('presences').create<PresenceRecord>(data)
+  // Lista presenças sem evento (órfãs) para revisão e conciliação da secretaria
+  async listOrphans() {
+    return pb.collection('presences').getFullList<PresenceRecord>({
+      filter: 'culto = "" || is_orphan = true',
+      sort: '-created',
+      expand: 'person,culto',
+    })
   },
 
+  async create(data: Partial<PresenceRecord>) {
+    const isOrphan = !data.culto || data.culto.trim() === ''
+    return pb.collection('presences').create<PresenceRecord>({
+      ...data,
+      is_orphan: isOrphan || !!data.is_orphan,
+      culto: isOrphan ? '' : data.culto,
+    })
+  },
+
+  // Vincula manualmente uma presença órfã a um evento da agenda (inclusive passado)
+  async linkToCulto(presenceId: string, targetCultoId: string) {
+    return pb.collection('presences').update<PresenceRecord>(presenceId, {
+      culto: targetCultoId,
+      is_orphan: false,
+    })
+  },
+
+  // Mover presença de um culto para outro
   async moveToCulto(presenceId: string, newCultoId: string) {
     return pb.collection('presences').update<PresenceRecord>(presenceId, {
       culto: newCultoId,
+      is_orphan: false,
     })
   },
 

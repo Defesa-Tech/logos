@@ -130,20 +130,13 @@ export default function VisitorLanding() {
           }
         }
 
-        // 2. Load active events by schedule + tolerance (D11 General Agenda)
+        // 2. Load active events by schedule + tolerance + recurrence (D11 General Agenda)
+        // Regra de desambiguação automática: escolhe o mais próximo do momento do registro
         const currentActiveList = await cultosService.getActiveEventsNow()
         setActiveEvents(currentActiveList)
-        if (currentActiveList.length === 1) {
-          setActiveCulto(currentActiveList[0])
-          setSelectedEventId(currentActiveList[0].id)
-        } else if (currentActiveList.length > 1) {
-          // If multiple events, set default to the first one but let user choose
-          setActiveCulto(currentActiveList[0])
-          setSelectedEventId(currentActiveList[0].id)
-        } else {
-          setActiveCulto(null)
-          setSelectedEventId('')
-        }
+        const autoChosen = await cultosService.resolveTargetEventAuto()
+        setActiveCulto(autoChosen)
+        setSelectedEventId(autoChosen ? autoChosen.id : '')
 
         const list = await cultosService.list()
         setAllCultos(list.slice(0, 3))
@@ -156,42 +149,28 @@ export default function VisitorLanding() {
     init()
   }, [])
 
-  // Refresh active events right before registering presence ("O que está acontecendo agora?")
-  const determineTargetEvent = async (userChosenEventId?: string): Promise<CultoRecord | null> => {
+  // Resolve target event: regra de desambiguação automática (início mais próximo, zero fricção)
+  const determineTargetEvent = async (): Promise<CultoRecord | null> => {
     const liveActiveEvents = await cultosService.getActiveEventsNow()
     setActiveEvents(liveActiveEvents)
 
-    if (liveActiveEvents.length === 0) {
-      return null
-    }
-
-    if (userChosenEventId) {
-      const match = liveActiveEvents.find((e) => e.id === userChosenEventId)
-      if (match) return match
-    }
-
-    if (selectedEventId) {
-      const match = liveActiveEvents.find((e) => e.id === selectedEventId)
-      if (match) return match
-    }
-
-    return liveActiveEvents[0]
+    const chosen = await cultosService.resolveTargetEventAuto()
+    return chosen
   }
 
-  // Action for recognized device: "Olá de novo, Fulano" -> 1-click confirmation
+  // Action for recognized device: "Olá de novo, Fulano" -> 1-click confirmation (Zero atrito)
   const handleRecognizedPresence = async () => {
     if (!recognizedPersonId) return
     try {
       setSubmitting(true)
       const person = await personsService.getById(recognizedPersonId)
 
-      // Determine which event is happening right now in the agenda
-      const chosenEvent = await determineTargetEvent(selectedEventId)
+      // Regra de desambiguação automática: escolhe evento cujo início é mais próximo do momento do registro
+      const chosenEvent = await determineTargetEvent()
       setActiveCulto(chosenEvent)
 
-      // Register presence if active event exists
       if (chosenEvent) {
-        // Check if already registered in THIS event
+        // Evento encontrado: verificar se já registrado
         const existingPresences = await presencesService.listByCulto(chosenEvent.id)
         const already = existingPresences.some((p) => p.person === person.id)
 
@@ -208,6 +187,18 @@ export default function VisitorLanding() {
             registered_by_name: 'Autoatendimento QR Code',
           })
         }
+      } else {
+        // Presença órfã (sem evento na agenda): gravar com culto vazio e is_orphan=true
+        await presencesService.create({
+          culto: '',
+          person: person.id,
+          modality: 'presencial',
+          presence_type: 'retorno',
+          origin: 'qr_code',
+          device_token: deviceToken,
+          is_orphan: true,
+          registered_by_name: 'Autoatendimento QR Code (Sem evento na agenda)',
+        })
       }
 
       // Check visit count and full form status
@@ -366,11 +357,10 @@ export default function VisitorLanding() {
       localStorage.setItem(DEVICE_PERSON_NAME_KEY, targetPerson.name)
       localStorage.setItem(DEVICE_PERSON_ID_KEY, targetPerson.id)
 
-      // Determine what event is happening right now in the church agenda
-      const chosenEvent = await determineTargetEvent(selectedEventId)
+      // Regra de desambiguação automática: escolhe o evento cujo início é mais próximo do momento do registro
+      const chosenEvent = await determineTargetEvent()
       setActiveCulto(chosenEvent)
 
-      // Register presence if active event is happening in agenda (D11)
       if (chosenEvent) {
         const existingPresences = await presencesService.listByCulto(chosenEvent.id)
         const already = existingPresences.some((p) => p.person === targetPerson.id)
@@ -388,6 +378,19 @@ export default function VisitorLanding() {
             registered_by_name: 'Autoatendimento QR Code',
           })
         }
+      } else {
+        // Presenças sem evento (órfãs): o cadastro é gravado, a presença fica sem evento (is_orphan: true)
+        // e a secretaria vê esses casos na lista para vincular manualmente ou ignorar.
+        await presencesService.create({
+          culto: '',
+          person: targetPerson.id,
+          modality: 'presencial',
+          presence_type: existingPerson ? 'retorno' : 'primeira_visita',
+          origin: 'qr_code',
+          device_token: deviceToken,
+          is_orphan: true,
+          registered_by_name: 'Autoatendimento QR Code (Sem evento na agenda)',
+        })
       }
 
       // Check visit count
@@ -791,64 +794,22 @@ export default function VisitorLanding() {
             </span>
             <h1 className="text-2xl font-black text-[#191919]">Olá de novo, {firstName}!</h1>
             <p className="text-xs text-gray-500 leading-relaxed">
-              {activeEvents.length > 1
-                ? 'Há mais de uma atividade da igreja acontecendo neste momento. Em qual delas você está?'
-                : activeCulto
-                  ? `Confirmar sua presença hoje no ${activeCulto.name}?`
-                  : 'Que bom ter você conosco na Defesa da Fé!'}
+              {activeCulto
+                ? `Confirmar sua presença hoje no ${activeCulto.name}?`
+                : 'Que bom ter você conosco na Defesa da Fé! Toque abaixo para confirmar sua presença.'}
             </p>
           </div>
 
-          {/* Se houver mais de um evento em andamento na agenda, perguntar: "O que está acontecendo agora?" */}
-          {activeEvents.length > 1 && (
-            <div className="p-4 bg-purple-50/70 border border-purple-200/80 rounded-2xl text-left space-y-2">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-[#820AD1]">
-                <Clock className="w-4 h-4" />
-                <span>O que está acontecendo agora?</span>
+          {/* D11 Regra de desambiguação automática: zero fricção para o visitante */}
+          {activeCulto && (
+            <div className="p-3 bg-purple-50/70 border border-purple-100 rounded-2xl text-left flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-[#820AD1]" />
+                <span className="font-semibold text-gray-700">{activeCulto.name}</span>
               </div>
-              <p className="text-[11px] text-gray-600">
-                Selecione o evento correspondente para vincularmos sua presença:
-              </p>
-              <div className="space-y-1.5 pt-1">
-                {activeEvents.map((ev) => (
-                  <label
-                    key={ev.id}
-                    className={`flex items-center gap-2.5 p-2.5 rounded-xl border cursor-pointer text-xs transition-all ${
-                      selectedEventId === ev.id
-                        ? 'border-[#820AD1] bg-white text-[#820AD1] font-bold shadow-xs'
-                        : 'border-gray-200/80 bg-white/60 text-gray-700 hover:border-gray-300'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="recognized-event-choice"
-                      value={ev.id}
-                      checked={selectedEventId === ev.id}
-                      onChange={() => {
-                        setSelectedEventId(ev.id)
-                        setActiveCulto(ev)
-                      }}
-                      className="text-[#820AD1] focus:ring-[#820AD1]"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <span className="truncate">{ev.name}</span>
-                        <span className="text-[10px] text-gray-400 shrink-0 ml-1">
-                          {new Date(ev.date_time).toLocaleTimeString('pt-BR', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </span>
-                      </div>
-                      {ev.notes && (
-                        <p className="text-[10px] text-gray-400 truncate mt-0.5 font-normal">
-                          {ev.notes}
-                        </p>
-                      )}
-                    </div>
-                  </label>
-                ))}
-              </div>
+              <span className="text-[10px] font-bold text-[#820AD1] bg-white px-2 py-0.5 rounded-full border border-purple-200">
+                Identificado automaticamente
+              </span>
             </div>
           )}
 
@@ -891,64 +852,22 @@ export default function VisitorLanding() {
             Seja muito bem-vindo(a)!
           </h1>
           <p className="text-xs text-gray-500 max-w-xs mx-auto">
-            {activeEvents.length > 1
-              ? 'Identificamos programações em andamento na agenda da igreja.'
-              : activeCulto
-                ? `Evento da Agenda: ${activeCulto.name}`
-                : 'Preencha seus dados para registrar sua visita à igreja.'}
+            {activeCulto
+              ? `Evento em andamento: ${activeCulto.name}`
+              : 'Preencha seus dados para registrar sua visita à igreja.'}
           </p>
         </div>
 
-        {/* Pergunta: "O que está acontecendo agora?" quando múltiplos eventos estão na janela */}
-        {activeEvents.length > 1 && (
-          <div className="p-4 bg-purple-50/70 border border-purple-200/80 rounded-2xl text-left space-y-2">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-[#820AD1]">
-              <Clock className="w-4 h-4" />
-              <span>O que está acontecendo agora?</span>
+        {/* D11 Regra de desambiguação automática: zero fricção para o visitante */}
+        {activeCulto && (
+          <div className="p-3 bg-purple-50/70 border border-purple-100 rounded-2xl text-left flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-[#820AD1]" />
+              <span className="font-semibold text-gray-700">{activeCulto.name}</span>
             </div>
-            <p className="text-[11px] text-gray-600">
-              Mais de um evento está em andamento na agenda. Em qual deles você está participando?
-            </p>
-            <div className="space-y-1.5 pt-1">
-              {activeEvents.map((ev) => (
-                <label
-                  key={ev.id}
-                  className={`flex items-center gap-2.5 p-2.5 rounded-xl border cursor-pointer text-xs transition-all ${
-                    selectedEventId === ev.id
-                      ? 'border-[#820AD1] bg-white text-[#820AD1] font-bold shadow-xs'
-                      : 'border-gray-200/80 bg-white/60 text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="new-event-choice"
-                    value={ev.id}
-                    checked={selectedEventId === ev.id}
-                    onChange={() => {
-                      setSelectedEventId(ev.id)
-                      setActiveCulto(ev)
-                    }}
-                    className="text-[#820AD1] focus:ring-[#820AD1]"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <span className="truncate">{ev.name}</span>
-                      <span className="text-[10px] text-gray-400 shrink-0 ml-1">
-                        {new Date(ev.date_time).toLocaleTimeString('pt-BR', {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </span>
-                    </div>
-                    {ev.notes && (
-                      <p className="text-[10px] text-gray-400 truncate mt-0.5 font-normal">
-                        {ev.notes}
-                      </p>
-                    )}
-                  </div>
-                </label>
-              ))}
-            </div>
+            <span className="text-[10px] font-bold text-[#820AD1] bg-white px-2 py-0.5 rounded-full border border-purple-200">
+              Vinculação automática
+            </span>
           </div>
         )}
 

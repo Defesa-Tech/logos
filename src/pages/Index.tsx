@@ -86,6 +86,7 @@ export default function Index() {
   const [activities, setActivities] = useState<ActivityRecord[]>([])
   const [openCultos, setOpenCultos] = useState<CultoRecord[]>([])
   const [todayPresences, setTodayPresences] = useState<PresenceRecord[]>([])
+  const [orphanPresences, setOrphanPresences] = useState<PresenceRecord[]>([])
   const [followUps, setFollowUps] = useState<FollowUpTaskRecord[]>([])
   const [divergences, setDivergences] = useState<RegistrationDivergenceRecord[]>([])
   const [loading, setLoading] = useState(true)
@@ -140,6 +141,7 @@ export default function Index() {
         cultosData,
         followUpsData,
         divergencesData,
+        orphansData,
       ] = await Promise.all([
         personsService.list(),
         familiesService.list(),
@@ -148,6 +150,7 @@ export default function Index() {
         cultosService.getOpenCultos(),
         followUpService.list('status = "aberta"'),
         divergencesService.list('status = "pendente"'),
+        presencesService.listOrphans(),
       ])
       setPersons(personsData)
       setFamilies(familiesData)
@@ -156,6 +159,7 @@ export default function Index() {
       setOpenCultos(cultosData)
       setFollowUps(followUpsData)
       setDivergences(divergencesData)
+      setOrphanPresences(orphansData)
 
       if (cultosData.length > 0) {
         const pres = await presencesService.listByCulto(cultosData[0].id)
@@ -429,21 +433,43 @@ export default function Index() {
             </div>
           </div>
 
-          {/* Divergências Pendentes Alert Box */}
-          {divergences.length > 0 && (
-            <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl space-y-2 text-xs">
+          {/* Alerta de Presenças Órfãs / Sem Evento na Agenda */}
+          {orphanPresences.length > 0 && (
+            <div className="p-4 bg-amber-50 border border-amber-300 rounded-2xl space-y-2 text-xs">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-amber-900 font-bold">
                   <AlertCircle className="w-4 h-4 text-amber-600" />
                   <span>
-                    {divergences.length} Divergência(s) de Cadastro do QR Code para Conciliação
+                    {orphanPresences.length} Presença(s) sem evento correspondente (Agenda
+                    desatualizada)
                   </span>
                 </div>
-                <Link to="/cultos" className="text-amber-800 font-bold hover:underline">
-                  Verificar na Secretaria &rarr;
+                <Link to="/secretaria" className="text-amber-800 font-bold hover:underline">
+                  Vincular na Secretaria &rarr;
                 </Link>
               </div>
               <p className="text-amber-700 text-[11px]">
+                Visitantes escanearam o QR Code fixo num horário sem evento cadastrado. O cadastro
+                foi salvo, mas requer vinculação manual ou configuração de evento recorrente.
+              </p>
+            </div>
+          )}
+
+          {/* Divergências Pendentes Alert Box */}
+          {divergences.length > 0 && (
+            <div className="p-4 bg-purple-50 border border-purple-200 rounded-2xl space-y-2 text-xs">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-[#820AD1] font-bold">
+                  <AlertCircle className="w-4 h-4 text-[#820AD1]" />
+                  <span>
+                    {divergences.length} Divergência(s) de Cadastro do QR Code para Conciliação
+                  </span>
+                </div>
+                <Link to="/secretaria" className="text-[#820AD1] font-bold hover:underline">
+                  Verificar na Secretaria &rarr;
+                </Link>
+              </div>
+              <p className="text-purple-700 text-[11px]">
                 Visitantes preencheram telefones existentes com nomes ou e-mails divergentes. O
                 sistema não sobrescreveu os dados originais.
               </p>

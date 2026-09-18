@@ -14,14 +14,22 @@ import {
   ExternalLink,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
-import { invitesService, personsService, divergencesService } from '@/services/church'
+import {
+  invitesService,
+  personsService,
+  divergencesService,
+  presencesService,
+  cultosService,
+} from '@/services/church'
 import type {
   InviteRecord,
   PersonRecord,
   UserRole,
   RegistrationDivergenceRecord,
+  PresenceRecord,
+  CultoRecord,
 } from '@/types/church'
-import { AlertCircle, CheckCircle2, XCircle } from 'lucide-react'
+import { AlertCircle, CheckCircle2, XCircle, Link as LinkIcon, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -43,7 +51,14 @@ export default function Secretary() {
   const [invites, setInvites] = useState<InviteRecord[]>([])
   const [persons, setPersons] = useState<PersonRecord[]>([])
   const [divergences, setDivergences] = useState<RegistrationDivergenceRecord[]>([])
+  const [orphanPresences, setOrphanPresences] = useState<PresenceRecord[]>([])
+  const [allCultos, setAllCultos] = useState<CultoRecord[]>([])
   const [loading, setLoading] = useState(true)
+
+  // Link orphan dialog
+  const [linkOrphanModalOpen, setLinkOrphanModalOpen] = useState(false)
+  const [orphanToLink, setOrphanToLink] = useState<PresenceRecord | null>(null)
+  const [linkTargetCultoId, setLinkTargetCultoId] = useState('')
 
   // Create invite dialog
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -70,16 +85,20 @@ export default function Secretary() {
   const loadData = async () => {
     try {
       setLoading(true)
-      const [invList, perList, divList] = await Promise.all([
+      const [invList, perList, divList, orphans, cultosList] = await Promise.all([
         invitesService.list(),
         personsService.list(),
         divergencesService.list('status = "pendente"'),
+        presencesService.listOrphans(),
+        cultosService.list(),
       ])
       setInvites(invList)
       setPersons(perList)
       setDivergences(divList)
+      setOrphanPresences(orphans)
+      setAllCultos(cultosList)
     } catch {
-      toast.error('Erro ao listar convites da secretaria.')
+      toast.error('Erro ao carregar dados da secretaria.')
     } finally {
       setLoading(false)
     }
@@ -166,6 +185,32 @@ export default function Secretary() {
     }
   }
 
+  const handleLinkOrphan = async () => {
+    if (!orphanToLink || !linkTargetCultoId) return
+    try {
+      await presencesService.linkToCulto(orphanToLink.id, linkTargetCultoId)
+      toast.success('Presença vinculada ao evento com sucesso!')
+      setLinkOrphanModalOpen(false)
+      setOrphanToLink(null)
+      setLinkTargetCultoId('')
+      const updated = await presencesService.listOrphans()
+      setOrphanPresences(updated)
+    } catch {
+      toast.error('Erro ao vincular presença.')
+    }
+  }
+
+  const handleDeleteOrphan = async (id: string) => {
+    if (!confirm('Deseja descartar este registro de presença órfã?')) return
+    try {
+      await presencesService.delete(id)
+      toast.success('Registro de presença descartado.')
+      setOrphanPresences((prev) => prev.filter((p) => p.id !== id))
+    } catch {
+      toast.error('Erro ao descartar presença.')
+    }
+  }
+
   const roleLabels: Record<UserRole, string> = {
     secretary: 'Secretaria',
     pastor: 'Pastor',
@@ -214,6 +259,91 @@ export default function Secretary() {
           Gerar Novo Convite
         </Button>
       </div>
+
+      {/* ALERTA DE PRESENÇAS ÓRFÃS / SEM EVENTO NA AGENDA (Secretaria D11) */}
+      {orphanPresences.length > 0 && (
+        <section className="bg-white border border-amber-300 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-amber-100">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold">
+                <AlertCircle className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="text-[10px] uppercase font-bold text-amber-800">
+                  Agenda da Igreja &bull; Pendências de Presença
+                </span>
+                <h2 className="text-base font-bold text-[#191919]">
+                  Presenças Sem Evento Correspondente ({orphanPresences.length})
+                </h2>
+              </div>
+            </div>
+            <span className="text-xs bg-amber-50 text-amber-900 border border-amber-200 px-3 py-1 rounded-full font-bold">
+              Agenda Desatualizada ou Registro Fora de Hora
+            </span>
+          </div>
+
+          <p className="text-xs text-amber-800 leading-relaxed">
+            Visitantes ou frequentadores escanearam o QR Code num momento sem evento ativo na
+            agenda. O cadastro foi gravado com segurança. Vincule manualmente ao evento correto
+            (inclusive passado) ou descarte o registro de presença:
+          </p>
+
+          <div className="divide-y divide-amber-100 text-xs">
+            {orphanPresences.map((orphan) => {
+              const person = orphan.expand?.person
+              return (
+                <div
+                  key={orphan.id}
+                  className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-amber-50/50 rounded-xl px-2 transition-colors"
+                >
+                  <div className="space-y-0.5">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-[#191919]">
+                        {person?.name || 'Pessoa Registrada'}
+                      </span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                        {orphan.presence_type === 'primeira_visita' ? '1ª Visita' : 'Retorno'}
+                      </span>
+                    </div>
+                    <p className="text-gray-600 text-[11px]">
+                      Telefone: {person?.phone || person?.whatsapp || 'Sem telefone'} &bull;
+                      Escaneamento:{' '}
+                      {new Date(orphan.created).toLocaleTimeString('pt-BR', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}{' '}
+                      de {new Date(orphan.created).toLocaleDateString('pt-BR')}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 self-end sm:self-auto">
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        setOrphanToLink(orphan)
+                        setLinkOrphanModalOpen(true)
+                      }}
+                      className="bg-[#820AD1] hover:bg-[#7008B7] text-white font-bold text-xs h-8 px-3 rounded-full cursor-pointer"
+                    >
+                      <LinkIcon className="w-3.5 h-3.5 mr-1" />
+                      Vincular a Evento
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleDeleteOrphan(orphan.id)}
+                      className="text-gray-400 hover:text-red-600 hover:bg-red-50 font-bold text-xs h-8 px-2.5 rounded-full cursor-pointer"
+                      title="Descartar este registro"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </section>
+      )}
 
       {/* Conciliação de Divergências de Cadastro do QR Code (D12 Cenários 7 & 8) */}
       {divergences.length > 0 && (
@@ -403,6 +533,58 @@ export default function Secretary() {
           </tbody>
         </table>
       </div>
+
+      {/* VINCULAR PRESENÇA ÓRFÃ A EVENTO */}
+      <Dialog open={linkOrphanModalOpen} onOpenChange={setLinkOrphanModalOpen}>
+        <DialogContent className="sm:max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border-gray-100">
+          <DialogHeader className="border-b border-gray-100 pb-3">
+            <DialogTitle className="text-lg font-bold text-[#191919]">
+              Vincular Presença a um Evento da Agenda
+            </DialogTitle>
+            <p className="text-xs text-gray-500">
+              Corrija o registro atribuindo-o ao culto ou evento correspondente (inclusive passado).
+            </p>
+          </DialogHeader>
+
+          {orphanToLink && (
+            <div className="space-y-4 pt-2 text-xs">
+              <div className="p-3 bg-purple-50 rounded-2xl border border-purple-100">
+                <span className="font-bold text-purple-900 block">
+                  {orphanToLink.expand?.person?.name || 'Pessoa'}
+                </span>
+                <span className="text-[11px] text-purple-700">
+                  Data/Hora do escaneamento:{' '}
+                  {new Date(orphanToLink.created).toLocaleString('pt-BR')}
+                </span>
+              </div>
+
+              <div className="space-y-1">
+                <Label className="font-semibold text-gray-700">Evento de Destino</Label>
+                <Select value={linkTargetCultoId} onValueChange={setLinkTargetCultoId}>
+                  <SelectTrigger className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent">
+                    <SelectValue placeholder="Selecione o evento para vincular" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white rounded-2xl shadow-xl">
+                    {allCultos.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.name} ({new Date(c.date_time).toLocaleDateString('pt-BR')} - {c.status})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <Button
+                onClick={handleLinkOrphan}
+                disabled={!linkTargetCultoId}
+                className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#820AD1]/20 cursor-pointer"
+              >
+                Confirmar Vinculação
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* CREATE INVITE DIALOG */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

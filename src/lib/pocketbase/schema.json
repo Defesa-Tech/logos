@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-18T22:10:12.479Z",
+  "generatedAt": "2026-09-18T22:14:44.215Z",
   "collections": [
     {
       "name": "users",
@@ -968,6 +968,30 @@
           "type": "text",
           "required": false,
           "system": false
+        },
+        {
+          "name": "is_recurrent",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "recurrence_days",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "recurrence_start_time",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "recurrence_end_time",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": ["CREATE INDEX idx_cultos_date ON cultos (date_time DESC)"]
@@ -986,7 +1010,7 @@
         {
           "name": "culto",
           "type": "relation",
-          "required": true,
+          "required": false,
           "system": false,
           "collectionRef": "cultos"
         },
@@ -1047,6 +1071,12 @@
         {
           "name": "device_token",
           "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "is_orphan",
+          "type": "bool",
           "required": false,
           "system": false
         }
