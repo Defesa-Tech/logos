@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-17T09:34:02.638Z",
+  "generatedAt": "2026-09-18T22:10:12.479Z",
   "collections": [
     {
       "name": "users",
@@ -945,6 +945,27 @@
         {
           "name": "tolerance_minutes_after",
           "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "event_type",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": [
+            "culto_domingo",
+            "culto_quarta",
+            "estudo_biblico",
+            "conferencia",
+            "vigilia",
+            "congresso",
+            "outro"
+          ]
+        },
+        {
+          "name": "description",
+          "type": "text",
           "required": false,
           "system": false
         }

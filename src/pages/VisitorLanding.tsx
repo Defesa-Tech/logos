@@ -48,7 +48,9 @@ export default function VisitorLanding() {
   const [recognizedPersonId, setRecognizedPersonId] = useState<string | null>(null)
   const [showCleanForm, setShowCleanForm] = useState(false)
 
-  // Active Culto based on schedule & tolerance (D11)
+  // Active Events based on schedule & tolerance (D11 General Agenda)
+  const [activeEvents, setActiveEvents] = useState<CultoRecord[]>([])
+  const [selectedEventId, setSelectedEventId] = useState<string>('')
   const [activeCulto, setActiveCulto] = useState<CultoRecord | null>(null)
   const [, setAllCultos] = useState<CultoRecord[]>([])
   const [, setLoadingInitial] = useState(true)
@@ -128,9 +130,20 @@ export default function VisitorLanding() {
           }
         }
 
-        // 2. Load active culto by schedule + tolerance (D11)
-        const currentActive = await cultosService.getActiveCultoNow()
-        setActiveCulto(currentActive)
+        // 2. Load active events by schedule + tolerance (D11 General Agenda)
+        const currentActiveList = await cultosService.getActiveEventsNow()
+        setActiveEvents(currentActiveList)
+        if (currentActiveList.length === 1) {
+          setActiveCulto(currentActiveList[0])
+          setSelectedEventId(currentActiveList[0].id)
+        } else if (currentActiveList.length > 1) {
+          // If multiple events, set default to the first one but let user choose
+          setActiveCulto(currentActiveList[0])
+          setSelectedEventId(currentActiveList[0].id)
+        } else {
+          setActiveCulto(null)
+          setSelectedEventId('')
+        }
 
         const list = await cultosService.list()
         setAllCultos(list.slice(0, 3))
@@ -143,6 +156,28 @@ export default function VisitorLanding() {
     init()
   }, [])
 
+  // Refresh active events right before registering presence ("O que está acontecendo agora?")
+  const determineTargetEvent = async (userChosenEventId?: string): Promise<CultoRecord | null> => {
+    const liveActiveEvents = await cultosService.getActiveEventsNow()
+    setActiveEvents(liveActiveEvents)
+
+    if (liveActiveEvents.length === 0) {
+      return null
+    }
+
+    if (userChosenEventId) {
+      const match = liveActiveEvents.find((e) => e.id === userChosenEventId)
+      if (match) return match
+    }
+
+    if (selectedEventId) {
+      const match = liveActiveEvents.find((e) => e.id === selectedEventId)
+      if (match) return match
+    }
+
+    return liveActiveEvents[0]
+  }
+
   // Action for recognized device: "Olá de novo, Fulano" -> 1-click confirmation
   const handleRecognizedPresence = async () => {
     if (!recognizedPersonId) return
@@ -150,17 +185,21 @@ export default function VisitorLanding() {
       setSubmitting(true)
       const person = await personsService.getById(recognizedPersonId)
 
-      // Register presence if active culto exists
-      if (activeCulto) {
-        // Check if already registered
-        const existingPresences = await presencesService.listByCulto(activeCulto.id)
+      // Determine which event is happening right now in the agenda
+      const chosenEvent = await determineTargetEvent(selectedEventId)
+      setActiveCulto(chosenEvent)
+
+      // Register presence if active event exists
+      if (chosenEvent) {
+        // Check if already registered in THIS event
+        const existingPresences = await presencesService.listByCulto(chosenEvent.id)
         const already = existingPresences.some((p) => p.person === person.id)
 
         if (already) {
           setAlreadyRegisteredToday(true)
         } else {
           await presencesService.create({
-            culto: activeCulto.id,
+            culto: chosenEvent.id,
             person: person.id,
             modality: 'presencial',
             presence_type: 'retorno',
@@ -327,16 +366,20 @@ export default function VisitorLanding() {
       localStorage.setItem(DEVICE_PERSON_NAME_KEY, targetPerson.name)
       localStorage.setItem(DEVICE_PERSON_ID_KEY, targetPerson.id)
 
-      // Register presence if active culto is happening (D11)
-      if (activeCulto) {
-        const existingPresences = await presencesService.listByCulto(activeCulto.id)
+      // Determine what event is happening right now in the church agenda
+      const chosenEvent = await determineTargetEvent(selectedEventId)
+      setActiveCulto(chosenEvent)
+
+      // Register presence if active event is happening in agenda (D11)
+      if (chosenEvent) {
+        const existingPresences = await presencesService.listByCulto(chosenEvent.id)
         const already = existingPresences.some((p) => p.person === targetPerson.id)
 
         if (already) {
           setAlreadyRegisteredToday(true)
         } else {
           await presencesService.create({
-            culto: activeCulto.id,
+            culto: chosenEvent.id,
             person: targetPerson.id,
             modality: 'presencial',
             presence_type: existingPerson ? 'retorno' : 'primeira_visita',
@@ -748,11 +791,66 @@ export default function VisitorLanding() {
             </span>
             <h1 className="text-2xl font-black text-[#191919]">Olá de novo, {firstName}!</h1>
             <p className="text-xs text-gray-500 leading-relaxed">
-              {activeCulto
-                ? `Confirmar sua presença hoje no ${activeCulto.name}?`
-                : 'Que bom ter você conosco na Defesa da Fé!'}
+              {activeEvents.length > 1
+                ? 'Há mais de uma atividade da igreja acontecendo neste momento. Em qual delas você está?'
+                : activeCulto
+                  ? `Confirmar sua presença hoje no ${activeCulto.name}?`
+                  : 'Que bom ter você conosco na Defesa da Fé!'}
             </p>
           </div>
+
+          {/* Se houver mais de um evento em andamento na agenda, perguntar: "O que está acontecendo agora?" */}
+          {activeEvents.length > 1 && (
+            <div className="p-4 bg-purple-50/70 border border-purple-200/80 rounded-2xl text-left space-y-2">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-[#820AD1]">
+                <Clock className="w-4 h-4" />
+                <span>O que está acontecendo agora?</span>
+              </div>
+              <p className="text-[11px] text-gray-600">
+                Selecione o evento correspondente para vincularmos sua presença:
+              </p>
+              <div className="space-y-1.5 pt-1">
+                {activeEvents.map((ev) => (
+                  <label
+                    key={ev.id}
+                    className={`flex items-center gap-2.5 p-2.5 rounded-xl border cursor-pointer text-xs transition-all ${
+                      selectedEventId === ev.id
+                        ? 'border-[#820AD1] bg-white text-[#820AD1] font-bold shadow-xs'
+                        : 'border-gray-200/80 bg-white/60 text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="recognized-event-choice"
+                      value={ev.id}
+                      checked={selectedEventId === ev.id}
+                      onChange={() => {
+                        setSelectedEventId(ev.id)
+                        setActiveCulto(ev)
+                      }}
+                      className="text-[#820AD1] focus:ring-[#820AD1]"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <span className="truncate">{ev.name}</span>
+                        <span className="text-[10px] text-gray-400 shrink-0 ml-1">
+                          {new Date(ev.date_time).toLocaleTimeString('pt-BR', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </span>
+                      </div>
+                      {ev.notes && (
+                        <p className="text-[10px] text-gray-400 truncate mt-0.5 font-normal">
+                          {ev.notes}
+                        </p>
+                      )}
+                    </div>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="space-y-3 pt-2">
             <Button
@@ -793,11 +891,66 @@ export default function VisitorLanding() {
             Seja muito bem-vindo(a)!
           </h1>
           <p className="text-xs text-gray-500 max-w-xs mx-auto">
-            {activeCulto
-              ? `Culto da Agenda: ${activeCulto.name}`
-              : 'Preencha seus dados para registrar sua presença no culto.'}
+            {activeEvents.length > 1
+              ? 'Identificamos programações em andamento na agenda da igreja.'
+              : activeCulto
+                ? `Evento da Agenda: ${activeCulto.name}`
+                : 'Preencha seus dados para registrar sua visita à igreja.'}
           </p>
         </div>
+
+        {/* Pergunta: "O que está acontecendo agora?" quando múltiplos eventos estão na janela */}
+        {activeEvents.length > 1 && (
+          <div className="p-4 bg-purple-50/70 border border-purple-200/80 rounded-2xl text-left space-y-2">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-[#820AD1]">
+              <Clock className="w-4 h-4" />
+              <span>O que está acontecendo agora?</span>
+            </div>
+            <p className="text-[11px] text-gray-600">
+              Mais de um evento está em andamento na agenda. Em qual deles você está participando?
+            </p>
+            <div className="space-y-1.5 pt-1">
+              {activeEvents.map((ev) => (
+                <label
+                  key={ev.id}
+                  className={`flex items-center gap-2.5 p-2.5 rounded-xl border cursor-pointer text-xs transition-all ${
+                    selectedEventId === ev.id
+                      ? 'border-[#820AD1] bg-white text-[#820AD1] font-bold shadow-xs'
+                      : 'border-gray-200/80 bg-white/60 text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="new-event-choice"
+                    value={ev.id}
+                    checked={selectedEventId === ev.id}
+                    onChange={() => {
+                      setSelectedEventId(ev.id)
+                      setActiveCulto(ev)
+                    }}
+                    className="text-[#820AD1] focus:ring-[#820AD1]"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <span className="truncate">{ev.name}</span>
+                      <span className="text-[10px] text-gray-400 shrink-0 ml-1">
+                        {new Date(ev.date_time).toLocaleTimeString('pt-BR', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </span>
+                    </div>
+                    {ev.notes && (
+                      <p className="text-[10px] text-gray-400 truncate mt-0.5 font-normal">
+                        {ev.notes}
+                      </p>
+                    )}
+                  </div>
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Short Form (<= 5 campos, propósito explícito) */}
         <form onSubmit={handleSubmit} className="space-y-4">

@@ -131,36 +131,43 @@ export const cultosService = {
     })
   },
 
-  // Find currently active culto within tolerance window (D11)
-  async getActiveCultoNow(): Promise<CultoRecord | null> {
+  // Find all active events/cultos within tolerance window (D11 general agenda)
+  async getActiveEventsNow(): Promise<CultoRecord[]> {
     try {
-      const openCultos = await pb.collection('cultos').getFullList<CultoRecord>({
+      const openEvents = await pb.collection('cultos').getFullList<CultoRecord>({
         filter: 'status = "aberto"',
-        sort: '-date_time',
+        sort: 'date_time',
       })
-      if (openCultos.length === 0) return null
+      if (openEvents.length === 0) return []
 
       const now = new Date().getTime()
+      const matchingEvents: CultoRecord[] = []
 
-      // Check which open culto has the current time inside [start - tolerance, end + tolerance]
-      for (const c of openCultos) {
+      for (const c of openEvents) {
         const start = new Date(c.date_time).getTime()
         const tolBefore = (c.tolerance_minutes_before ?? 60) * 60000
         const tolAfter = (c.tolerance_minutes_after ?? 60) * 60000
-
-        let end = c.end_time ? new Date(c.end_time).getTime() : start + 2 * 3600000 // default 2 hours
+        const end = c.end_time ? new Date(c.end_time).getTime() : start + 2 * 3600000
 
         if (now >= start - tolBefore && now <= end + tolAfter) {
-          return c
+          matchingEvents.push(c)
         }
       }
 
-      // If only one open culto exists and was created today, return it as fallback
-      if (openCultos.length === 1) {
-        return openCultos[0]
-      }
+      return matchingEvents
+    } catch {
+      return []
+    }
+  },
 
-      return openCultos[0] || null
+  // Find currently active culto within tolerance window (D11) - backwards-compatible helper
+  async getActiveCultoNow(): Promise<CultoRecord | null> {
+    try {
+      const activeEvents = await this.getActiveEventsNow()
+      if (activeEvents.length > 0) {
+        return activeEvents[0]
+      }
+      return null
     } catch {
       return null
     }

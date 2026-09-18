@@ -20,7 +20,7 @@ O sistema **Logos** foi concebido para atender às necessidades práticas e ecle
 - **D8 (MVP)**: O aplicativo é **único** e a tela inicial se monta organicamente em **blocos conforme as atuações ativas da pessoa** (ex.: uma pessoa que é membro, técnica de áudio na Mídia e líder do Coral visualiza os três blocos no mesmo app simultaneamente, sem trocar de perfil ou sair da conta).
 - **D9 (MVP)**: O visitante pode se registrar sozinho pelo **QR Code fixo**, em uma página web leve, sem precisar baixar o app ou fazer login prévio.
 - **D10 (MVP)**: O visitante também pode ser registrado por um voluntário da equipe de **Boas-Vindas**, com busca rápida prévia por telefone para evitar duplicidades.
-- **D11 (MVP)**: O QR Code é **fixo** (impresso nos bancos/tótens), e a presença é associada automaticamente ao culto pela **agenda da igreja** e sua respectiva janela de horário.
+- **D11 (MVP — Revisada: Vinculação por Agenda de Eventos Gerais no Momento do Registro)**: O QR Code é **fixo** (mesma URL impressa nos bancos/tótens, sem token dinâmico por evento). Quem decide a qual evento a presença pertence é a **agenda da igreja**, no exato momento do registro. O sistema consulta a agenda e determina _"o que está acontecendo agora?"_ (respeitando tolerância de chegada antecipada e encerramento). Essa regra cobre **qualquer tipo de evento da igreja** — culto de domingo, estudo bíblico de sábado, conferência, vigília ou congresso — recebendo visitantes automaticamente sem necessidade de preparação prévia antes de cada evento. Se houver **mais de um evento simultâneo em andamento** na janela da agenda, a página pergunta ao visitante _"O que está acontecendo agora?"_ e permite selecionar o evento correspondente antes de confirmar a presença. Se nenhum evento estiver em andamento, o cadastro é salvo/atualizado sem gerar presença artificial.
 - **D12 (MVP)**: O número de **telefone** identifica a pessoa e une registros vindos do QR Code de autoatendimento e do balcão de Boas-Vindas.
 - **D13 (MVP — Revisada: Princípio CX de Coleta Progressiva e Vínculo Proporcional)**: A distribuição de convites e coleta de dados respeita rigorosamente o momento do visitante: "pedir compromisso na proporção do vínculo". Na **1ª visita**, a tela de confirmação exibe APENAS os horários dos cultos da semana e a preferência de contato — SEM link do app e SEM convite ao formulário completo (evitando sobrecarga para quem está sentada no banco antes do culto). O **link do app** é oferecido no **follow-up pós-1ª visita via WhatsApp** pelo voluntário do Boas-Vindas em mensagem pessoal. Na **2ª visita**, a tela de confirmação traz o formulário "Conte mais sobre você" como **AÇÃO PRINCIPAL** e o link do app como ação secundária. Da **3ª visita em diante**, a página oferece apenas o que ainda não foi atendido ou preenchido, sem repetir convites já concluídos.
 - **D14 (MVP)**: O convite ao formulário "Conte mais sobre você" é a ação principal na 2ª visita e segue disponível em visitas subsequentes caso ainda não tenha sido preenchido, nunca repetindo perguntas ou dados já informados.
@@ -202,9 +202,10 @@ Permitir que qualquer pessoa registre sua presença no culto em menos de 10 segu
                  └─ (Verifica se nome indica possível familiar)
               │
               ▼
-    [Culto da agenda em andamento dentro da tolerância?]
-     ├─ SIM ──► Registra presença com origem `qr_code`
-     └─ NÃO ──► Apenas salva/atualiza dados cadastrais (sem presença)
+    [O que está acontecendo agora na agenda da igreja?]
+     ├─ 1 evento em andamento ──────► Vincula presença automaticamente ao evento correspondente
+     ├─ Mais de 1 evento em andamento ──► Pergunta "O que está acontecendo agora?" e usuário escolhe
+     └─ Nenhum evento em andamento ──► Apenas salva/atualiza dados cadastrais (sem presença)
               │
               ▼
     [Tela de Confirmação Acolhedora Conforme Momento - D13]
@@ -244,16 +245,17 @@ Permitir que qualquer pessoa registre sua presença no culto em menos de 10 segu
 
 ### Regras de Negócio e Casos de Borda
 
-1. **Primeira visita, telefone novo**: Cria cadastro de visitante e associa presença ao culto da agenda em andamento. Tela de confirmação exibe **estritamente horários da semana e preferência de contato**, sem link de app e sem formulário longo.
-2. **Retorno pelo mesmo aparelho**: Aparelho identificado via token/armazenamento local. Exibe saudação calorosa e botão de confirmação com 1 clique. O link _"Não é você?"_ limpa a identificação local e abre o formulário vazio.
-3. **Presença já registrada no mesmo culto**: O sistema identifica que a pessoa já está presente no culto atual e exibe confirmação informativa, não duplicando o registro.
+1. **Primeira visita, telefone novo**: Cria cadastro de visitante e associa presença ao evento da agenda em andamento (culto de domingo, estudo bíblico, conferência, vigília, congresso). Se houver mais de um evento na janela, pergunta _"O que está acontecendo agora?"_. Tela de confirmação exibe **estritamente horários da semana e preferência de contato**, sem link de app e sem formulário longo.
+2. **Retorno pelo mesmo aparelho**: Aparelho identificado via token/armazenamento local. Exibe saudação calorosa e confirmação rápida. Se houver mais de um evento ativo na agenda, exibe as opções para o visitante escolher em qual está. O link _"Não é você?"_ limpa a identificação local e abre o formulário vazio.
+3. **Presença já registrada no mesmo evento**: O sistema identifica que a pessoa já está presente no evento atual e exibe confirmação informativa, não duplicando o registro.
 4. **Segunda visita (D13 revisada)**: Exibe a confirmação de presença com destaque principal para o formulário "Conte mais sobre você" (aniversário, bairro, filhos, como conheceu) e link secundário do app.
 5. **Terceira visita em diante**: Mostra apenas o que ainda não foi atendido ou preenchido. Se já preencheu o formulário completo, mostra apenas acolhimento e horários/app.
-6. **Preenchimento repetido com telefone já existente**: Localiza o registro anterior pelo número e vincula a presença; nunca cria duplicata de pessoa com o mesmo telefone.
+6. **Preenchimento repetido com telefone já existente**: Localiza o registro anterior pelo número e vincula a presença ao evento ativo; nunca cria duplicata de pessoa com o mesmo telefone.
 7. **Mesmo telefone com e-mail novo ou variação no nome**: Não sobrescreve os dados existentes bruscamente; registra um apontamento de **divergência cadastral** (`divergences`) para análise e conciliação pela Secretaria.
 8. **Mesmo telefone com nome manifestamente diferente**: Se for submetido um nome diferente da pessoa titular do telefone, cria um novo cadastro de visitante marcado com a tag `"possivel_familiar"` e vincula a divergência para a Secretaria revisar a árvore familiar.
-9. **Boas-Vindas registrou e visitante também escaneou**: O telefone une os registros. A presença permanece estritamente **única** no culto em questão.
-10. **QR escaneado fora do horário de culto**: Salva/atualiza o cadastro do visitante, mas não gera presença artificial; informa que o cadastro foi acolhido.
+9. **Boas-Vindas registrou e visitante também escaneou**: O telefone une os registros. A presença permanece estritamente **única** no evento em questão.
+10. **QR escaneado fora de qualquer evento da agenda**: Salva/atualiza o cadastro do visitante, mas não gera presença artificial; informa que o cadastro foi acolhido.
+11. **Múltiplos eventos simultâneos na agenda**: Quando a janela de tolerância coincide para dois ou mais eventos (ex.: Culto da Palavra no templo principal e Estudo Bíblico em sala anexa, ou Vigília e Conferência), a tela de autoatendimento pergunta _"O que está acontecendo agora?"_, permitindo ao visitante indicar seu evento específico sem erro de vinculação.
 
 ### Privacidade e Tratamento de Dados Sensíveis
 

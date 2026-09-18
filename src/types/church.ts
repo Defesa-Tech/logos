@@ -252,10 +252,21 @@ export interface OverlapRuleRecord extends RecordModel {
   }
 }
 
+export type EventType =
+  | 'culto_domingo'
+  | 'culto_quarta'
+  | 'estudo_biblico'
+  | 'conferencia'
+  | 'vigilia'
+  | 'congresso'
+  | 'outro'
+
 export interface CultoRecord extends RecordModel {
   name: string
   date_time: string
   end_time?: string
+  event_type?: EventType
+  description?: string
   tolerance_minutes_before?: number
   tolerance_minutes_after?: number
   is_regular?: boolean

@@ -71,10 +71,14 @@ export default function Cultos() {
   const [presenceToMove, setPresenceToMove] = useState<PresenceRecord | null>(null)
   const [targetCultoId, setTargetCultoId] = useState('')
 
-  // Create Culto Modal
+  // Create Culto/Evento Modal
   const [createCultoOpen, setCreateCultoOpen] = useState(false)
   const [cultoName, setCultoName] = useState('Culto da Palavra')
+  const [cultoEventType, setCultoEventType] = useState<string>('culto_domingo')
   const [cultoDate, setCultoDate] = useState(new Date().toISOString().slice(0, 16))
+  const [cultoEndDate, setCultoEndDate] = useState('')
+  const [cultoTolBefore, setCultoTolBefore] = useState(60)
+  const [cultoTolAfter, setCultoTolAfter] = useState(45)
   const [cultoIsRegular, setCultoIsRegular] = useState(true)
 
   // Realtime subscription for presences
@@ -313,13 +317,22 @@ export default function Cultos() {
     }
   }
 
-  // Create new Culto
+  // Create new Culto / Evento da Agenda
   const handleCreateCulto = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
+      const startDate = new Date(cultoDate)
+      const endDate = cultoEndDate
+        ? new Date(cultoEndDate)
+        : new Date(startDate.getTime() + 2 * 3600000)
+
       const created = await cultosService.create({
         name: cultoName,
-        date_time: new Date(cultoDate).toISOString(),
+        event_type: (cultoEventType as any) || 'outro',
+        date_time: startDate.toISOString(),
+        end_time: endDate.toISOString(),
+        tolerance_minutes_before: Number(cultoTolBefore) || 60,
+        tolerance_minutes_after: Number(cultoTolAfter) || 45,
         is_regular: cultoIsRegular,
         status: 'aberto',
         anonymous_count: 0,
@@ -327,9 +340,9 @@ export default function Cultos() {
       setCultos([created, ...cultos])
       setSelectedCulto(created)
       setCreateCultoOpen(false)
-      toast.success('Culto criado com sucesso!')
+      toast.success('Evento da agenda aberto com sucesso! Pronto para receber visitantes.')
     } catch {
-      toast.error('Erro ao criar culto.')
+      toast.error('Erro ao criar evento na agenda.')
     }
   }
 
@@ -365,11 +378,12 @@ export default function Cultos() {
             <span>Registro & Lista de Culto</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191919]">
-            Recepção, Culto & Presenças
+            Recepção, Agenda & Presenças
           </h1>
           <p className="text-xs sm:text-sm text-gray-500 mt-1 max-w-2xl font-normal">
-            Busca por telefone antes de cadastrar (R3), registro ágil com um toque (J1) e lista em
-            tempo real da Secretaria para apresentação dos visitantes (J2).
+            A agenda da igreja recebe visitantes automaticamente em qualquer evento (cultos,
+            conferências, vigílias e estudos), com busca rápida por telefone (R3), autoatendimento
+            QR Code fixo e lista em tempo real para a Secretaria (J2).
           </p>
         </div>
 
@@ -380,7 +394,7 @@ export default function Cultos() {
               className="bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-10 px-4 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all cursor-pointer"
             >
               <Plus className="w-4 h-4 mr-1.5" strokeWidth={2.5} />
-              Novo Culto
+              Novo Evento na Agenda
             </Button>
           )}
         </div>
@@ -572,7 +586,9 @@ export default function Cultos() {
               </span>
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             </div>
-            <h2 className="text-xl font-bold text-[#191919]">Presenças do Culto</h2>
+            <h2 className="text-xl font-bold text-[#191919]">
+              Presenças {selectedCulto ? `— ${selectedCulto.name}` : 'do Evento'}
+            </h2>
             <p className="text-xs text-gray-500 mt-0.5">
               Lista pronta para a Secretaria apresentar os visitantes no púlpito.
             </p>
@@ -836,35 +852,108 @@ export default function Cultos() {
 
       {/* CREATE CULTO MODAL */}
       <Dialog open={createCultoOpen} onOpenChange={setCreateCultoOpen}>
-        <DialogContent className="sm:max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border-gray-100">
+        <DialogContent className="sm:max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border-gray-100 max-h-[90vh] overflow-y-auto">
           <DialogHeader className="border-b border-gray-100 pb-3">
-            <DialogTitle className="text-lg font-bold text-[#191919]">Abrir Novo Culto</DialogTitle>
+            <DialogTitle className="text-lg font-bold text-[#191919]">
+              Abrir Novo Evento na Agenda
+            </DialogTitle>
+            <p className="text-xs text-gray-500">
+              Qualquer evento da agenda recebe visitantes automaticamente via QR Code fixo ou
+              recepção.
+            </p>
           </DialogHeader>
 
-          <form onSubmit={handleCreateCulto} className="space-y-4 pt-2 text-xs">
+          <form onSubmit={handleCreateCulto} className="space-y-3.5 pt-2 text-xs">
             <div className="space-y-1">
-              <Label className="font-semibold text-gray-700">Nome do Culto / Encontro *</Label>
+              <Label className="font-semibold text-gray-700">Tipo de Evento</Label>
+              <Select
+                value={cultoEventType}
+                onValueChange={(val) => {
+                  setCultoEventType(val)
+                  if (val === 'culto_domingo' && cultoName === 'Culto da Palavra')
+                    setCultoName('Culto da Palavra (Domingo)')
+                  if (val === 'culto_quarta' && cultoName === 'Culto da Palavra')
+                    setCultoName('Culto de Doutrina (Quarta)')
+                  if (val === 'estudo_biblico') setCultoName('Estudo Bíblico')
+                  if (val === 'conferencia') setCultoName('Conferência')
+                  if (val === 'vigilia') setCultoName('Vigília de Oração')
+                  if (val === 'congresso') setCultoName('Congresso')
+                }}
+              >
+                <SelectTrigger className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-white rounded-2xl shadow-xl">
+                  <SelectItem value="culto_domingo">Culto de Domingo</SelectItem>
+                  <SelectItem value="culto_quarta">Culto de Quarta</SelectItem>
+                  <SelectItem value="estudo_biblico">Estudo Bíblico</SelectItem>
+                  <SelectItem value="conferencia">Conferência</SelectItem>
+                  <SelectItem value="vigilia">Vigília</SelectItem>
+                  <SelectItem value="congresso">Congresso</SelectItem>
+                  <SelectItem value="outro">Outro Evento / Celebração Especial</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1">
+              <Label className="font-semibold text-gray-700">Nome do Evento / Culto *</Label>
               <Input
                 required
                 value={cultoName}
                 onChange={(e) => setCultoName(e.target.value)}
-                placeholder="Ex: Culto de Celebração de Domingo"
+                placeholder="Ex: Conferência da Família, Estudo Bíblico..."
                 className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
               />
             </div>
 
-            <div className="space-y-1">
-              <Label className="font-semibold text-gray-700">Data e Hora *</Label>
-              <Input
-                type="datetime-local"
-                required
-                value={cultoDate}
-                onChange={(e) => setCultoDate(e.target.value)}
-                className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
-              />
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1">
+                <Label className="font-semibold text-gray-700">Início Previsto *</Label>
+                <Input
+                  type="datetime-local"
+                  required
+                  value={cultoDate}
+                  onChange={(e) => setCultoDate(e.target.value)}
+                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label className="font-semibold text-gray-700">Término Previsto</Label>
+                <Input
+                  type="datetime-local"
+                  value={cultoEndDate}
+                  onChange={(e) => setCultoEndDate(e.target.value)}
+                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                />
+              </div>
             </div>
 
-            <div className="pt-2">
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1">
+                <Label className="font-semibold text-gray-700">Tolerância Antes (min)</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  value={cultoTolBefore}
+                  onChange={(e) => setCultoTolBefore(Number(e.target.value))}
+                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label className="font-semibold text-gray-700">Tolerância Depois (min)</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  value={cultoTolAfter}
+                  onChange={(e) => setCultoTolAfter(Number(e.target.value))}
+                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                />
+              </div>
+            </div>
+
+            <div className="pt-1">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
@@ -880,9 +969,9 @@ export default function Cultos() {
 
             <Button
               type="submit"
-              className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#820AD1]/20"
+              className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#820AD1]/20 mt-2"
             >
-              Criar e Abrir Culto
+              Criar e Abrir Evento na Agenda
             </Button>
           </form>
         </DialogContent>
