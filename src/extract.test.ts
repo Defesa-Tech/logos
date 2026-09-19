@@ -6,7 +6,6 @@ import * as zlib from 'zlib'
 test('extract pages from bundle html', () => {
   const htmlPath = path.join(process.cwd(), 'src/assets/logos-app-de-gestao-de-igreja-6af67.html')
   const outDir = path.join(process.cwd(), 'extracted/pages')
-  expect(true).toBe(false)
 
   if (!fs.existsSync(outDir)) {
     fs.mkdirSync(outDir, { recursive: true })

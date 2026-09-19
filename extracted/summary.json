@@ -1,0 +1,227 @@
+[
+  {
+    "order": 1,
+    "uuid": "a59cda03-77a5-4ff9-a71c-a7f27e8e9910",
+    "title": "Login · Celular",
+    "docTitle": "Logos — Entrar (celular)",
+    "filename": "01_Login_Celular.html",
+    "path": "extracted/pages/01_Login_Celular.html",
+    "bytes": 276445
+  },
+  {
+    "order": 2,
+    "uuid": "a9c76d3c-6b08-40b7-8bd8-ef8c361acbdf",
+    "title": "Login · Desktop",
+    "docTitle": "Logos — Entrar (desktop)",
+    "filename": "02_Login_Desktop.html",
+    "path": "extracted/pages/02_Login_Desktop.html",
+    "bytes": 277857
+  },
+  {
+    "order": 3,
+    "uuid": "60c223a3-0857-4db1-ad20-59170c67dd07",
+    "title": "Home · Membro voluntário",
+    "docTitle": "Logos — Home do membro voluntário (celular)",
+    "filename": "03_Home_Membro_voluntário.html",
+    "path": "extracted/pages/03_Home_Membro_voluntário.html",
+    "bytes": 278618
+  },
+  {
+    "order": 4,
+    "uuid": "334df273-a3ee-4a05-9d9c-c2e452264d25",
+    "title": "Home · Membro comum",
+    "docTitle": "Logos — Home do membro comum (celular)",
+    "filename": "04_Home_Membro_comum.html",
+    "path": "extracted/pages/04_Home_Membro_comum.html",
+    "bytes": 279724
+  },
+  {
+    "order": 5,
+    "uuid": "d0fc16aa-c1a6-4518-b204-7f3bbc1b93cd",
+    "title": "Home Desktop · Membro voluntário",
+    "docTitle": "Logos — Home do membro voluntário (desktop)",
+    "filename": "05_Home_Desktop_Membro_voluntário.html",
+    "path": "extracted/pages/05_Home_Desktop_Membro_voluntário.html",
+    "bytes": 282197
+  },
+  {
+    "order": 6,
+    "uuid": "95ba1bc4-10d6-4071-b902-df1c6bc56f3d",
+    "title": "Home Desktop · Membro comum",
+    "docTitle": "Logos — Home do membro comum (desktop)",
+    "filename": "06_Home_Desktop_Membro_comum.html",
+    "path": "extracted/pages/06_Home_Desktop_Membro_comum.html",
+    "bytes": 281986
+  },
+  {
+    "order": 7,
+    "uuid": "04d101d4-319a-4df4-8495-6b05de9e51d8",
+    "title": "Meu perfil · Celular",
+    "docTitle": "Logos — Meu perfil (celular)",
+    "filename": "07_Meu_perfil_Celular.html",
+    "path": "extracted/pages/07_Meu_perfil_Celular.html",
+    "bytes": 277625
+  },
+  {
+    "order": 8,
+    "uuid": "b273f568-fa10-4521-bfdb-861dbc0c9af6",
+    "title": "Meu perfil · Desktop",
+    "docTitle": "Logos — Meu perfil (desktop)",
+    "filename": "08_Meu_perfil_Desktop.html",
+    "path": "extracted/pages/08_Meu_perfil_Desktop.html",
+    "bytes": 299454
+  },
+  {
+    "order": 9,
+    "uuid": "3d9f729b-71a5-4793-b936-169636010fe6",
+    "title": "Carteirinha digital · Celular",
+    "docTitle": "Logos — Carteirinha digital",
+    "filename": "09_Carteirinha_digital_Celular.html",
+    "path": "extracted/pages/09_Carteirinha_digital_Celular.html",
+    "bytes": 275457
+  },
+  {
+    "order": 10,
+    "uuid": "99773af2-fee9-430d-8073-eb6c5ad4e01c",
+    "title": "Perfil · Dados pessoais",
+    "docTitle": "Logos — Dados pessoais (celular)",
+    "filename": "10_Perfil_Dados_pessoais.html",
+    "path": "extracted/pages/10_Perfil_Dados_pessoais.html",
+    "bytes": 273806
+  },
+  {
+    "order": 11,
+    "uuid": "17ca07c8-a3ad-41ad-9865-5b5381a53906",
+    "title": "Perfil · Vínculos",
+    "docTitle": "Logos — Vínculos (celular)",
+    "filename": "11_Perfil_Vínculos.html",
+    "path": "extracted/pages/11_Perfil_Vínculos.html",
+    "bytes": 274047
+  },
+  {
+    "order": 12,
+    "uuid": "0dcd64ac-106b-446a-922a-7eae4b6bbbbf",
+    "title": "Perfil · Talentos",
+    "docTitle": "Logos — Talentos (celular)",
+    "filename": "12_Perfil_Talentos.html",
+    "path": "extracted/pages/12_Perfil_Talentos.html",
+    "bytes": 274339
+  },
+  {
+    "order": 13,
+    "uuid": "33c2d481-fecd-4dd5-80f9-e151e11de8f8",
+    "title": "Perfil · Minha vida na igreja",
+    "docTitle": "Logos — Minha vida na igreja",
+    "filename": "13_Perfil_Minha_vida_na_igreja.html",
+    "path": "extracted/pages/13_Perfil_Minha_vida_na_igreja.html",
+    "bytes": 280724
+  },
+  {
+    "order": 14,
+    "uuid": "ea5a5b7a-07ec-4b1e-8f15-177f7806f0b0",
+    "title": "Agenda · Celular",
+    "docTitle": "Logos — Agenda (celular)",
+    "filename": "14_Agenda_Celular.html",
+    "path": "extracted/pages/14_Agenda_Celular.html",
+    "bytes": 284648
+  },
+  {
+    "order": 15,
+    "uuid": "7f4fedef-1985-4271-9659-f1bc38ae7fd3",
+    "title": "Agenda · Desktop",
+    "docTitle": "Logos — Agenda (desktop)",
+    "filename": "15_Agenda_Desktop.html",
+    "path": "extracted/pages/15_Agenda_Desktop.html",
+    "bytes": 288835
+  },
+  {
+    "order": 16,
+    "uuid": "6560502a-a013-45e4-a434-21aa045b8db5",
+    "title": "Informar disponibilidade · Celular",
+    "docTitle": "Logos — Minha disponibilidade",
+    "filename": "16_Informar_disponibilidade_Celular.html",
+    "path": "extracted/pages/16_Informar_disponibilidade_Celular.html",
+    "bytes": 286665
+  },
+  {
+    "order": 17,
+    "uuid": "72061160-8171-434f-b803-81c716aad788",
+    "title": "Bloquear período · Celular",
+    "docTitle": "Logos — Bloquear um período",
+    "filename": "17_Bloquear_período_Celular.html",
+    "path": "extracted/pages/17_Bloquear_período_Celular.html",
+    "bytes": 275346
+  },
+  {
+    "order": 18,
+    "uuid": "b4503559-9338-4cc6-b393-810db0098c9c",
+    "title": "Igreja · Celular",
+    "docTitle": "Logos — Igreja (celular)",
+    "filename": "18_Igreja_Celular.html",
+    "path": "extracted/pages/18_Igreja_Celular.html",
+    "bytes": 289565
+  },
+  {
+    "order": 19,
+    "uuid": "3c5f0a29-3d69-4768-ba84-a9293cb34a6f",
+    "title": "Departamento · Celular",
+    "docTitle": "Logos — Departamento de Música",
+    "filename": "19_Departamento_Celular.html",
+    "path": "extracted/pages/19_Departamento_Celular.html",
+    "bytes": 286365
+  },
+  {
+    "order": 20,
+    "uuid": "0fd5a56c-ef89-493d-8048-54c1fdb4d6d4",
+    "title": "Igreja · Desktop",
+    "docTitle": "Logos — Igreja (desktop)",
+    "filename": "20_Igreja_Desktop.html",
+    "path": "extracted/pages/20_Igreja_Desktop.html",
+    "bytes": 288988
+  },
+  {
+    "order": 21,
+    "uuid": "f366c9a1-c011-4b24-bf42-cda7d9a103c8",
+    "title": "Igreja · Quem somos",
+    "docTitle": "Logos — Quem somos",
+    "filename": "21_Igreja_Quem_somos.html",
+    "path": "extracted/pages/21_Igreja_Quem_somos.html",
+    "bytes": 276069
+  },
+  {
+    "order": 22,
+    "uuid": "dfc60539-572a-437a-a139-40fe536f2264",
+    "title": "Página pública · Celular",
+    "docTitle": "Igreja Defesa da Fé — página pública (celular)",
+    "filename": "22_Página_pública_Celular.html",
+    "path": "extracted/pages/22_Página_pública_Celular.html",
+    "bytes": 295101
+  },
+  {
+    "order": 23,
+    "uuid": "c2bb0dbb-140d-4faa-a1ed-017c18932d1d",
+    "title": "Página pública · Desktop",
+    "docTitle": "Igreja Defesa da Fé — página pública (desktop)",
+    "filename": "23_Página_pública_Desktop.html",
+    "path": "extracted/pages/23_Página_pública_Desktop.html",
+    "bytes": 299180
+  },
+  {
+    "order": 24,
+    "uuid": "724d7964-02c8-4ece-9b7a-74c915a40e7d",
+    "title": "Avisos · Celular",
+    "docTitle": "Logos — Avisos (celular)",
+    "filename": "24_Avisos_Celular.html",
+    "path": "extracted/pages/24_Avisos_Celular.html",
+    "bytes": 285222
+  },
+  {
+    "order": 25,
+    "uuid": "543634cc-0456-4c9e-a752-1ab8b54b051d",
+    "title": "Avisos · Desktop",
+    "docTitle": "Logos — Avisos (desktop)",
+    "filename": "25_Avisos_Desktop.html",
+    "path": "extracted/pages/25_Avisos_Desktop.html",
+    "bytes": 286293
+  }
+]
