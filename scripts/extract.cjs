@@ -26,11 +26,15 @@ const templateMatch = html.match(/<script type="__bundler\/template">\s*([\s\S]*
 const template = templateMatch ? JSON.parse(templateMatch[1]) : ''
 
 const titlesMap = {}
-for (const match of template.matchAll(/<h2>(.*?)<\/h2><iframe[^>]*src="about:blank#([a-f0-9-]+)"/g)) {
+for (const match of template.matchAll(
+  /<h2>(.*?)<\/h2><iframe[^>]*src="about:blank#([a-f0-9-]+)"/g,
+)) {
   titlesMap[match[2]] = match[1].replace(/<[^>]+>/g, '').trim()
 }
 if (Object.keys(titlesMap).length === 0) {
-  for (const match of template.matchAll(/<h2>(.*?)<\\\/h2><iframe[^>]*src=\\"about:blank#([a-f0-9-]+)\\"/g)) {
+  for (const match of template.matchAll(
+    /<h2>(.*?)<\\\/h2><iframe[^>]*src=\\"about:blank#([a-f0-9-]+)\\"/g,
+  )) {
     titlesMap[match[2]] = match[1].replace(/<[^>]+>/g, '').trim()
   }
 }
@@ -75,5 +79,8 @@ for (let i = 0; i < pageOrder.length; i++) {
   })
 }
 
-fs.writeFileSync(path.join(process.cwd(), 'extracted/summary.json'), JSON.stringify(summary, null, 2))
+fs.writeFileSync(
+  path.join(process.cwd(), 'extracted/summary.json'),
+  JSON.stringify(summary, null, 2),
+)
 console.log('Extracted', summary.length, 'pages into extracted/pages.')
