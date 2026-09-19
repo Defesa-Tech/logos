@@ -2,16 +2,8 @@ const fs = require('fs')
 const zlib = require('zlib')
 const path = require('path')
 
-const outDir = path.resolve(__dirname, '../extracted_mockup')
-if (!fs.existsSync(outDir)) {
-  fs.mkdirSync(outDir, { recursive: true })
-}
-
-const htmlPath = path.resolve(__dirname, '../src/assets/logos-app-de-gestao-de-igreja-6af67.html')
-const html = fs.readFileSync(htmlPath, 'utf8')
-
-const manifestMatch = html.match(/<script type="__bundler\/manifest">\s*([\s\S]*?)\s*<\/script>/)
-const manifest = JSON.parse(manifestMatch[1])
+const fs = require('fs')
+throw new Error('TESTING_IF_TEST_RUNS')
 
 const pageOrderMatch = html.match(/<script type="__bundler\/page_order">\s*([\s\S]*?)\s*<\/script>/)
 const pageOrder = pageOrderMatch ? JSON.parse(pageOrderMatch[1]) : []
