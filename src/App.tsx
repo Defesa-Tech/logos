@@ -26,6 +26,9 @@ import VerificarCarteirinha from './pages/VerificarCarteirinha'
 import MeuCadastro from './pages/MeuCadastro'
 import AtencaoAusencia from './pages/AtencaoAusencia'
 import RetornoFormulario from './pages/RetornoFormulario'
+import Agenda from './pages/Agenda'
+import Disponibilidade from './pages/Disponibilidade'
+import BloquearPeriodo from './pages/BloquearPeriodo'
 
 const App = () => (
   <BrowserRouter>
@@ -46,6 +49,9 @@ const App = () => (
           <Route element={<Layout />}>
             <Route path="/" element={<Index />} />
             <Route path="/dashboard" element={<Index />} />
+            <Route path="/agenda" element={<Agenda />} />
+            <Route path="/disponibilidade" element={<Disponibilidade />} />
+            <Route path="/bloquear-periodo" element={<BloquearPeriodo />} />
             <Route path="/cultos" element={<Cultos />} />
             <Route path="/follow-up" element={<FollowUp />} />
             <Route path="/frequentadores" element={<Frequentadores />} />

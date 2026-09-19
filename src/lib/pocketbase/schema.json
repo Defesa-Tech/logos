@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-19T21:01:34.941Z",
+  "generatedAt": "2026-09-19T21:11:53.169Z",
   "collections": [
     {
       "name": "users",
@@ -1818,6 +1818,223 @@
         }
       ],
       "indexes": ["CREATE UNIQUE INDEX idx_volunteer_prof_person ON volunteer_profiles (person)"]
+    },
+    {
+      "name": "monthly_availabilities",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "",
+        "update": "",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "person",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "persons"
+        },
+        {
+          "name": "year_month",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "mode",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["nao", "sim"]
+        },
+        {
+          "name": "marked_days",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "reason_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "details",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_avail_person_month ON monthly_availabilities (person, year_month)"
+      ]
+    },
+    {
+      "name": "blocked_periods",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "",
+        "update": "",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "person",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "persons"
+        },
+        {
+          "name": "start_date",
+          "type": "date",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "end_date",
+          "type": "date",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_blocked_person ON blocked_periods (person)"]
+    },
+    {
+      "name": "scales",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "",
+        "update": "",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "culto",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "cultos"
+        },
+        {
+          "name": "person",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "persons"
+        },
+        {
+          "name": "department",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "departments"
+        },
+        {
+          "name": "role",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "department_roles"
+        },
+        {
+          "name": "date_time",
+          "type": "date",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "function_title",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["pendente", "confirmado", "recusado", "substituido"]
+        },
+        {
+          "name": "confirmed_at",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_scales_person_date ON scales (person, date_time)",
+        "CREATE INDEX idx_scales_culto ON scales (culto)"
+      ]
     }
   ]
 }

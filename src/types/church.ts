@@ -384,3 +384,49 @@ export interface UserPermissions {
   canManageRoles: boolean // Secretaria em tudo, Líder na sua unidade
   canManageOverlaps: boolean // Secretaria global, Líder na sua unidade
 }
+
+// -------------------------------------------------------------
+// GRUPO 3: AGENDA, ESCALAS E DISPONIBILIDADE
+// -------------------------------------------------------------
+export interface MonthlyAvailabilityRecord extends RecordModel {
+  person: string
+  year_month: string // "2026-10"
+  mode: 'nao' | 'sim' // 'nao' = não posso servir nos dias marcados; 'sim' = posso servir nos dias marcados
+  marked_days: number[] // [10, 11, 25]
+  reason_id?: string
+  details?: string
+  expand?: {
+    person?: PersonRecord
+  }
+}
+
+export interface BlockedPeriodRecord extends RecordModel {
+  person: string
+  start_date: string
+  end_date: string
+  reason: 'ferias' | 'viagem' | 'trabalho' | 'estudos' | 'outro'
+  description?: string
+  expand?: {
+    person?: PersonRecord
+  }
+}
+
+export type ScaleStatus = 'pendente' | 'confirmado' | 'recusado' | 'substituido'
+
+export interface ScaleRecord extends RecordModel {
+  culto: string
+  person: string
+  department?: string
+  role?: string
+  date_time: string
+  function_title?: string // Ex: "Bateria · Culto da Manhã"
+  status: ScaleStatus
+  confirmed_at?: string
+  notes?: string
+  expand?: {
+    culto?: CultoRecord
+    person?: PersonRecord
+    department?: DepartmentRecord
+    role?: DepartmentRoleRecord
+  }
+}

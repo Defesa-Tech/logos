@@ -103,6 +103,8 @@ export default function Layout() {
 
   const navItems = [
     { label: 'Início', fullLabel: 'Visão Geral', path: '/', icon: LayoutDashboard },
+    // Grupo 3: Agenda & Escalas
+    { label: 'Agenda', fullLabel: 'Agenda & Escalas', path: '/agenda', icon: Calendar },
     // J1/J2 Cultos & Presença
     { label: 'Cultos', fullLabel: 'Cultos & Presenças (J1/J2)', path: '/cultos', icon: Calendar },
     // J3 Follow-up

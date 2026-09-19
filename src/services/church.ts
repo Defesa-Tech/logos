@@ -21,6 +21,9 @@ import type {
   CourseClassRecord,
   CourseEnrollmentRecord,
   VolunteerProfileRecord,
+  MonthlyAvailabilityRecord,
+  BlockedPeriodRecord,
+  ScaleRecord,
 } from '@/types/church'
 
 export const personsService = {
@@ -1142,5 +1145,131 @@ export const volunteerProfilesService = {
         notify_when_c1_opens: data.notify_when_c1_opens ?? false,
       })
     }
+  },
+}
+
+// -------------------------------------------------------------
+// GRUPO 3: ESCALAS & AGENDA SERVICE
+// -------------------------------------------------------------
+export const scalesService = {
+  async listByPerson(personId: string) {
+    return pb.collection('scales').getFullList<ScaleRecord>({
+      filter: `person = "${personId}"`,
+      sort: 'date_time',
+      expand: 'culto,department,role',
+    })
+  },
+
+  async listAll(filter?: string) {
+    return pb.collection('scales').getFullList<ScaleRecord>({
+      filter: filter || '',
+      sort: 'date_time',
+      expand: 'culto,person,department,role',
+    })
+  },
+
+  async getNextByPerson(personId: string): Promise<ScaleRecord | null> {
+    try {
+      const nowIso = new Date().toISOString()
+      const list = await pb.collection('scales').getList<ScaleRecord>(1, 1, {
+        filter: `person = "${personId}" && date_time >= "${nowIso}"`,
+        sort: 'date_time',
+        expand: 'culto,department,role',
+      })
+      if (list.items.length > 0) return list.items[0]
+      // Fallback: última escala se não houver futura
+      const fallbackList = await pb.collection('scales').getList<ScaleRecord>(1, 1, {
+        filter: `person = "${personId}"`,
+        sort: '-date_time',
+        expand: 'culto,department,role',
+      })
+      return fallbackList.items[0] || null
+    } catch {
+      return null
+    }
+  },
+
+  async confirmPresence(id: string) {
+    return pb.collection('scales').update<ScaleRecord>(id, {
+      status: 'confirmado',
+      confirmed_at: new Date().toISOString(),
+    })
+  },
+
+  async create(data: Partial<ScaleRecord>) {
+    return pb.collection('scales').create<ScaleRecord>({
+      status: 'pendente',
+      ...data,
+    })
+  },
+}
+
+// -------------------------------------------------------------
+// GRUPO 3: DISPONIBILIDADE MENSAL & BLOQUEIO DE PERÍODOS
+// -------------------------------------------------------------
+export const availabilityService = {
+  async getByPersonAndMonth(personId: string, yearMonth: string) {
+    try {
+      return await pb
+        .collection('monthly_availabilities')
+        .getFirstListItem<MonthlyAvailabilityRecord>(
+          `person = "${personId}" && year_month = "${yearMonth}"`,
+        )
+    } catch {
+      return null
+    }
+  },
+
+  async saveMonthly(data: {
+    person: string
+    year_month: string
+    mode: 'nao' | 'sim'
+    marked_days: number[]
+    reason_id?: string
+    details?: string
+  }) {
+    const existing = await this.getByPersonAndMonth(data.person, data.year_month)
+    if (existing) {
+      return pb
+        .collection('monthly_availabilities')
+        .update<MonthlyAvailabilityRecord>(existing.id, {
+          mode: data.mode,
+          marked_days: data.marked_days,
+          reason_id: data.reason_id,
+          details: data.details,
+        })
+    } else {
+      return pb.collection('monthly_availabilities').create<MonthlyAvailabilityRecord>({
+        person: data.person,
+        year_month: data.year_month,
+        mode: data.mode,
+        marked_days: data.marked_days,
+        reason_id: data.reason_id,
+        details: data.details,
+      })
+    }
+  },
+
+  // Períodos Bloqueados
+  async listBlockedPeriods(personId: string) {
+    return pb.collection('blocked_periods').getFullList<BlockedPeriodRecord>({
+      filter: `person = "${personId}"`,
+      sort: 'start_date',
+      expand: 'person',
+    })
+  },
+
+  async createBlockedPeriod(data: {
+    person: string
+    start_date: string
+    end_date: string
+    reason: 'ferias' | 'viagem' | 'trabalho' | 'estudos' | 'outro'
+    description?: string
+  }) {
+    return pb.collection('blocked_periods').create<BlockedPeriodRecord>(data)
+  },
+
+  async deleteBlockedPeriod(id: string) {
+    return pb.collection('blocked_periods').delete(id)
   },
 }
