@@ -201,85 +201,100 @@ export default function Layout() {
     secretary: {
       label: 'Secretaria',
       roleType: 'Gestão Plena',
-      badge: 'border-purple-200 text-[#820AD1] bg-[#F7EEFD]',
-      dotColor: 'bg-[#820AD1]',
+      badge: 'border-[#DAD7F3] text-[#3A31CE] bg-[#F2F1FB]',
+      dotColor: 'bg-[#3A31CE]',
     },
     pastor: {
       label: 'Pastor',
       roleType: 'Cuidado Pastoral',
-      badge: 'border-purple-200 text-purple-900 bg-purple-50',
-      dotColor: 'bg-[#820AD1]',
+      badge: 'border-[#DAD7F3] text-[#3A31CE] bg-[#F2F1FB]',
+      dotColor: 'bg-[#3A31CE]',
     },
     leader: {
       label: 'Líder',
       roleType: 'Pequenos Grupos',
-      badge: 'border-zinc-200 text-zinc-800 bg-zinc-100',
-      dotColor: 'bg-indigo-600',
+      badge: 'border-[#E8EAF0] text-[#14161D] bg-[#FBFBFD]',
+      dotColor: 'bg-[#3A31CE]',
     },
     member: {
       label: 'Membro',
       roleType: 'Vida Comunitária',
-      badge: 'border-zinc-200 text-zinc-700 bg-zinc-100',
+      badge: 'border-[#E8EAF0] text-[#14161D] bg-[#FBFBFD]',
       dotColor: 'bg-emerald-600',
     },
     visitor: {
       label: 'Visitante',
       roleType: 'Acolhimento',
-      badge: 'border-zinc-200 text-zinc-600 bg-zinc-100',
-      dotColor: 'bg-zinc-400',
+      badge: 'border-[#E8EAF0] text-[#5A6072] bg-[#FBFBFD]',
+      dotColor: 'bg-[#6B7183]',
     },
   }
 
   const currentMeta = roleMeta[role] || roleMeta.secretary
 
   return (
-    <div className="min-h-screen bg-[#F5F6F8] flex flex-col md:flex-row text-[#191919] antialiased selection:bg-[#820AD1] selection:text-white">
+    <div className="min-h-screen bg-[#FBFBFD] flex flex-col md:flex-row text-[#14161D] antialiased selection:bg-[#3A31CE] selection:text-white font-sans">
       {/* =========================================================================
-          DESKTOP SIDEBAR — Nubank Clean Identity (White rounded cards & purple accents)
+          DESKTOP SIDEBAR — Design System Logos (Fundo limpo e Indigo #3A31CE)
           ========================================================================= */}
-      <aside className="hidden md:flex flex-col w-64 lg:w-72 bg-white text-[#191919] flex-shrink-0 border-r border-[#E9ECEF] z-20 sticky top-0 h-screen select-none">
+      <aside className="hidden md:flex flex-col w-64 lg:w-72 bg-white text-[#14161D] flex-shrink-0 border-r border-[#E8EAF0] z-20 sticky top-0 h-screen select-none">
         {/* Brand Header */}
-        <div className="px-6 py-5 border-b border-[#F0F1F5] flex items-center justify-between">
+        <div className="px-6 py-5 border-b border-[#E8EAF0] flex items-center justify-between">
           <Link to="/" className="group flex items-center gap-3">
-            <div className="w-9 h-9 rounded-2xl bg-[#820AD1] text-white flex items-center justify-center font-bold text-sm tracking-tight shadow-sm shadow-[#820AD1]/20 group-hover:scale-105 transition-transform">
-              L
+            <div className="w-10 h-10 rounded-[14px] bg-[#3A31CE] text-white flex items-center justify-center font-bold text-sm tracking-tight shadow-sm shadow-[#3A31CE]/20 group-hover:scale-105 transition-transform">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path
+                  d="M7.6 4.6 C10.4 4.2 11.6 6.2 12.6 8.9 L16.6 19.4"
+                  stroke="#FFFFFF"
+                  strokeWidth="2.3"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M11.9 10.6 L6.6 19.4"
+                  stroke="#FFFFFF"
+                  strokeWidth="2.3"
+                  strokeLinecap="round"
+                />
+              </svg>
             </div>
             <div className="flex flex-col">
-              <span className="text-base font-bold tracking-tight text-[#191919]">Logos</span>
-              <span className="text-[11px] font-medium text-gray-500 tracking-tight leading-none">
-                Gestão de Igreja
+              <span className="font-heading text-lg font-bold tracking-tight text-[#14161D]">
+                Logos
+              </span>
+              <span className="text-[10px] font-bold text-[#6B7183] uppercase tracking-wider leading-none">
+                Defesa da Fé
               </span>
             </div>
           </Link>
-          <span className="text-[11px] font-semibold px-2.5 py-0.5 bg-[#F7EEFD] text-[#820AD1] rounded-full">
-            Nu-Exp
+          <span className="text-[11px] font-semibold px-2.5 py-0.5 bg-[#F2F1FB] text-[#3A31CE] rounded-full">
+            v2.4
           </span>
         </div>
-        {/* User Identity Display — Nubank card with direct Action */}
-        <div className="px-5 py-4 border-b border-[#F0F1F5] bg-[#F8F9FB]">
-          <div className="flex items-center justify-between text-[11px] font-semibold text-gray-500 mb-2">
+        {/* User Identity Display */}
+        <div className="px-5 py-4 border-b border-[#E8EAF0] bg-[#FBFBFD]">
+          <div className="flex items-center justify-between text-[11px] font-semibold text-[#5A6072] mb-2">
             <span className="flex items-center gap-1.5">
-              <Shield className="w-3.5 h-3.5 text-[#820AD1]" /> Perfil Autenticado
+              <Shield className="w-3.5 h-3.5 text-[#3A31CE]" /> Perfil Autenticado
             </span>
             {user ? (
               <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Ativo
               </span>
             ) : (
-              <span className="text-[10px] text-zinc-400 font-medium">Modo Visitante</span>
+              <span className="text-[10px] text-[#6B7183] font-medium">Modo Visitante</span>
             )}
           </div>
 
-          <div className="w-full p-2.5 rounded-2xl bg-white border border-[#E9ECEF] space-y-2 text-xs text-[#191919] shadow-xs">
+          <div className="w-full p-2.5 rounded-[16px] bg-white border border-[#E8EAF0] space-y-2 text-xs text-[#14161D] shadow-xs">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 truncate">
                 <span className={`w-2 h-2 rounded-full ${currentMeta.dotColor}`} />
                 <span className="font-bold">{currentMeta.label}</span>
-                <span className="text-[11px] text-gray-400">
+                <span className="text-[11px] text-[#6B7183]">
                   &bull; {currentMeta.roleType.split(' ')[0]}
                 </span>
               </div>
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#F7EEFD] text-[#820AD1] flex-shrink-0">
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#F2F1FB] text-[#3A31CE] flex-shrink-0">
                 {user ? 'Real' : 'Visitante'}
               </span>
             </div>
@@ -302,7 +317,7 @@ export default function Layout() {
                 <button
                   type="button"
                   onClick={() => setIsLoginModalOpen(true)}
-                  className="text-[11px] font-bold text-[#820AD1] hover:underline flex items-center gap-1 cursor-pointer"
+                  className="text-[11px] font-bold text-[#3A31CE] hover:underline flex items-center gap-1 cursor-pointer"
                 >
                   Entrar
                 </button>
@@ -322,21 +337,21 @@ export default function Layout() {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`relative flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-semibold transition-all ${
+                className={`relative flex items-center gap-3 px-3.5 py-2.5 rounded-[14px] text-xs font-semibold transition-all ${
                   active
-                    ? 'text-[#820AD1] bg-[#F7EEFD] shadow-xs'
-                    : 'text-gray-600 hover:text-[#191919] hover:bg-gray-50'
+                    ? 'text-[#3A31CE] bg-[#F2F1FB] shadow-xs'
+                    : 'text-[#5A6072] hover:text-[#14161D] hover:bg-[#FBFBFD]'
                 }`}
               >
                 <div
-                  className={`w-7 h-7 rounded-xl flex items-center justify-center transition-colors ${
-                    active ? 'bg-[#820AD1] text-white' : 'bg-gray-100 text-gray-600'
+                  className={`w-7 h-7 rounded-[10px] flex items-center justify-center transition-colors ${
+                    active ? 'bg-[#3A31CE] text-white' : 'bg-[#F2F3F7] text-[#5A6072]'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" strokeWidth={2} />
                 </div>
                 <span className="flex-1 tracking-tight">{item.fullLabel}</span>
-                {active && <span className="w-2 h-2 rounded-full bg-[#820AD1]" />}
+                {active && <span className="w-2 h-2 rounded-full bg-[#3A31CE]" />}
               </Link>
             )
           })}
@@ -350,29 +365,31 @@ export default function Layout() {
               to="/visitante-cadastro"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs text-gray-700 hover:text-[#820AD1] hover:bg-[#F7EEFD] border border-[#E9ECEF] transition-all group"
+              className="flex items-center justify-between px-3.5 py-2.5 rounded-[14px] text-xs text-[#5A6072] hover:text-[#3A31CE] hover:bg-[#F2F1FB] border border-[#E8EAF0] transition-all group"
             >
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-xl bg-purple-50 text-[#820AD1] flex items-center justify-center">
+                <div className="w-7 h-7 rounded-[10px] bg-[#F2F1FB] text-[#3A31CE] flex items-center justify-center">
                   <QrCode className="w-3.5 h-3.5" strokeWidth={2} />
                 </div>
-                <span className="tracking-tight font-semibold">QR Culto / Boas-Vindas</span>
+                <span className="tracking-tight font-semibold text-[#14161D]">
+                  QR Culto / Boas-Vindas
+                </span>
               </div>
-              <ExternalLink className="w-3 h-3 text-gray-400 group-hover:text-[#820AD1] transition-colors" />
+              <ExternalLink className="w-3 h-3 text-[#6B7183] group-hover:text-[#3A31CE] transition-colors" />
             </Link>
           </div>
         </nav>
         {/* User profile footer */}
         <div className="p-4 border-t border-[#F0F1F5] bg-[#F8F9FB] flex items-center justify-between gap-2">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-9 h-9 rounded-full bg-[#820AD1] text-white text-xs flex items-center justify-center font-bold flex-shrink-0 shadow-sm shadow-[#820AD1]/20">
+            <div className="w-9 h-9 rounded-full bg-[#F2F1FB] border border-[#DAD7F3] text-[#3A31CE] text-xs flex items-center justify-center font-bold flex-shrink-0">
               {user?.name ? user.name.slice(0, 2).toUpperCase() : 'LG'}
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-bold text-[#191919] truncate leading-tight">
+              <p className="text-xs font-bold text-[#14161D] truncate leading-tight">
                 {user?.name || 'Visitante Logos'}
               </p>
-              <p className="text-[11px] text-gray-400 truncate mt-0.5">
+              <p className="text-[11px] text-[#6B7183] truncate mt-0.5">
                 {user?.email || 'Acesso anônimo'}
               </p>
             </div>
@@ -382,7 +399,7 @@ export default function Layout() {
               type="button"
               onClick={handleLogout}
               title="Encerrar sessão"
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-semibold text-red-600 hover:bg-red-50 border border-red-200/60 active:scale-95 transition-all cursor-pointer flex-shrink-0 shadow-xs"
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-[10px] text-xs font-semibold text-red-600 hover:bg-red-50 border border-red-200/60 active:scale-95 transition-all cursor-pointer flex-shrink-0 shadow-xs"
             >
               <LogOut className="w-3.5 h-3.5" strokeWidth={2} />
               <span>Sair</span>
@@ -392,43 +409,61 @@ export default function Layout() {
               type="button"
               onClick={() => setIsLoginModalOpen(true)}
               title="Fazer Login"
-              className="px-2.5 py-1.5 rounded-full text-xs font-semibold text-[#820AD1] bg-[#F7EEFD] hover:bg-[#ebdcfc] active:scale-95 transition-all cursor-pointer flex-shrink-0 shadow-xs"
+              className="px-3 py-1.5 rounded-[10px] text-xs font-semibold text-[#3A31CE] bg-[#F2F1FB] hover:bg-[#e4e1f7] active:scale-95 transition-all cursor-pointer flex-shrink-0 shadow-xs"
             >
               Entrar
             </button>
           )}
-        </div>{' '}
+        </div>
       </aside>
-
       {/* =========================================================================
           MAIN CONTAINER (Nubank Canvas: Soft Off-White Background)
           ========================================================================= */}
       <div className="flex-1 flex flex-col min-w-0 pb-24 md:pb-8">
-        {/* TOP BAR / HEADER — Nubank Mobile / Desktop Header */}
-        <header className="sticky top-0 z-20 bg-[#820AD1] md:bg-white/95 md:backdrop-blur-sm border-b md:border-[#E9ECEF] border-transparent px-4 sm:px-6 md:px-8 py-3.5 flex items-center justify-between gap-3 transition-all text-white md:text-[#191919]">
-          {/* Mobile brand & Nubank Avatar */}
+        {/* TOP BAR / HEADER — Design System Logos */}
+        <header className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b border-[#E8EAF0] px-4 sm:px-6 md:px-8 py-3.5 flex items-center justify-between gap-3 transition-all text-[#14161D]">
+          {/* Mobile brand & Logos Icon */}
           <div className="flex items-center gap-2.5 md:hidden">
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="p-1.5 -ml-1 rounded-xl text-white hover:bg-white/10 transition-colors"
+              className="p-1.5 -ml-1 rounded-xl text-[#14161D] hover:bg-[#F2F1FB] transition-colors"
               aria-label="Abrir menu"
             >
               <Menu className="w-6 h-6" strokeWidth={2} />
             </button>
             <Link to="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-white/20 text-white flex items-center justify-center font-bold text-xs backdrop-blur-xs">
-                L
+              <div className="w-8 h-8 rounded-[11px] bg-[#3A31CE] text-white flex items-center justify-center font-bold text-xs shadow-xs">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M7.6 4.6 C10.4 4.2 11.6 6.2 12.6 8.9 L16.6 19.4"
+                    stroke="#FFFFFF"
+                    strokeWidth="2.3"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M11.9 10.6 L6.6 19.4"
+                    stroke="#FFFFFF"
+                    strokeWidth="2.3"
+                    strokeLinecap="round"
+                  />
+                </svg>
               </div>
               <div className="flex flex-col">
-                <span className="font-bold text-sm tracking-tight leading-tight">Logos</span>
-                <span className="text-[10px] text-purple-200 leading-none">Igreja Viva</span>
+                <span className="font-heading font-bold text-sm tracking-tight leading-tight text-[#14161D]">
+                  Logos
+                </span>
+                <span className="text-[10px] text-[#6B7183] leading-none uppercase font-bold">
+                  Defesa da Fé
+                </span>
               </div>
             </Link>
           </div>
 
           {/* Desktop Section indicator (breadcrumb) */}
           <div className="hidden md:flex items-center gap-2.5 text-xs">
-            <span className="text-[#820AD1] font-bold text-xs tracking-tight">Logos</span>
+            <span className="text-[#3A31CE] font-bold text-xs tracking-tight font-heading">
+              Logos
+            </span>
             <span className="text-gray-300">/</span>
             <span className="font-semibold text-gray-700">
               {location.pathname === '/'
@@ -458,7 +493,7 @@ export default function Layout() {
                 placeholder="Buscar por nome ou contato..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 pr-3 h-9 text-xs rounded-full bg-[#F0F1F5] md:bg-[#F5F6F8] border-transparent focus:bg-white focus:border-[#820AD1] focus:ring-1 focus:ring-[#820AD1] transition-all shadow-none placeholder:text-gray-400"
+                className="pl-9 pr-3 h-9 text-xs rounded-full bg-[#F2F3F7] md:bg-[#FBFBFD] border-[#E8EAF0] focus:bg-white focus:border-[#3A31CE] focus:ring-1 focus:ring-[#3A31CE] transition-all shadow-none placeholder:text-[#6B7183]"
               />
 
               {/* Desktop Search Dropdown */}
@@ -507,7 +542,6 @@ export default function Layout() {
                 )}
               </AnimatePresence>
             </div>
-
             {/* Mobile search toggle button */}
             <button
               onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
@@ -516,7 +550,6 @@ export default function Layout() {
             >
               <Search className="w-5 h-5" strokeWidth={2} />
             </button>
-
             {/* Notifications Button */}
             <button
               onClick={() => setNotificationsOpen(true)}
@@ -528,60 +561,58 @@ export default function Layout() {
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-400 md:bg-[#820AD1] ring-2 ring-white" />
               )}
             </button>
-
             {/* QR Quick Access Button */}
             <Link
               to="/visitante-cadastro"
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden lg:flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-[#F7EEFD] text-[#820AD1] hover:bg-[#ebdcfc] transition-colors"
+              className="hidden lg:flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-[12px] bg-[#F2F1FB] text-[#3A31CE] hover:bg-[#e4e1f7] transition-colors"
             >
-              <QrCode className="w-3.5 h-3.5 text-[#820AD1]" strokeWidth={2} />
+              <QrCode className="w-3.5 h-3.5 text-[#3A31CE]" strokeWidth={2} />
               <span>QR Recepção</span>
             </Link>
-
             {/* Profile Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 p-0.5 rounded-full hover:ring-2 hover:ring-[#820AD1]/30 transition-all cursor-pointer">
-                  <div className="w-8 h-8 rounded-full border-2 border-white md:border-[#820AD1] bg-white text-[#820AD1] md:bg-[#820AD1] md:text-white font-bold text-xs flex items-center justify-center shadow-xs">
+                <button className="flex items-center gap-2 p-0.5 rounded-full hover:ring-2 hover:ring-[#3A31CE]/30 transition-all cursor-pointer">
+                  <div className="w-8 h-8 rounded-full border border-[#DAD7F3] bg-[#F2F1FB] text-[#3A31CE] font-bold text-xs flex items-center justify-center shadow-xs">
                     {user?.name ? user.name.slice(0, 2).toUpperCase() : 'LG'}
                   </div>
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
-                className="w-60 bg-white text-[#191919] shadow-xl border border-gray-100 rounded-2xl p-2 text-xs"
+                className="w-60 bg-white text-[#14161D] shadow-xl border border-[#E8EAF0] rounded-2xl p-2 text-xs"
               >
                 <DropdownMenuLabel className="p-2.5">
-                  <p className="font-bold text-[#191919] text-xs">{user?.name || 'Visitante'}</p>
-                  <p className="text-[11px] text-gray-400 truncate mt-0.5">
+                  <p className="font-bold text-[#14161D] text-xs">{user?.name || 'Visitante'}</p>
+                  <p className="text-[11px] text-[#6B7183] truncate mt-0.5">
                     {user?.email || 'Acesso anônimo'}
                   </p>
                   <div className="mt-2">
-                    <span className="inline-block text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-[#F7EEFD] text-[#820AD1]">
+                    <span className="inline-block text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-[#F2F1FB] text-[#3A31CE]">
                       {currentMeta.label} &bull; {currentMeta.roleType}
                     </span>
                   </div>
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-gray-100" />
+                <DropdownMenuSeparator className="bg-[#E8EAF0]" />
                 <DropdownMenuItem
                   onClick={() => navigate('/pessoas')}
-                  className="cursor-pointer py-2 rounded-xl hover:bg-[#F7EEFD] hover:text-[#820AD1]"
+                  className="cursor-pointer py-2 rounded-xl hover:bg-[#F2F1FB] hover:text-[#3A31CE]"
                 >
                   <Users className="w-4 h-4 mr-2.5 text-gray-500" strokeWidth={1.75} />
                   <span className="font-medium">Pessoas & Membros</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => navigate('/familias')}
-                  className="cursor-pointer py-2 rounded-xl hover:bg-[#F7EEFD] hover:text-[#820AD1]"
+                  className="cursor-pointer py-2 rounded-xl hover:bg-[#F2F1FB] hover:text-[#3A31CE]"
                 >
                   <HomeIcon className="w-4 h-4 mr-2.5 text-gray-500" strokeWidth={1.75} />
                   <span className="font-medium">Núcleos Familiares</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => navigate('/jornada')}
-                  className="cursor-pointer py-2 rounded-xl hover:bg-[#F7EEFD] hover:text-[#820AD1]"
+                  className="cursor-pointer py-2 rounded-xl hover:bg-[#F2F1FB] hover:text-[#3A31CE]"
                 >
                   <GitFork className="w-4 h-4 mr-2.5 text-gray-500" strokeWidth={1.75} />
                   <span className="font-medium">Jornada & Pipeline</span>
@@ -589,32 +620,32 @@ export default function Layout() {
                 {canAccessAll && (
                   <DropdownMenuItem
                     onClick={() => navigate('/secretaria')}
-                    className="cursor-pointer py-2 rounded-xl hover:bg-[#F7EEFD] hover:text-[#820AD1]"
+                    className="cursor-pointer py-2 rounded-xl hover:bg-[#F2F1FB] hover:text-[#3A31CE]"
                   >
                     <Mail className="w-4 h-4 mr-2.5 text-gray-500" strokeWidth={1.75} />
                     <span className="font-medium">Secretaria & Convites</span>
                   </DropdownMenuItem>
                 )}
-                <DropdownMenuSeparator className="bg-gray-100" />
+                <DropdownMenuSeparator className="bg-[#E8EAF0]" />
                 {user ? (
                   <DropdownMenuItem
                     onClick={handleLogout}
-                    className="text-red-600 font-bold cursor-pointer py-2.5 rounded-xl hover:bg-red-50 focus:bg-red-50 focus:text-red-600"
+                    className="text-red-600 cursor-pointer py-2 rounded-xl hover:bg-red-50 focus:bg-red-50 focus:text-red-600"
                   >
-                    <LogOut className="w-4 h-4 mr-2 text-red-500" strokeWidth={2} />
-                    <span>Sair da conta (Logout)</span>
+                    <LogOut className="w-4 h-4 mr-2 text-red-600" strokeWidth={1.75} />
+                    <span className="font-bold">Encerrar Sessão</span>
                   </DropdownMenuItem>
                 ) : (
                   <DropdownMenuItem
                     onClick={() => setIsLoginModalOpen(true)}
-                    className="text-[#820AD1] font-bold cursor-pointer py-2.5 rounded-xl hover:bg-[#F7EEFD] focus:bg-[#F7EEFD] focus:text-[#820AD1]"
+                    className="text-[#3A31CE] font-bold cursor-pointer py-2 rounded-xl hover:bg-[#F2F1FB] focus:bg-[#F2F1FB] focus:text-[#3A31CE]"
                   >
-                    <LogIn className="w-4 h-4 mr-2 text-[#820AD1]" strokeWidth={2} />
-                    <span>Entrar no sistema</span>
+                    <LogIn className="w-4 h-4 mr-2 text-[#3A31CE]" strokeWidth={2} />
+                    <span>Entrar no Sistema</span>
                   </DropdownMenuItem>
                 )}
               </DropdownMenuContent>
-            </DropdownMenu>
+            </DropdownMenu>{' '}
           </div>
         </header>
 
@@ -838,7 +869,7 @@ export default function Layout() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-between px-3.5 py-3 rounded-2xl text-xs font-semibold text-[#820AD1] bg-[#F7EEFD]"
+                className="flex items-center justify-between px-3.5 py-3 rounded-[14px] text-xs font-semibold text-[#3A31CE] bg-[#F2F1FB]"
               >
                 <span className="flex items-center gap-2.5">
                   <QrCode className="w-4 h-4" strokeWidth={2} />
@@ -850,12 +881,12 @@ export default function Layout() {
           </nav>
 
           {/* Footer */}
-          <div className="p-4 border-t border-gray-100 bg-[#F8F9FB] flex items-center justify-between">
+          <div className="p-4 border-t border-[#E8EAF0] bg-[#FBFBFD] flex items-center justify-between">
             <div className="min-w-0">
-              <p className="text-xs font-bold text-[#191919] truncate">
+              <p className="text-xs font-bold text-[#14161D] truncate">
                 {user?.name || 'Visitante'}
               </p>
-              <p className="text-[10px] text-gray-400 truncate">
+              <p className="text-[10px] text-[#6B7183] truncate">
                 {user ? user.email : currentMeta.roleType}
               </p>
             </div>
@@ -866,7 +897,7 @@ export default function Layout() {
                   setMobileMenuOpen(false)
                   handleLogout()
                 }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 transition-all cursor-pointer active:scale-95"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 transition-all cursor-pointer active:scale-95"
                 title="Sair"
               >
                 <LogOut className="w-3.5 h-3.5" strokeWidth={2} />
@@ -879,7 +910,7 @@ export default function Layout() {
                   setMobileMenuOpen(false)
                   setIsLoginModalOpen(true)
                 }}
-                className="px-3 py-1.5 rounded-full text-xs font-bold text-[#820AD1] bg-[#F7EEFD] hover:bg-[#ebdcfc] transition-all cursor-pointer active:scale-95"
+                className="px-3 py-1.5 rounded-[10px] text-xs font-bold text-[#3A31CE] bg-[#F2F1FB] hover:bg-[#e4e1f7] transition-all cursor-pointer active:scale-95"
               >
                 Entrar
               </button>
@@ -889,10 +920,9 @@ export default function Layout() {
       </Sheet>
 
       {/* =========================================================================
-          MOBILE BOTTOM NAVIGATION — Nubank App Style Bottom Bar
-          Clean floating-like bar with rounded icons and active purple accent
+          MOBILE BOTTOM NAVIGATION — Design System Logos (Fiel às Telas 03 e 04)
           ========================================================================= */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-100 py-1.5 px-3 z-30 flex items-center justify-around safe-bottom shadow-lg shadow-black/5">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-[#E8EAF0] py-1.5 px-3 z-30 flex items-center justify-around safe-bottom shadow-lg shadow-black/5">
         {navItems.map((item) => {
           const active = location.pathname === item.path
           const Icon = item.icon
@@ -903,15 +933,15 @@ export default function Layout() {
               className="relative flex flex-col items-center justify-center py-1 px-2 min-w-[58px] select-none text-center active:scale-95 transition-transform"
             >
               <div
-                className={`w-7 h-7 rounded-full flex items-center justify-center transition-all ${
-                  active ? 'bg-[#F7EEFD] text-[#820AD1]' : 'text-gray-400'
+                className={`w-7 h-7 rounded-[10px] flex items-center justify-center transition-all ${
+                  active ? 'bg-[#F2F1FB] text-[#3A31CE]' : 'text-[#6B7183]'
                 }`}
               >
                 <Icon className="w-4 h-4" strokeWidth={active ? 2.4 : 1.75} />
               </div>
               <span
                 className={`text-[10px] tracking-tight transition-colors mt-0.5 ${
-                  active ? 'text-[#820AD1] font-bold' : 'text-gray-500 font-medium'
+                  active ? 'text-[#3A31CE] font-bold' : 'text-[#5A6072] font-medium'
                 }`}
               >
                 {item.label}
