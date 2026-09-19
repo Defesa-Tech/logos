@@ -166,8 +166,8 @@ export default function Layout() {
       path: '/carteirinha',
       icon: CreditCard,
     },
-    // J8 Meu Cadastro
-    { label: 'Meu Cadastro', fullLabel: 'Meu Cadastro (J8)', path: '/meu-cadastro', icon: User },
+    // J8 Meu Perfil / Cadastro
+    { label: 'Meu Perfil', fullLabel: 'Meu Perfil (J8)', path: '/meu-cadastro', icon: User },
     // R10 Atenção por ausência
     ...(permissions.canViewAll || permissions.isBoasVindasLider
       ? [
@@ -596,6 +596,20 @@ export default function Layout() {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-[#E8EAF0]" />
+                <DropdownMenuItem
+                  onClick={() => navigate('/meu-cadastro')}
+                  className="cursor-pointer py-2 rounded-xl hover:bg-[#F2F1FB] hover:text-[#3A31CE]"
+                >
+                  <User className="w-4 h-4 mr-2.5 text-[#3A31CE]" strokeWidth={1.75} />
+                  <span className="font-medium">Meu Perfil</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => navigate('/carteirinha')}
+                  className="cursor-pointer py-2 rounded-xl hover:bg-[#F2F1FB] hover:text-[#3A31CE]"
+                >
+                  <CreditCard className="w-4 h-4 mr-2.5 text-[#3A31CE]" strokeWidth={1.75} />
+                  <span className="font-medium">Carteirinha Digital</span>
+                </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => navigate('/pessoas')}
                   className="cursor-pointer py-2 rounded-xl hover:bg-[#F2F1FB] hover:text-[#3A31CE]"
