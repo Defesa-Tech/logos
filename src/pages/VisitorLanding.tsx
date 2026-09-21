@@ -460,25 +460,25 @@ export default function VisitorLanding() {
     const fullFormPending = !confirmedPerson.full_form_completed && !progressiveSuccess
 
     return (
-      <PageTransition className="min-h-screen bg-[#F8F9FB] flex flex-col justify-center items-center p-4 sm:p-6 text-[#191919]">
-        <div className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-gray-100 space-y-6 text-center">
+      <PageTransition className="min-h-screen bg-[#FBFBFD] flex flex-col justify-center items-center p-4 sm:p-6 text-[#14161D]">
+        <div className="w-full max-w-md bg-white rounded-[22px] p-6 sm:p-8 shadow-xl border border-[#E8EAF0] space-y-6 text-center">
           {/* Logo & Church Badge */}
           <div className="flex justify-center">
-            <div className="w-16 h-16 rounded-full bg-[#F7EEFD] text-[#820AD1] flex items-center justify-center shadow-inner">
+            <div className="w-16 h-16 rounded-full bg-[#F2F1FB] text-[#3A31CE] flex items-center justify-center shadow-inner">
               <CheckCircle2 className="w-9 h-9" />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <span className="text-[10px] uppercase font-bold tracking-wider text-[#820AD1] bg-purple-50 px-3 py-1 rounded-full">
-              Igreja Defesa da Fé
+            <span className="text-[10px] uppercase font-bold tracking-wider text-[#3A31CE] bg-[#F2F1FB] px-3 py-1 rounded-full font-heading">
+              Logos Gestão de Igreja
             </span>
-            <h1 className="text-2xl font-black text-[#191919]">
+            <h1 className="text-2xl font-black text-[#14161D] font-heading">
               {isFirstVisit
                 ? `Que alegria ter você, ${firstName}!`
                 : `Presença Confirmada, ${firstName}!`}
             </h1>
-            <p className="text-xs text-gray-500 leading-relaxed max-w-xs mx-auto">
+            <p className="text-xs text-[#5A6072] leading-relaxed max-w-xs mx-auto">
               {alreadyRegisteredToday
                 ? 'Sua presença já estava confirmada no culto de hoje. Bom culto!'
                 : activeCulto
@@ -493,11 +493,11 @@ export default function VisitorLanding() {
           {isFirstVisit && (
             <div className="space-y-4">
               {/* Preferência de Contato Confirmada */}
-              <div className="p-3 bg-purple-50/70 border border-purple-100 rounded-2xl text-left flex items-start gap-2.5">
-                <Check className="w-4 h-4 text-[#820AD1] shrink-0 mt-0.5" />
+              <div className="p-3 bg-[#F2F1FB] border border-[#DAD7F3] rounded-2xl text-left flex items-start gap-2.5">
+                <Check className="w-4 h-4 text-[#3A31CE] shrink-0 mt-0.5" />
                 <div className="text-xs">
-                  <p className="font-bold text-[#820AD1]">Preferência de contato registrada</p>
-                  <p className="text-gray-600 text-[11px] mt-0.5">
+                  <p className="font-bold text-[#3A31CE]">Preferência de contato registrada</p>
+                  <p className="text-[#5A6072] text-[11px] mt-0.5">
                     {confirmedPerson.contact_preference === 'whatsapp'
                       ? 'Entraremos em contato via WhatsApp com uma mensagem de boas-vindas.'
                       : confirmedPerson.contact_preference === 'ligacao'
@@ -508,30 +508,30 @@ export default function VisitorLanding() {
               </div>
 
               {/* Horários dos Cultos da Semana */}
-              <div className="p-4 bg-[#F8F9FB] rounded-2xl border border-gray-100 text-left space-y-2.5">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-gray-700">
-                  <Calendar className="w-4 h-4 text-[#820AD1]" />
+              <div className="p-4 bg-[#F8F9FB] rounded-2xl border border-[#E8EAF0] text-left space-y-2.5">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[#14161D]">
+                  <Calendar className="w-4 h-4 text-[#3A31CE]" />
                   <span>Nossos Cultos Durante a Semana</span>
                 </div>
-                <div className="space-y-1.5 text-xs text-gray-600">
-                  <div className="flex justify-between items-center py-1 border-b border-gray-200/50">
-                    <span className="font-semibold text-gray-800">Culto da Palavra</span>
-                    <span className="text-[11px] text-gray-500">Domingo &bull; 10h00</span>
+                <div className="space-y-1.5 text-xs text-[#5A6072]">
+                  <div className="flex justify-between items-center py-1 border-b border-[#E8EAF0]">
+                    <span className="font-semibold text-[#14161D]">Culto da Palavra</span>
+                    <span className="text-[11px] text-[#6B7183]">Domingo &bull; 10h00</span>
                   </div>
-                  <div className="flex justify-between items-center py-1 border-b border-gray-200/50">
-                    <span className="font-semibold text-gray-800">Culto de Doutrina</span>
-                    <span className="text-[11px] text-gray-500">Quarta &bull; 19h30</span>
+                  <div className="flex justify-between items-center py-1 border-b border-[#E8EAF0]">
+                    <span className="font-semibold text-[#14161D]">Culto de Doutrina</span>
+                    <span className="text-[11px] text-[#6B7183]">Quarta &bull; 19h30</span>
                   </div>
                   <div className="flex justify-between items-center py-1">
-                    <span className="font-semibold text-gray-800">
+                    <span className="font-semibold text-[#14161D]">
                       Encontro de Jovens &amp; Famílias
                     </span>
-                    <span className="text-[11px] text-gray-500">Sábado &bull; 18h00</span>
+                    <span className="text-[11px] text-[#6B7183]">Sábado &bull; 18h00</span>
                   </div>
                 </div>
               </div>
 
-              <p className="text-[11px] text-gray-400 italic">
+              <p className="text-[11px] text-[#6B7183] italic">
                 Aproveite o culto! Nossa equipe de Boas-Vindas está à disposição para o que você
                 precisar.
               </p>
@@ -539,23 +539,22 @@ export default function VisitorLanding() {
           )}
 
           {/* MOMENTO 2: 2ª VISITA (OU 3ª COM FORMULÁRIO PENDENTE) */}
-          {/* D13: Formulário "Conte mais sobre você" como AÇÃO PRINCIPAL; link do app como secundária */}
           {(isSecondVisit || (isThirdOrMore && fullFormPending)) && fullFormPending && (
             <div className="space-y-4">
               {!showProgressiveModal ? (
-                <div className="p-5 bg-gradient-to-br from-purple-50 via-white to-purple-50/40 border-2 border-[#820AD1]/30 rounded-3xl text-left space-y-3.5 shadow-sm">
+                <div className="p-5 bg-gradient-to-br from-[#F2F1FB] via-white to-[#F2F1FB]/40 border-2 border-[#DAD7F3] rounded-[20px] text-left space-y-3.5 shadow-sm">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-[#820AD1] text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <div className="w-10 h-10 rounded-2xl bg-[#3A31CE] text-white flex items-center justify-center shrink-0 shadow-xs font-heading">
                       <Sparkles className="w-5 h-5" />
                     </div>
                     <div className="space-y-1">
-                      <span className="text-[10px] font-black uppercase tracking-wider text-[#820AD1] bg-purple-100/70 px-2.5 py-0.5 rounded-full">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-[#3A31CE] bg-[#F2F1FB] px-2.5 py-0.5 rounded-full font-heading">
                         Ação Principal &bull; 2ª Visita
                       </span>
-                      <h2 className="font-extrabold text-sm text-[#191919]">
+                      <h2 className="font-extrabold text-sm text-[#14161D] font-heading">
                         Conte mais sobre você
                       </h2>
-                      <p className="text-[11px] text-gray-600 leading-relaxed">
+                      <p className="text-[11px] text-[#5A6072] leading-relaxed">
                         Para lembrarmos do seu aniversário e indicar programações especiais para sua
                         família.
                       </p>
@@ -565,7 +564,7 @@ export default function VisitorLanding() {
                   <div className="pt-1">
                     <Button
                       onClick={() => setShowProgressiveModal(true)}
-                      className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-11 rounded-full font-bold shadow-md shadow-[#820AD1]/25 cursor-pointer active:scale-95 transition-all flex items-center justify-center gap-1.5"
+                      className="w-full bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-11 rounded-full font-bold shadow-md shadow-[#3A31CE]/25 cursor-pointer active:scale-95 transition-all flex items-center justify-center gap-1.5"
                     >
                       <span>Preencher em 1 minuto</span>
                       <ArrowRight className="w-4 h-4" />
@@ -573,25 +572,25 @@ export default function VisitorLanding() {
                   </div>
                 </div>
               ) : (
-                /* Progressive Form Inline (<= 5 campos, indicador de progresso, microcopys de propósito) */
+                /* Progressive Form Inline */
                 <form
                   onSubmit={handleSaveProgressive}
-                  className="p-5 bg-white border border-purple-200 rounded-3xl text-left space-y-4 shadow-md text-xs"
+                  className="p-5 bg-white border border-[#DAD7F3] rounded-[20px] text-left space-y-4 shadow-md text-xs"
                 >
-                  <div className="flex items-center justify-between border-b border-gray-100 pb-2.5">
+                  <div className="flex items-center justify-between border-b border-[#E8EAF0] pb-2.5">
                     <div>
-                      <span className="text-[10px] font-black uppercase text-[#820AD1] tracking-wider">
+                      <span className="text-[10px] font-black uppercase text-[#3A31CE] tracking-wider font-heading">
                         Passo Único &bull; 4 campos rápidos
                       </span>
-                      <h3 className="font-bold text-[#191919] text-sm">Conte mais sobre você</h3>
+                      <h3 className="font-bold text-[#14161D] text-sm font-heading">Conte mais sobre você</h3>
                     </div>
-                    <span className="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
+                    <span className="text-[10px] text-[#6B7183] bg-gray-100 px-2 py-0.5 rounded-full">
                       Tudo opcional
                     </span>
                   </div>
 
                   {/* Microcopy de propósito geral */}
-                  <div className="p-2.5 bg-[#F7EEFD] rounded-xl text-[11px] text-[#820AD1] flex items-center gap-2">
+                  <div className="p-2.5 bg-[#F2F1FB] rounded-xl text-[11px] text-[#3A31CE] flex items-center gap-2">
                     <Heart className="w-4 h-4 shrink-0" />
                     <span>
                       Pedimos apenas para lembrarmos do seu aniversário e indicar programações para
@@ -602,53 +601,53 @@ export default function VisitorLanding() {
                   {/* Campo 1: Data de Nascimento */}
                   <div className="space-y-1">
                     <div className="flex justify-between items-center">
-                      <label className="font-bold text-gray-700">Data de Nascimento</label>
-                      <span className="text-[10px] text-[#820AD1]">Para seu aniversário</span>
+                      <label className="font-bold text-[#5A6072]">Data de Nascimento</label>
+                      <span className="text-[10px] text-[#3A31CE]">Para seu aniversário</span>
                     </div>
                     <Input
                       type="date"
                       value={progressiveBirthDate}
                       onChange={(e) => setProgressiveBirthDate(e.target.value)}
-                      className="h-10 rounded-2xl bg-[#F8F9FB] border-gray-200"
+                      className="h-10 rounded-[14px] bg-[#F8F9FB] border-[#E8EAF0]"
                     />
                   </div>
 
                   {/* Campo 2: Bairro */}
                   <div className="space-y-1">
                     <div className="flex justify-between items-center">
-                      <label className="font-bold text-gray-700">Seu Bairro / Região</label>
-                      <span className="text-[10px] text-gray-400">Para células próximas</span>
+                      <label className="font-bold text-[#5A6072]">Seu Bairro / Região</label>
+                      <span className="text-[10px] text-[#6B7183]">Para células próximas</span>
                     </div>
                     <Input
                       placeholder="Ex: Centro, Pinheiros, Vila Nova..."
                       value={progressiveNeighborhood}
                       onChange={(e) => setProgressiveNeighborhood(e.target.value)}
-                      className="h-10 rounded-2xl bg-[#F8F9FB] border-gray-200"
+                      className="h-10 rounded-[14px] bg-[#F8F9FB] border-[#E8EAF0]"
                     />
                   </div>
 
                   {/* Campo 3: Como conheceu a igreja */}
                   <div className="space-y-1">
                     <div className="flex justify-between items-center">
-                      <label className="font-bold text-gray-700">Como conheceu a igreja?</label>
-                      <span className="text-[10px] text-gray-400">Opcional</span>
+                      <label className="font-bold text-[#5A6072]">Como conheceu a igreja?</label>
+                      <span className="text-[10px] text-[#6B7183]">Opcional</span>
                     </div>
                     <Input
                       placeholder="Ex: Convite de amigo, Instagram, mora perto..."
                       value={progressiveHowMet}
                       onChange={(e) => setProgressiveHowMet(e.target.value)}
-                      className="h-10 rounded-2xl bg-[#F8F9FB] border-gray-200"
+                      className="h-10 rounded-[14px] bg-[#F8F9FB] border-[#E8EAF0]"
                     />
                   </div>
 
                   {/* Campo 4: Filhos e idades */}
-                  <div className="p-3 bg-[#F8F9FB] rounded-2xl border border-gray-100 space-y-2.5">
-                    <label className="flex items-center gap-2 cursor-pointer font-bold text-gray-800">
+                  <div className="p-3 bg-[#F8F9FB] rounded-2xl border border-[#E8EAF0] space-y-2.5">
+                    <label className="flex items-center gap-2 cursor-pointer font-bold text-[#14161D]">
                       <input
                         type="checkbox"
                         checked={progressiveHasChildren}
                         onChange={(e) => setProgressiveHasChildren(e.target.checked)}
-                        className="rounded text-[#820AD1] focus:ring-[#820AD1]"
+                        className="rounded text-[#3A31CE] focus:ring-[#3A31CE]"
                       />
                       <span>Tenho filhos</span>
                     </label>
@@ -656,16 +655,16 @@ export default function VisitorLanding() {
                     {progressiveHasChildren && (
                       <div className="space-y-1 pt-1">
                         <div className="flex justify-between items-center">
-                          <label className="text-[11px] font-semibold text-gray-600">
+                          <label className="text-[11px] font-semibold text-[#5A6072]">
                             Nome e idades dos filhos
                           </label>
-                          <span className="text-[10px] text-[#820AD1]">Para o Ministério Kids</span>
+                          <span className="text-[10px] text-[#3A31CE]">Para o Ministério Kids</span>
                         </div>
                         <Input
                           placeholder="Ex: Pedro (5 anos) e Clara (8 anos)"
                           value={progressiveChildrenInfo}
                           onChange={(e) => setProgressiveChildrenInfo(e.target.value)}
-                          className="h-9 rounded-2xl bg-white border-gray-200"
+                          className="h-9 rounded-[14px] bg-white border-[#E8EAF0]"
                         />
                       </div>
                     )}
@@ -676,7 +675,7 @@ export default function VisitorLanding() {
                     <Button
                       type="submit"
                       disabled={savingProgressive}
-                      className="flex-1 bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all"
+                      className="flex-1 bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#3A31CE]/20 active:scale-95 transition-all"
                     >
                       {savingProgressive ? 'Salvando...' : 'Salvar e Concluir'}
                     </Button>
@@ -684,7 +683,7 @@ export default function VisitorLanding() {
                       type="button"
                       variant="ghost"
                       onClick={() => setShowProgressiveModal(false)}
-                      className="text-xs text-gray-500 hover:bg-gray-100 rounded-full h-10 px-3"
+                      className="text-xs text-[#5A6072] hover:bg-[#F2F1FB] rounded-full h-10 px-3"
                     >
                       Depois
                     </Button>
@@ -693,10 +692,10 @@ export default function VisitorLanding() {
               )}
 
               {/* Ação secundária na 2ª visita: Link do app */}
-              <div className="pt-2 border-t border-gray-100">
+              <div className="pt-2 border-t border-[#E8EAF0]">
                 <Link
                   to="/"
-                  className="flex items-center justify-center gap-1.5 text-xs text-gray-500 hover:text-[#820AD1] py-1 font-semibold"
+                  className="flex items-center justify-center gap-1.5 text-xs text-[#5A6072] hover:text-[#3A31CE] py-1 font-semibold"
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>Acessar o aplicativo web da igreja (secundário)</span>
@@ -722,16 +721,16 @@ export default function VisitorLanding() {
           {/* MOMENTO 3: 3ª VISITA EM DIANTE (SÓ O QUE AINDA NÃO FOI FEITO) */}
           {isThirdOrMore && (
             <div className="space-y-3 pt-1 text-left">
-              <div className="p-4 bg-[#F8F9FB] rounded-2xl border border-gray-100 space-y-2">
+              <div className="p-4 bg-[#F8F9FB] rounded-2xl border border-[#E8EAF0] space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-xs text-gray-800">
-                    Sua Caminhada na Defesa da Fé
+                  <span className="font-bold text-xs text-[#14161D]">
+                    Sua Caminhada com a Logos
                   </span>
-                  <span className="text-[10px] font-bold uppercase bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full">
+                  <span className="text-[10px] font-bold uppercase bg-[#F2F1FB] text-[#3A31CE] px-2 py-0.5 rounded-full font-heading">
                     {visitCount}ª Visita
                   </span>
                 </div>
-                <p className="text-[11px] text-gray-600">
+                <p className="text-[11px] text-[#5A6072]">
                   {fullFormPending
                     ? 'Ainda não completou sua ficha? Você pode nos contar mais sobre sua família quando quiser.'
                     : 'Você já completou seus dados básicos! Em breve você poderá dar o próximo passo para Frequentador ou Membro.'}
@@ -741,10 +740,10 @@ export default function VisitorLanding() {
               {/* Oferecer app se ainda não visitou o app */}
               <Link
                 to="/"
-                className="flex items-center justify-between p-3 rounded-2xl bg-white border border-gray-200 hover:border-[#820AD1] transition-colors text-xs font-semibold text-gray-700"
+                className="flex items-center justify-between p-3 rounded-2xl bg-white border border-[#E8EAF0] hover:border-[#3A31CE] transition-colors text-xs font-semibold text-[#14161D]"
               >
                 <div className="flex items-center gap-2">
-                  <Download className="w-4 h-4 text-[#820AD1]" />
+                  <Download className="w-4 h-4 text-[#3A31CE]" />
                   <span>Acessar portal web da igreja</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-gray-400" />
@@ -755,7 +754,7 @@ export default function VisitorLanding() {
           {/* Social Links & WhatsApp Shortcut */}
           <div className="space-y-2 pt-1">
             <a
-              href="https://wa.me/5511999999999?text=Olá!%20Estou%20visitando%20a%20Igreja%20Defesa%20da%20Fé."
+              href="https://wa.me/5511999999999?text=Olá!%20Estou%20visitando%20a%20Igreja%20Logos."
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 w-full py-2.5 rounded-full bg-emerald-50 text-emerald-800 font-bold text-xs border border-emerald-200 hover:bg-emerald-100 transition-colors"
@@ -765,8 +764,8 @@ export default function VisitorLanding() {
             </a>
           </div>
 
-          <div className="pt-2 text-[10px] text-gray-400">
-            Igreja Defesa da Fé &bull; Rua da Paz, 100 &bull; Ministério com fidelidade bíblica
+          <div className="pt-2 text-[10px] text-[#6B7183]">
+            Logos Gestão de Igreja &bull; Comunidade &bull; Ministério com fidelidade bíblica
           </div>
         </div>
       </PageTransition>
@@ -780,34 +779,34 @@ export default function VisitorLanding() {
     const firstName = recognizedPersonName.split(' ')[0]
 
     return (
-      <PageTransition className="min-h-screen bg-[#F8F9FB] flex flex-col justify-center items-center p-4 sm:p-6 text-[#191919]">
-        <div className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-gray-100 space-y-6 text-center">
+      <PageTransition className="min-h-screen bg-[#FBFBFD] flex flex-col justify-center items-center p-4 sm:p-6 text-[#14161D]">
+        <div className="w-full max-w-md bg-white rounded-[22px] p-6 sm:p-8 shadow-xl border border-[#E8EAF0] space-y-6 text-center">
           <div className="flex justify-center">
-            <div className="w-16 h-16 rounded-full bg-[#F7EEFD] text-[#820AD1] flex items-center justify-center shadow-inner">
+            <div className="w-16 h-16 rounded-full bg-[#F2F1FB] text-[#3A31CE] flex items-center justify-center shadow-inner font-heading">
               <User className="w-8 h-8" />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <span className="text-[10px] uppercase font-bold tracking-wider text-[#820AD1] bg-purple-50 px-3 py-1 rounded-full">
+            <span className="text-[10px] uppercase font-bold tracking-wider text-[#3A31CE] bg-[#F2F1FB] px-3 py-1 rounded-full font-heading">
               Reconhecimento do Aparelho
             </span>
-            <h1 className="text-2xl font-black text-[#191919]">Olá de novo, {firstName}!</h1>
-            <p className="text-xs text-gray-500 leading-relaxed">
+            <h1 className="text-2xl font-black text-[#14161D] font-heading">Olá de novo, {firstName}!</h1>
+            <p className="text-xs text-[#5A6072] leading-relaxed">
               {activeCulto
                 ? `Confirmar sua presença hoje no ${activeCulto.name}?`
-                : 'Que bom ter você conosco na Defesa da Fé! Toque abaixo para confirmar sua presença.'}
+                : 'Que bom ter você conosco na Logos! Toque abaixo para confirmar sua presença.'}
             </p>
           </div>
 
           {/* D11 Regra de desambiguação automática: zero fricção para o visitante */}
           {activeCulto && (
-            <div className="p-3 bg-purple-50/70 border border-purple-100 rounded-2xl text-left flex items-center justify-between text-xs">
+            <div className="p-3 bg-[#F2F1FB] border border-[#DAD7F3] rounded-2xl text-left flex items-center justify-between text-xs">
               <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-[#820AD1]" />
-                <span className="font-semibold text-gray-700">{activeCulto.name}</span>
+                <Clock className="w-4 h-4 text-[#3A31CE]" />
+                <span className="font-semibold text-[#14161D]">{activeCulto.name}</span>
               </div>
-              <span className="text-[10px] font-bold text-[#820AD1] bg-white px-2 py-0.5 rounded-full border border-purple-200">
+              <span className="text-[10px] font-bold text-[#3A31CE] bg-white px-2 py-0.5 rounded-full border border-[#DAD7F3]">
                 Identificado automaticamente
               </span>
             </div>
@@ -817,7 +816,7 @@ export default function VisitorLanding() {
             <Button
               onClick={handleRecognizedPresence}
               disabled={submitting}
-              className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white font-bold text-sm h-12 rounded-full shadow-lg shadow-[#820AD1]/20 cursor-pointer active:scale-95 transition-all"
+              className="w-full bg-[#3A31CE] hover:bg-[#2A23A6] text-white font-bold text-sm h-12 rounded-full shadow-lg shadow-[#3A31CE]/20 cursor-pointer active:scale-95 transition-all"
             >
               <CheckCircle2 className="w-5 h-5 mr-2" />
               {submitting ? 'Registrando...' : 'Confirmar Minha Presença Hoje'}
@@ -826,7 +825,7 @@ export default function VisitorLanding() {
             <button
               type="button"
               onClick={handleNotYou}
-              className="text-xs text-gray-400 hover:text-[#820AD1] font-semibold underline cursor-pointer"
+              className="text-xs text-[#6B7183] hover:text-[#3A31CE] font-semibold underline cursor-pointer"
             >
               Não é você? Clique aqui para abrir um formulário em branco.
             </button>
@@ -840,18 +839,18 @@ export default function VisitorLanding() {
   // VIEW 3: FORMULÁRIO CURTO & LEVE (USO COM UMA MÃO NO BANCO)
   // -------------------------------------------------------------
   return (
-    <PageTransition className="min-h-screen bg-[#F8F9FB] flex flex-col justify-center items-center p-4 sm:p-6 text-[#191919]">
-      <div className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-gray-100 space-y-6">
+    <PageTransition className="min-h-screen bg-[#FBFBFD] flex flex-col justify-center items-center p-4 sm:p-6 text-[#14161D]">
+      <div className="w-full max-w-md bg-white rounded-[22px] p-6 sm:p-8 shadow-xl border border-[#E8EAF0] space-y-6">
         {/* Acolhimento Curto no Topo */}
         <div className="text-center space-y-1.5">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F7EEFD] text-[#820AD1] text-[10px] font-bold uppercase tracking-wider mb-1">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F2F1FB] text-[#3A31CE] text-[10px] font-bold uppercase tracking-wider mb-1 font-heading">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Igreja Defesa da Fé</span>
+            <span>Logos Igreja</span>
           </div>
-          <h1 className="text-2xl font-black tracking-tight text-[#191919]">
+          <h1 className="text-2xl font-black tracking-tight text-[#14161D] font-heading">
             Seja muito bem-vindo(a)!
           </h1>
-          <p className="text-xs text-gray-500 max-w-xs mx-auto">
+          <p className="text-xs text-[#5A6072] max-w-xs mx-auto">
             {activeCulto
               ? `Evento em andamento: ${activeCulto.name}`
               : 'Preencha seus dados para registrar sua visita à igreja.'}
@@ -860,12 +859,12 @@ export default function VisitorLanding() {
 
         {/* D11 Regra de desambiguação automática: zero fricção para o visitante */}
         {activeCulto && (
-          <div className="p-3 bg-purple-50/70 border border-purple-100 rounded-2xl text-left flex items-center justify-between text-xs">
+          <div className="p-3 bg-[#F2F1FB] border border-[#DAD7F3] rounded-2xl text-left flex items-center justify-between text-xs">
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-[#820AD1]" />
-              <span className="font-semibold text-gray-700">{activeCulto.name}</span>
+              <Clock className="w-4 h-4 text-[#3A31CE]" />
+              <span className="font-semibold text-[#14161D]">{activeCulto.name}</span>
             </div>
-            <span className="text-[10px] font-bold text-[#820AD1] bg-white px-2 py-0.5 rounded-full border border-purple-200">
+            <span className="text-[10px] font-bold text-[#3A31CE] bg-white px-2 py-0.5 rounded-full border border-[#DAD7F3]">
               Vinculação automática
             </span>
           </div>
@@ -875,22 +874,22 @@ export default function VisitorLanding() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1">
             <div className="flex justify-between items-center">
-              <label className="text-xs font-bold text-gray-700">Seu Nome Completo *</label>
-              <span className="text-[10px] text-[#820AD1]">Para te dar as boas-vindas</span>
+              <label className="text-xs font-bold text-[#5A6072]">Seu Nome Completo *</label>
+              <span className="text-[10px] text-[#3A31CE]">Para te dar as boas-vindas</span>
             </div>
             <Input
               placeholder="Ex.: Lucas Silveira"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="rounded-2xl h-12 text-sm border-gray-200 focus:border-[#820AD1]"
+              className="rounded-[14px] h-12 text-sm border-[#E8EAF0] focus:border-[#3A31CE]"
               required
             />
           </div>
 
           <div className="space-y-1">
             <div className="flex justify-between items-center">
-              <label className="text-xs font-bold text-gray-700">Seu WhatsApp (com DDD) *</label>
-              <span className="text-[10px] text-gray-400">Identificador no culto</span>
+              <label className="text-xs font-bold text-[#5A6072]">Seu WhatsApp (com DDD) *</label>
+              <span className="text-[10px] text-[#6B7183]">Identificador no culto</span>
             </div>
             <Input
               type="tel"
@@ -898,15 +897,15 @@ export default function VisitorLanding() {
               placeholder="(11) 98765-4321"
               value={phone}
               onChange={(e) => setPhone(formatPhone(e.target.value))}
-              className="rounded-2xl h-12 text-sm border-gray-200 focus:border-[#820AD1] font-medium"
+              className="rounded-[14px] h-12 text-sm border-[#E8EAF0] focus:border-[#3A31CE] font-medium"
               required
             />
           </div>
 
           <div className="space-y-1">
             <div className="flex justify-between items-center">
-              <label className="text-xs font-bold text-gray-700">E-mail</label>
-              <span className="text-[10px] text-gray-400">Opcional</span>
+              <label className="text-xs font-bold text-[#5A6072]">E-mail</label>
+              <span className="text-[10px] text-[#6B7183]">Opcional</span>
             </div>
             <Input
               type="email"
@@ -914,13 +913,13 @@ export default function VisitorLanding() {
               placeholder="exemplo@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="rounded-2xl h-12 text-sm border-gray-200 focus:border-[#820AD1]"
+              className="rounded-[14px] h-12 text-sm border-[#E8EAF0] focus:border-[#3A31CE]"
             />
           </div>
 
           {/* Preferência de Contato */}
           <div className="space-y-1.5 pt-1">
-            <label className="text-[11px] font-bold text-gray-600 block">
+            <label className="text-[11px] font-bold text-[#5A6072] block">
               Como prefere que nossa equipe entre em contato?
             </label>
             <div className="grid grid-cols-3 gap-2 text-xs">
@@ -929,8 +928,8 @@ export default function VisitorLanding() {
                 onClick={() => setContactPreference('whatsapp')}
                 className={`py-2 px-2 rounded-xl border text-center font-semibold cursor-pointer transition-colors ${
                   contactPreference === 'whatsapp'
-                    ? 'border-[#820AD1] bg-purple-50 text-[#820AD1]'
-                    : 'border-gray-200 text-gray-600'
+                    ? 'border-[#3A31CE] bg-[#F2F1FB] text-[#3A31CE]'
+                    : 'border-[#E8EAF0] text-[#5A6072]'
                 }`}
               >
                 WhatsApp
@@ -940,8 +939,8 @@ export default function VisitorLanding() {
                 onClick={() => setContactPreference('ligacao')}
                 className={`py-2 px-2 rounded-xl border text-center font-semibold cursor-pointer transition-colors ${
                   contactPreference === 'ligacao'
-                    ? 'border-[#820AD1] bg-purple-50 text-[#820AD1]'
-                    : 'border-gray-200 text-gray-600'
+                    ? 'border-[#3A31CE] bg-[#F2F1FB] text-[#3A31CE]'
+                    : 'border-[#E8EAF0] text-[#5A6072]'
                 }`}
               >
                 Ligação
@@ -951,8 +950,8 @@ export default function VisitorLanding() {
                 onClick={() => setContactPreference('nenhum')}
                 className={`py-2 px-2 rounded-xl border text-center font-semibold cursor-pointer transition-colors ${
                   contactPreference === 'nenhum'
-                    ? 'border-[#820AD1] bg-purple-50 text-[#820AD1]'
-                    : 'border-gray-200 text-gray-600'
+                    ? 'border-[#3A31CE] bg-[#F2F1FB] text-[#3A31CE]'
+                    : 'border-[#E8EAF0] text-[#5A6072]'
                 }`}
               >
                 Não contatar
@@ -962,17 +961,17 @@ export default function VisitorLanding() {
 
           {/* LGPD: Autorização de contato DESMARCADA por padrão */}
           <div className="pt-2">
-            <label className="flex items-start gap-2.5 cursor-pointer text-[11px] text-gray-600">
+            <label className="flex items-start gap-2.5 cursor-pointer text-[11px] text-[#5A6072]">
               <input
                 type="checkbox"
                 checked={contactAuthorized}
                 onChange={(e) => setContactAuthorized(e.target.checked)}
-                className="mt-0.5 rounded text-[#820AD1] focus:ring-[#820AD1]"
+                className="mt-0.5 rounded text-[#3A31CE] focus:ring-[#3A31CE]"
               />
               <span>
-                Autorizo a Igreja Defesa da Fé a enviar uma mensagem de acolhimento e avisos sobre
+                Autorizo a Igreja a enviar uma mensagem de acolhimento e avisos sobre
                 nossas atividades bíblicas, conforme a{' '}
-                <span className="text-[#820AD1] underline">Política de Privacidade (LGPD)</span>.
+                <span className="text-[#3A31CE] underline">Política de Privacidade (LGPD)</span>.
               </span>
             </label>
           </div>
@@ -981,7 +980,7 @@ export default function VisitorLanding() {
           <Button
             type="submit"
             disabled={submitting}
-            className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white font-bold text-sm h-12 rounded-full shadow-lg shadow-[#820AD1]/20 cursor-pointer active:scale-95 transition-all mt-3"
+            className="w-full bg-[#3A31CE] hover:bg-[#2A23A6] text-white font-bold text-sm h-12 rounded-full shadow-lg shadow-[#3A31CE]/20 cursor-pointer active:scale-95 transition-all mt-3"
           >
             {submitting ? 'Enviando...' : 'Enviar e Confirmar Presença'}
           </Button>
