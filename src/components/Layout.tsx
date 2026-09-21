@@ -29,6 +29,7 @@ import {
   AlertTriangle,
   Church,
 } from 'lucide-react'
+import { churchNoticesService } from '@/data/churchNotices'
 import { useAuth } from '@/contexts/AuthContext'
 import { personsService, activitiesService } from '@/services/church'
 import { LoginDialog } from '@/components/LoginDialog'
@@ -102,8 +103,32 @@ export default function Layout() {
     return () => clearTimeout(timer)
   }, [searchQuery])
 
+  const [unreadNoticesCount, setUnreadNoticesCount] = useState(() =>
+    churchNoticesService.getUnreadCount(),
+  )
+
+  useEffect(() => {
+    const handleStorage = () => {
+      setUnreadNoticesCount(churchNoticesService.getUnreadCount())
+    }
+    window.addEventListener('storage', handleStorage)
+    const interval = setInterval(handleStorage, 4000)
+    return () => {
+      window.removeEventListener('storage', handleStorage)
+      clearInterval(interval)
+    }
+  }, [])
+
   const navItems = [
     { label: 'Início', fullLabel: 'Visão Geral', path: '/', icon: LayoutDashboard },
+    // Grupo 5: Avisos da Igreja
+    {
+      label: 'Avisos',
+      fullLabel: 'Avisos da Igreja',
+      path: '/avisos',
+      icon: Bell,
+      badge: unreadNoticesCount > 0 ? unreadNoticesCount : undefined,
+    },
     // Grupo 4: Igreja & Institucional
     { label: 'Igreja', fullLabel: 'Igreja & Departamentos', path: '/igreja', icon: Church },
     // Grupo 3: Agenda & Escalas
@@ -356,6 +381,11 @@ export default function Layout() {
                   <Icon className="w-3.5 h-3.5" strokeWidth={2} />
                 </div>
                 <span className="flex-1 tracking-tight">{item.fullLabel}</span>
+                {item.badge !== undefined && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#3A31CE] text-white">
+                    {item.badge}
+                  </span>
+                )}
                 {active && <span className="w-2 h-2 rounded-full bg-[#3A31CE]" />}
               </Link>
             )
@@ -569,17 +599,17 @@ export default function Layout() {
             >
               <Search className="w-5 h-5" strokeWidth={2} />
             </button>
-            {/* Notifications Button */}
-            <button
-              onClick={() => setNotificationsOpen(true)}
-              className="relative p-2 rounded-full text-white md:text-gray-600 hover:bg-white/10 md:hover:bg-gray-100 transition-colors cursor-pointer"
-              title="Atividades Recentes"
+            {/* Avisos Link Button */}
+            <Link
+              to="/avisos"
+              className="relative p-2 rounded-full text-gray-600 hover:bg-[#F2F1FB] hover:text-[#3A31CE] transition-colors cursor-pointer"
+              title="Avisos da congregação"
             >
               <Bell className="w-5 h-5 md:w-4 md:h-4" strokeWidth={2} />
-              {activities.length > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-400 md:bg-[#820AD1] ring-2 ring-white" />
+              {unreadNoticesCount > 0 && (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#3A31CE] ring-2 ring-white" />
               )}
-            </button>
+            </Link>
             {/* QR Quick Access Button */}
             <Link
               to="/visitante-cadastro"
@@ -758,34 +788,34 @@ export default function Layout() {
           ========================================================================= */}
       <Sheet open={notificationsOpen} onOpenChange={setNotificationsOpen}>
         <SheetContent className="w-full sm:max-w-md bg-white p-6 overflow-y-auto border-l border-gray-100 rounded-l-3xl">
-          <SheetHeader className="mb-4 pb-3 border-b border-gray-100">
-            <SheetTitle className="text-lg font-bold text-[#191919] flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#820AD1]" />
+          <SheetHeader className="mb-4 pb-3 border-b border-[#E8EAF0]">
+            <SheetTitle className="text-lg font-heading font-bold text-[#14161D] flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#3A31CE]" />
               Atividades Recentes
             </SheetTitle>
           </SheetHeader>
           <div className="space-y-2.5">
             {activities.length === 0 ? (
-              <p className="text-xs text-gray-400 text-center py-8">
+              <p className="text-xs text-[#6B7183] text-center py-8">
                 Nenhum registro de atividade recente.
               </p>
             ) : (
               activities.map((act) => (
                 <div
                   key={act.id}
-                  className="p-3.5 bg-[#F8F9FB] hover:bg-[#F7EEFD] rounded-2xl text-xs space-y-1 transition-colors"
+                  className="p-3.5 bg-[#FBFBFD] hover:bg-[#F2F1FB] border border-[#E8EAF0] rounded-[16px] text-xs space-y-1 transition-colors"
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-bold text-[#191919] truncate">{act.title}</span>
-                    <span className="text-[10px] text-gray-400 flex items-center gap-1 flex-shrink-0">
-                      <Clock className="w-3 h-3 text-[#820AD1]" strokeWidth={1.75} />
+                    <span className="font-bold text-[#14161D] truncate">{act.title}</span>
+                    <span className="text-[10px] text-[#6B7183] flex items-center gap-1 flex-shrink-0">
+                      <Clock className="w-3 h-3 text-[#3A31CE]" strokeWidth={1.75} />
                       {new Date(act.created).toLocaleDateString('pt-BR', {
                         hour: '2-digit',
                         minute: '2-digit',
                       })}
                     </span>
                   </div>
-                  <p className="text-gray-600 text-[11px] leading-relaxed">{act.description}</p>
+                  <p className="text-[#5A6072] text-[11px] leading-relaxed">{act.description}</p>
                 </div>
               ))
             )}
@@ -794,22 +824,22 @@ export default function Layout() {
       </Sheet>
 
       {/* =========================================================================
-          MOBILE DRAWER / HAMBURGER MENU — Nubank Purple Canvas
+          MOBILE DRAWER / HAMBURGER MENU — Design System Logos (#3A31CE)
           ========================================================================= */}
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetContent
           side="left"
-          className="w-80 max-w-[85vw] bg-white text-[#191919] p-0 flex flex-col border-r border-gray-100 rounded-r-3xl"
+          className="w-80 max-w-[85vw] bg-white text-[#14161D] p-0 flex flex-col border-r border-[#E8EAF0] rounded-r-3xl"
         >
           {/* Header */}
-          <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-[#820AD1] text-white">
+          <div className="p-5 border-b border-[#E8EAF0] flex items-center justify-between bg-[#3A31CE] text-white">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-full bg-white/20 text-white flex items-center justify-center font-bold text-sm">
                 L
               </div>
               <div className="flex flex-col">
-                <span className="font-bold text-base">Logos</span>
-                <span className="text-[11px] text-purple-200">Gestão de Igreja</span>
+                <span className="font-heading font-bold text-base">Logos</span>
+                <span className="text-[11px] text-indigo-100">Gestão de Igreja</span>
               </div>
             </div>
             <button
@@ -821,20 +851,20 @@ export default function Layout() {
           </div>
 
           {/* Authenticated user status mobile */}
-          <div className="p-4 border-b border-gray-100 bg-[#F8F9FB]">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2">
+          <div className="p-4 border-b border-[#E8EAF0] bg-[#FBFBFD]">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-[#6B7183] mb-2">
               Perfil Autenticado:
             </p>
-            <div className="p-3 rounded-2xl bg-white border border-gray-200 text-xs space-y-2.5">
+            <div className="p-3 rounded-2xl bg-white border border-[#E8EAF0] text-xs space-y-2.5 shadow-xs">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 min-w-0">
                   <span className={`w-2 h-2 rounded-full ${currentMeta.dotColor}`} />
-                  <span className="font-bold text-[#191919]">{currentMeta.label}</span>
-                  <span className="text-[11px] text-gray-400 truncate">
+                  <span className="font-bold text-[#14161D]">{currentMeta.label}</span>
+                  <span className="text-[11px] text-[#6B7183] truncate">
                     &bull; {currentMeta.roleType}
                   </span>
                 </div>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#F7EEFD] text-[#820AD1] flex-shrink-0">
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#F2F1FB] text-[#3A31CE] flex-shrink-0">
                   {user ? 'Autenticado' : 'Visitante'}
                 </span>
               </div>
@@ -859,7 +889,7 @@ export default function Layout() {
                     setMobileMenuOpen(false)
                     setIsLoginModalOpen(true)
                   }}
-                  className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-full bg-[#820AD1] text-white hover:bg-[#7008B7] font-bold text-xs active:scale-95 transition-all cursor-pointer shadow-sm shadow-[#820AD1]/20"
+                  className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-full bg-[#3A31CE] text-white hover:bg-[#2A23A6] font-bold text-xs active:scale-95 transition-all cursor-pointer shadow-sm shadow-[#3A31CE]/20"
                 >
                   <LogIn className="w-3.5 h-3.5" strokeWidth={2} />
                   <span>Entrar no sistema</span>
@@ -880,18 +910,23 @@ export default function Layout() {
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center gap-3 px-3.5 py-3 rounded-2xl text-xs font-semibold transition-all ${
                     active
-                      ? 'bg-[#F7EEFD] text-[#820AD1]'
-                      : 'text-gray-700 hover:text-[#820AD1] hover:bg-gray-50'
+                      ? 'bg-[#F2F1FB] text-[#3A31CE]'
+                      : 'text-[#5A6072] hover:text-[#3A31CE] hover:bg-[#FBFBFD]'
                   }`}
                 >
                   <div
                     className={`w-7 h-7 rounded-xl flex items-center justify-center ${
-                      active ? 'bg-[#820AD1] text-white' : 'bg-gray-100 text-gray-600'
+                      active ? 'bg-[#3A31CE] text-white' : 'bg-gray-100 text-gray-600'
                     }`}
                   >
                     <Icon className="w-4 h-4" strokeWidth={2} />
                   </div>
-                  <span>{item.fullLabel}</span>
+                  <span className="flex-1">{item.fullLabel}</span>
+                  {item.badge !== undefined && (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#3A31CE] text-white">
+                      {item.badge}
+                    </span>
+                  )}
                 </Link>
               )
             })}
@@ -953,24 +988,40 @@ export default function Layout() {
       </Sheet>
 
       {/* =========================================================================
-          MOBILE BOTTOM NAVIGATION — Design System Logos (Fiel às Telas 03 e 04)
+          MOBILE BOTTOM NAVIGATION — Design System Logos (Fiel às Telas 03, 04 e 24)
+          Exibe as rotas essenciais: Início, Agenda, Igreja, Avisos, Perfil
           ========================================================================= */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-[#E8EAF0] py-1.5 px-3 z-30 flex items-center justify-around safe-bottom shadow-lg shadow-black/5">
-        {navItems.map((item) => {
-          const active = location.pathname === item.path
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-[#E8EAF0] py-1 px-2 z-30 flex items-center justify-around safe-bottom shadow-lg shadow-black/5">
+        {[
+          { label: 'Início', path: '/', icon: LayoutDashboard },
+          { label: 'Agenda', path: '/agenda', icon: Calendar },
+          { label: 'Igreja', path: '/igreja', icon: Church },
+          {
+            label: 'Avisos',
+            path: '/avisos',
+            icon: Bell,
+            badge: unreadNoticesCount > 0 ? unreadNoticesCount : undefined,
+          },
+          { label: 'Perfil', path: '/meu-cadastro', icon: User },
+        ].map((item) => {
+          const active =
+            item.path === '/' ? location.pathname === '/' : location.pathname.startsWith(item.path)
           const Icon = item.icon
           return (
             <Link
               key={item.path}
               to={item.path}
-              className="relative flex flex-col items-center justify-center py-1 px-2 min-w-[58px] select-none text-center active:scale-95 transition-transform"
+              className="relative flex flex-col items-center justify-center py-1 px-1.5 min-w-[52px] select-none text-center active:scale-95 transition-transform"
             >
               <div
-                className={`w-7 h-7 rounded-[10px] flex items-center justify-center transition-all ${
+                className={`relative w-7 h-7 rounded-[10px] flex items-center justify-center transition-all ${
                   active ? 'bg-[#F2F1FB] text-[#3A31CE]' : 'text-[#6B7183]'
                 }`}
               >
                 <Icon className="w-4 h-4" strokeWidth={active ? 2.4 : 1.75} />
+                {item.badge !== undefined && (
+                  <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#3A31CE] ring-2 ring-white" />
+                )}
               </div>
               <span
                 className={`text-[10px] tracking-tight transition-colors mt-0.5 ${

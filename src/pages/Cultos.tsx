@@ -434,13 +434,13 @@ export default function Cultos() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#820AD1] mb-1">
-            <span className="w-2 h-2 rounded-full bg-[#820AD1]" />
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#3A31CE] mb-1">
+            <span className="w-2 h-2 rounded-full bg-[#3A31CE]" />
             <span>Jornadas J1 & J2</span>
             <span className="text-gray-300">/</span>
             <span>Registro & Lista de Culto</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191919]">
+          <h1 className="font-heading text-2xl sm:text-3xl font-semibold tracking-[-0.025em] text-[#14161D]">
             Recepção, Agenda & Presenças
           </h1>
           <p className="text-xs sm:text-sm text-gray-500 mt-1 max-w-2xl font-normal">
@@ -454,7 +454,7 @@ export default function Cultos() {
           {permissions.canManageAssignments && (
             <Button
               onClick={() => setCreateCultoOpen(true)}
-              className="bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-10 px-4 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all cursor-pointer"
+              className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-10 px-4 rounded-[14px] font-bold shadow-sm shadow-[#3A31CE]/20 active:scale-95 transition-all cursor-pointer"
             >
               <Plus className="w-4 h-4 mr-1.5" strokeWidth={2.5} />
               Novo Evento na Agenda
@@ -551,9 +551,9 @@ export default function Cultos() {
       )}
 
       {/* Select Culto Bar */}
-      <div className="bg-white rounded-3xl p-4 sm:p-5 border border-gray-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white rounded-[22px] p-4 sm:p-5 border border-[#E8EAF0] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-[#F7EEFD] text-[#820AD1] flex items-center justify-center font-bold">
+          <div className="w-10 h-10 rounded-[14px] bg-[#F2F1FB] text-[#3A31CE] flex items-center justify-center font-bold">
             <Calendar className="w-5 h-5" />
           </div>
           <div>
@@ -588,7 +588,7 @@ export default function Cultos() {
         {selectedCulto && (
           <div className="flex items-center gap-3 self-end md:self-center">
             {selectedCulto.is_recurrent && (
-              <span className="text-xs px-2.5 py-1 rounded-full font-bold bg-purple-50 text-[#820AD1] border border-purple-200 flex items-center gap-1">
+              <span className="text-xs px-2.5 py-1 rounded-full font-bold bg-[#F2F1FB] text-[#3A31CE] border border-[#DAD7F3] flex items-center gap-1">
                 <Repeat className="w-3 h-3" />
                 Recorrente ({selectedCulto.recurrence_start_time || 'Horário fixo'})
               </span>
@@ -620,13 +620,15 @@ export default function Cultos() {
 
       {/* J1: BOAS-VINDAS FLOW (Search by Phone, 1-tap presence, or quick signup) */}
       {permissions.canRegisterPresence && selectedCulto?.status === 'aberto' && (
-        <section className="bg-gradient-to-br from-[#190326] via-[#2A0845] to-[#820AD1] text-white rounded-3xl p-6 sm:p-7 shadow-xl shadow-[#820AD1]/15 space-y-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
+        <section className="bg-[#3A31CE] text-white rounded-[22px] p-6 sm:p-7 shadow-lg shadow-[#3A31CE]/20 space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/15 pb-3">
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-purple-200">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-100">
                 Jornada J1 &bull; Recepção de Boas-Vindas
               </span>
-              <h2 className="text-xl font-bold tracking-tight">Identificar e Acolher na Chegada</h2>
+              <h2 className="font-heading text-xl font-bold tracking-tight">
+                Identificar e Acolher na Chegada
+              </h2>
             </div>
             <span className="text-xs bg-white/15 px-3 py-1 rounded-full border border-white/20 font-semibold self-start sm:self-auto">
               Regra R3: Identificação por Telefone
@@ -634,18 +636,18 @@ export default function Cultos() {
           </div>
 
           <div className="space-y-3">
-            <Label className="text-xs text-purple-200 font-semibold">
+            <Label className="text-xs text-indigo-100 font-semibold">
               Digite o telefone/WhatsApp da pessoa que chegou:
             </Label>
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="relative flex-1">
-                <Phone className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-purple-300" />
+                <Phone className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-indigo-200" />
                 <Input
                   type="text"
                   placeholder="(11) 98765-4321..."
                   value={searchPhone}
                   onChange={(e) => setSearchPhone(e.target.value)}
-                  className="pl-10 h-11 rounded-2xl bg-white/15 border-white/20 text-white placeholder:text-purple-300 text-sm focus:bg-white focus:text-[#191919]"
+                  className="pl-10 h-11 rounded-[14px] bg-white/15 border-white/20 text-white placeholder:text-indigo-200 text-sm focus:bg-white focus:text-[#14161D]"
                 />
               </div>
 
@@ -654,7 +656,7 @@ export default function Cultos() {
                   setNewPhone(searchPhone)
                   setSignupModalOpen(true)
                 }}
-                className="bg-white text-[#820AD1] hover:bg-purple-50 h-11 px-5 rounded-2xl font-bold text-xs shadow-md active:scale-95 transition-all flex items-center gap-1.5"
+                className="bg-white text-[#3A31CE] hover:bg-[#F2F1FB] h-11 px-5 rounded-[14px] font-bold text-xs shadow-md active:scale-95 transition-all flex items-center gap-1.5"
               >
                 <UserPlus className="w-4 h-4" />
                 <span>Primeira Visita (Novo Cadastro)</span>
@@ -734,16 +736,16 @@ export default function Cultos() {
       )}
 
       {/* J2: SECRETARIA / CULTO LIVE LIST */}
-      <section className="bg-white rounded-3xl p-6 sm:p-7 border border-gray-100 shadow-sm space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-4">
+      <section className="bg-white rounded-[22px] p-6 sm:p-7 border border-[#E8EAF0] shadow-xs space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E8EAF0] pb-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#820AD1]">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#3A31CE]">
                 Jornada J2 &bull; Lista em Tempo Real
               </span>
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             </div>
-            <h2 className="text-xl font-bold text-[#191919]">
+            <h2 className="font-heading text-xl font-bold text-[#14161D]">
               Presenças {selectedCulto ? `— ${selectedCulto.name}` : 'do Evento'}
             </h2>
             <p className="text-xs text-gray-500 mt-0.5">
@@ -757,10 +759,10 @@ export default function Cultos() {
               <span className="font-extrabold text-[#191919] text-base">{totalPresences}</span>
             </div>
             <div className="border-l border-gray-200 px-3 text-center">
-              <span className="text-[10px] uppercase font-bold text-[#820AD1] block">
+              <span className="text-[10px] uppercase font-bold text-[#3A31CE] block">
                 1ª Visita
               </span>
-              <span className="font-extrabold text-[#820AD1] text-base">{firstVisits.length}</span>
+              <span className="font-extrabold text-[#3A31CE] text-base">{firstVisits.length}</span>
             </div>
             <div className="border-l border-gray-200 px-3 text-center">
               <span className="text-[10px] uppercase font-bold text-blue-600 block">Retornos</span>
@@ -806,9 +808,9 @@ export default function Cultos() {
                     <div
                       className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs ${
                         isFirst
-                          ? 'bg-[#F7EEFD] text-[#820AD1]'
+                          ? 'bg-[#F2F1FB] text-[#3A31CE]'
                           : isRet
-                            ? 'bg-blue-50 text-blue-700'
+                            ? 'bg-indigo-50 text-indigo-700'
                             : 'bg-emerald-50 text-emerald-700'
                       }`}
                     >
@@ -823,9 +825,9 @@ export default function Cultos() {
                         <span
                           className={`text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full ${
                             isFirst
-                              ? 'bg-[#F7EEFD] text-[#820AD1] border border-purple-200'
+                              ? 'bg-[#F2F1FB] text-[#3A31CE] border border-[#DAD7F3]'
                               : isRet
-                                ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                                ? 'bg-indigo-50 text-indigo-700 border border-indigo-200'
                                 : 'bg-emerald-50 text-emerald-700'
                           }`}
                         >
@@ -857,7 +859,7 @@ export default function Cultos() {
                         setTargetCultoId(selectedCulto?.id || '')
                         setMoveModalOpen(true)
                       }}
-                      className="text-xs text-gray-400 hover:text-[#820AD1] hover:bg-[#F7EEFD] rounded-full self-end sm:self-auto"
+                      className="text-xs text-[#6B7183] hover:text-[#3A31CE] hover:bg-[#F2F1FB] rounded-full self-end sm:self-auto"
                       title="Mover presença para outro culto (caso registrada por engano)"
                     >
                       <ArrowLeftRight className="w-3.5 h-3.5 mr-1" />
@@ -956,9 +958,10 @@ export default function Cultos() {
 
             <Button
               type="submit"
-              disabled={isSubmittingSignup}
-              className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-11 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all"
+              disabled={submitting}
+              className="w-full bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-11 rounded-[14px] font-bold shadow-sm shadow-[#3A31CE]/20 active:scale-95 transition-all"
             >
+              {' '}
               {isSubmittingSignup ? 'Cadastrando...' : 'Confirmar Presença e Cadastrar'}
             </Button>
           </form>
@@ -1048,10 +1051,11 @@ export default function Cultos() {
               </div>
 
               <Button
-                onClick={handleLinkOrphan}
-                disabled={!linkTargetCultoId}
-                className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#820AD1]/20"
+                onClick={handleCreateTotemPresence}
+                disabled={submitting}
+                className="w-full bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-10 rounded-[14px] font-bold shadow-sm shadow-[#3A31CE]/20"
               >
+                {' '}
                 Confirmar Vinculação
               </Button>
             </div>

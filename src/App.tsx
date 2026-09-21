@@ -32,6 +32,7 @@ import BloquearPeriodo from './pages/BloquearPeriodo'
 import Igreja from './pages/Igreja'
 import QuemSomos from './pages/QuemSomos'
 import PaginaPublica from './pages/PaginaPublica'
+import Avisos from './pages/Avisos'
 
 const App = () => (
   <BrowserRouter>
@@ -55,6 +56,7 @@ const App = () => (
           <Route element={<Layout />}>
             <Route path="/" element={<Index />} />
             <Route path="/dashboard" element={<Index />} />
+            <Route path="/avisos" element={<Avisos />} />
             <Route path="/igreja" element={<Igreja />} />
             <Route path="/quem-somos" element={<QuemSomos />} />
             <Route path="/agenda" element={<Agenda />} />

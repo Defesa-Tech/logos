@@ -56,6 +56,7 @@ import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { useRealtime } from '@/hooks/use-realtime'
 import { PageTransition } from '@/components/MotionKit'
+import { churchNoticesService } from '@/data/churchNotices'
 
 export default function Index() {
   const { currentPerson, activeAssignments, permissions, user, logout, setIsLoginModalOpen } =
@@ -477,63 +478,75 @@ export default function Index() {
 
       {/* =========================================================================
           AVISOS DA IGREJA (Cards no estilo original das 4 telas de Home)
-          Cards com ponto colorido indicador (tint / branco)
+          Conectado aos dados centralizados e link para a tela completa /avisos
           ========================================================================= */}
       <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="font-heading text-lg font-semibold tracking-[-0.015em] text-[#14161D]">
-            Avisos da igreja
-          </h2>
-          <span className="text-xs font-semibold text-[#6B7183]">Mural informativo</span>
+          <div className="flex items-center gap-2">
+            <h2 className="font-heading text-lg font-semibold tracking-[-0.015em] text-[#14161D]">
+              Avisos da igreja
+            </h2>
+            {churchNoticesService.getUnreadCount() > 0 && (
+              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#F2F1FB] text-[#3A31CE]">
+                {churchNoticesService.getUnreadCount()} novos
+              </span>
+            )}
+          </div>
+          <Link
+            to="/avisos"
+            className="text-xs font-bold text-[#3A31CE] hover:underline flex items-center gap-1"
+          >
+            <span>Ver todos</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
 
         <div className="space-y-3">
-          {/* Aviso 1 — Destaque em Tint #F2F1FB com pontinho azul #3A31CE */}
-          <div className="flex items-start gap-3.5 p-4 sm:p-4.5 bg-[#F2F1FB] border border-[#DAD7F3] rounded-[18px]">
-            <span className="w-2 h-2 mt-1.5 rounded-full bg-[#3A31CE] flex-shrink-0" />
-            <div className="space-y-0.5">
-              <h3 className="font-sans text-sm sm:text-base font-bold text-[#14161D] leading-snug">
-                Reunião de líderes de departamento e voluntários
-              </h3>
-              <p className="text-xs sm:text-sm text-[#5A6072] leading-relaxed">
-                Próxima quinta-feira às 20h no auditório. Alinhamento das próximas escalas e cultos
-                especiais.
-              </p>
-            </div>
-          </div>
-
-          {/* Aviso 2 — Branco com borda #E8EAF0 */}
-          <div className="flex items-start gap-3.5 p-4 sm:p-4.5 bg-white border-[1.5px] border-[#E8EAF0] rounded-[18px]">
-            <span className="w-2 h-2 mt-1.5 rounded-full bg-[#C7CBDA] flex-shrink-0" />
-            <div className="space-y-0.5">
-              <h3 className="font-sans text-sm sm:text-base font-bold text-[#14161D] leading-snug">
-                Campanha do agasalho e alimentos
-              </h3>
-              <p className="text-xs sm:text-sm text-[#5A6072] leading-relaxed">
-                Entregue suas doações no balcão da secretaria durante os cultos de domingo e quarta.
-              </p>
-            </div>
-          </div>
-
-          {/* Aviso 3 — Atualização cadastral */}
-          <div className="flex items-start gap-3.5 p-4 sm:p-4.5 bg-white border-[1.5px] border-[#E8EAF0] rounded-[18px]">
-            <span className="w-2 h-2 mt-1.5 rounded-full bg-[#C7CBDA] flex-shrink-0" />
-            <div className="space-y-0.5 flex-1">
-              <h3 className="font-sans text-sm sm:text-base font-bold text-[#14161D] leading-snug">
-                Seu cadastro está atualizado?
-              </h3>
-              <p className="text-xs sm:text-sm text-[#5A6072] leading-relaxed">
-                Mantenha seu telefone e endereço em dia para receber notificações de escala e
-                avisos.
-              </p>
-            </div>
-            <Link
-              to="/meu-cadastro"
-              className="text-xs font-bold text-[#3A31CE] hover:underline self-center flex-shrink-0"
-            >
-              Revisar dados &rarr;
-            </Link>
-          </div>
+          {churchNoticesService
+            .getAll()
+            .slice(0, 3)
+            .map((item) => {
+              const isUnread = !item.read
+              return (
+                <div
+                  key={item.id}
+                  className={`flex items-start gap-3.5 p-4 sm:p-4.5 rounded-[18px] transition-all ${
+                    isUnread
+                      ? 'bg-[#F2F1FB] border border-[#DAD7F3]'
+                      : 'bg-white border-[1.5px] border-[#E8EAF0]'
+                  }`}
+                >
+                  <span
+                    className={`w-2 h-2 mt-1.5 rounded-full flex-shrink-0 ${
+                      isUnread ? 'bg-[#3A31CE]' : 'bg-[#C7CBDA]'
+                    }`}
+                  />
+                  <div className="space-y-0.5 flex-1 min-w-0">
+                    <h3 className="font-sans text-sm sm:text-base font-bold text-[#14161D] leading-snug">
+                      {item.title}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-[#5A6072] leading-relaxed">
+                      {item.description}
+                    </p>
+                  </div>
+                  {item.actionLabel && item.actionLink ? (
+                    <Link
+                      to={item.actionLink}
+                      className="text-xs font-bold text-[#3A31CE] hover:underline self-center flex-shrink-0 whitespace-nowrap"
+                    >
+                      {item.actionLabel} &rarr;
+                    </Link>
+                  ) : (
+                    <Link
+                      to="/avisos"
+                      className="text-xs font-semibold text-[#8A90A2] hover:text-[#3A31CE] self-center flex-shrink-0"
+                    >
+                      {item.timeAgo}
+                    </Link>
+                  )}
+                </div>
+              )
+            })}
         </div>
       </section>
 
