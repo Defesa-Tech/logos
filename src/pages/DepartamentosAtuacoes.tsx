@@ -951,7 +951,7 @@ export function DepartamentosAtuacoes() {
                         <span className="font-bold text-[#191919] text-sm">
                           {asg.expand?.person?.name || 'Membro'}
                         </span>
-                        <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700">
+                        <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-[#F2F1FB] text-[#3A31CE]">
                           {asg.expand?.role?.name || 'Função'}
                         </span>
                         {asg.leadership_level && asg.leadership_level !== 'voluntario' && (
@@ -1048,7 +1048,7 @@ export function DepartamentosAtuacoes() {
                       <div>
                         <div className="flex items-center gap-2">
                           <h3 className="font-bold text-[#191919] text-sm">{dept.name}</h3>
-                          <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700">
+                          <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-[#F2F1FB] text-[#3A31CE]">
                             Departamento
                           </span>
                           {dept.status === 'arquivado' && (
@@ -1098,7 +1098,7 @@ export function DepartamentosAtuacoes() {
 
                   {/* Subdepartamentos list */}
                   {subs.length > 0 && (
-                    <div className="pl-6 pt-2 space-y-2 border-l-2 border-purple-200">
+                    <div className="pl-6 pt-2 space-y-2 border-l-2 border-[#DAD7F3]">
                       <span className="text-[10px] uppercase font-bold text-gray-400 block">
                         Subdepartamentos vinculados ({subs.length})
                       </span>
@@ -1142,15 +1142,15 @@ export function DepartamentosAtuacoes() {
       {activeTab === 'requisitos_igreja' && (
         <section className="bg-white rounded-3xl p-6 sm:p-7 shadow-sm border border-gray-100 space-y-6">
           {/* Header Banner com a regra do usuário */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-purple-50/70 border border-purple-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="p-4 sm:p-5 rounded-2xl bg-[#F2F1FB] border border-[#DAD7F3] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-[#3A31CE]" />
-                <h3 className="font-extrabold text-[#191919] text-sm sm:text-base">
+                <h3 className="font-extrabold text-[#14161D] text-sm sm:text-base font-heading">
                   Requisitos em 3 Camadas Que Se Somam
                 </h3>
               </div>
-              <p className="text-xs text-gray-600 max-w-3xl">
+              <p className="text-xs text-[#5A6072] max-w-3xl">
                 Para qualquer função, o voluntário precisa cumprir cumulativamente:
                 <br />
                 <strong>1. Nível Igreja (Padrão):</strong> C1 concluído (definido pela Secretaria;
@@ -1163,11 +1163,11 @@ export function DepartamentosAtuacoes() {
                 líder ou secretaria).
               </p>
             </div>
-            <div className="shrink-0 p-3 bg-white rounded-xl border border-purple-200 text-xs">
+            <div className="shrink-0 p-3 bg-white rounded-xl border border-[#DAD7F3] text-xs">
               <p className="font-bold text-[#3A31CE] flex items-center gap-1.5">
                 <Lock className="w-3.5 h-3.5" /> Dispensa Exclusiva
               </p>
-              <p className="text-[11px] text-gray-500 mt-0.5 max-w-xs">
+              <p className="text-[11px] text-[#6B7183] mt-0.5 max-w-xs">
                 Apenas a Secretaria registra dispensas com justificativa oficial auditada. O líder
                 vê, mas não pode criar nem remover.
               </p>
@@ -1195,7 +1195,7 @@ export function DepartamentosAtuacoes() {
               {churchRequirements.map((cr) => (
                 <div
                   key={cr.id}
-                  className="p-4 rounded-2xl border border-purple-200 bg-[#FBF9FE] flex items-start justify-between gap-3"
+                  className="p-4 rounded-2xl border border-[#DAD7F3] bg-[#F2F1FB]/40 flex items-start justify-between gap-3"
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
@@ -1251,7 +1251,7 @@ export function DepartamentosAtuacoes() {
                   }}
                   variant="outline"
                   size="sm"
-                  className="rounded-full text-xs border-purple-200 text-purple-700 hover:bg-purple-50 h-8 self-start sm:self-auto"
+                  className="rounded-full text-xs border-[#DAD7F3] text-[#3A31CE] hover:bg-[#F2F1FB] h-8 self-start sm:self-auto"
                 >
                   <Plus className="w-3.5 h-3.5 mr-1" />+ Requisito do Departamento
                 </Button>
@@ -1345,7 +1345,7 @@ export function DepartamentosAtuacoes() {
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
                           Dispensa: {w.requirement_title}
                         </span>
-                        <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-800">
+                        <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-[#F2F1FB] text-[#3A31CE] border border-[#DAD7F3]">
                           Nível {w.requirement_type}
                         </span>
                       </div>
@@ -1414,8 +1414,8 @@ export function DepartamentosAtuacoes() {
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-bold text-[#191919] text-sm">{r.name}</h3>
-                      <p className="text-[11px] text-purple-700 font-semibold">
+                      <h3 className="font-bold text-[#14161D] text-sm">{r.name}</h3>
+                      <p className="text-[11px] text-[#3A31CE] font-semibold">
                         {r.expand?.department?.name || 'Unidade'}
                       </p>
                     </div>
@@ -1613,25 +1613,25 @@ export function DepartamentosAtuacoes() {
             )}
 
             {/* FEATURE 1: CHECKLIST COMPLETO SOMANDO OS 3 NÍVEIS + REGRA R8 */}
-            <div className="p-4 bg-purple-50/60 border border-purple-200 rounded-2xl space-y-3">
+            <div className="p-4 bg-[#F2F1FB] border border-[#DAD7F3] rounded-2xl space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 font-bold text-[#3A31CE]">
                   <ListCheck className="w-4 h-4" />
                   <span>Checklist Cumulativo em 3 Camadas</span>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#F2F1FB] text-[#3A31CE]">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white text-[#3A31CE] border border-[#DAD7F3]">
                   Soma dos 3 Níveis
                 </span>
               </div>
-              <p className="text-[11px] text-gray-500">
+              <p className="text-[11px] text-[#5A6072]">
                 O sistema exige simultaneamente a regra de membro (R8), o requisito universal da
                 Igreja (C1), os requisitos da unidade e os da função específica.
               </p>
 
               {/* NÍVEL 1: IGREJA (C1) */}
-              <div className="p-3 bg-white rounded-xl border border-purple-100 space-y-1.5">
+              <div className="p-3 bg-white rounded-xl border border-[#DAD7F3] space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] uppercase font-bold text-purple-700">
+                  <span className="text-[10px] uppercase font-bold text-[#3A31CE]">
                     1. Nível Igreja (Padrão Universal)
                   </span>
                   <span className="text-[10px] text-gray-400">Política da Igreja</span>
@@ -1727,7 +1727,7 @@ export function DepartamentosAtuacoes() {
               })()}
 
               {/* NÍVEL 3: FUNÇÃO */}
-              <div className="p-3 bg-white rounded-xl border border-purple-100 space-y-1.5">
+              <div className="p-3 bg-white rounded-xl border border-[#DAD7F3] space-y-1.5">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] uppercase font-bold text-[#3A31CE]">
                     3. Nível Função ({selectedRoleRecord?.name || 'Função'})
@@ -1743,7 +1743,7 @@ export function DepartamentosAtuacoes() {
                   selectedRoleRecord?.requirements?.map((req) => (
                     <label
                       key={req.id}
-                      className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-purple-50/40 cursor-pointer"
+                      className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-[#F2F1FB] cursor-pointer"
                     >
                       <input
                         type="checkbox"
@@ -1942,12 +1942,12 @@ export function DepartamentosAtuacoes() {
             </div>
 
             {/* Requisitos Checklist Management */}
-            <div className="p-4 bg-purple-50/50 border border-purple-200 rounded-2xl space-y-3">
+            <div className="p-4 bg-[#F2F1FB] border border-[#DAD7F3] rounded-2xl space-y-3">
               <div className="flex items-center justify-between">
                 <span className="font-bold text-[#3A31CE]">
                   Requisitos para Exercer a Função (D18)
                 </span>
-                <span className="text-[10px] text-gray-500">
+                <span className="text-[10px] text-[#5A6072]">
                   Configurável pelo Líder e Secretaria
                 </span>
               </div>
@@ -1963,7 +1963,7 @@ export function DepartamentosAtuacoes() {
                       handleAddRequirement()
                     }
                   }}
-                  className="rounded-xl text-xs h-9 bg-white"
+                  className="rounded-xl text-xs h-9 bg-white border-[#E1E3EB]"
                 />
                 <Button
                   type="button"
@@ -1976,12 +1976,12 @@ export function DepartamentosAtuacoes() {
 
               <div className="space-y-1.5 pt-1">
                 {roleForm.requirements.length === 0 ? (
-                  <p className="text-[11px] text-gray-400 italic">Nenhum requisito exigido.</p>
+                  <p className="text-[11px] text-[#6B7183] italic">Nenhum requisito exigido.</p>
                 ) : (
                   roleForm.requirements.map((req) => (
                     <div
                       key={req.id}
-                      className="flex items-center justify-between p-2 bg-white rounded-xl border border-purple-100 text-[11px]"
+                      className="flex items-center justify-between p-2 bg-white rounded-xl border border-[#DAD7F3] text-[11px]"
                     >
                       <span className="font-medium text-gray-800">{req.title}</span>
                       <button

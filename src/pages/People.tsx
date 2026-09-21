@@ -798,7 +798,7 @@ export default function People() {
                         key={h.id}
                         className="text-[11px] border-b border-gray-200/50 pb-2 last:border-0 last:pb-0"
                       >
-                        <div className="flex items-center justify-between font-bold text-[#820AD1]">
+                        <div className="flex items-center justify-between font-bold text-[#3A31CE]">
                           <span>
                             {h.from_stage || 'Início'} &rarr; {h.to_stage}
                           </span>

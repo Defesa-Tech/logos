@@ -110,8 +110,8 @@ export default {
         subtle: '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03)',
         card: '0 2px 8px -2px rgba(26, 26, 46, 0.04), 0 1px 3px 0 rgba(26, 26, 46, 0.02)',
         'card-hover':
-          '0 10px 28px -6px rgba(130, 10, 209, 0.1), 0 4px 10px -2px rgba(0, 0, 0, 0.04)',
-        nu: '0 4px 20px -4px rgba(130, 10, 209, 0.12)',
+          '0 10px 28px -6px rgba(58, 49, 206, 0.1), 0 4px 10px -2px rgba(0, 0, 0, 0.04)',
+        nu: '0 4px 20px -4px rgba(58, 49, 206, 0.12)',
       },
     },
   },

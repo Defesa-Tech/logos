@@ -123,18 +123,20 @@ export default function RetornoFormulario() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F0F1F5] flex items-center justify-center p-4">
-      <PageTransition className="w-full max-w-lg bg-white rounded-[32px] p-6 sm:p-8 shadow-xl border border-gray-100 space-y-6">
+    <div className="min-h-screen bg-[#FBFBFD] flex items-center justify-center p-4">
+      <PageTransition className="w-full max-w-lg bg-white rounded-[24px] p-6 sm:p-8 shadow-card border border-[#E8EAF0] space-y-6">
         {/* Brand Header */}
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-[#820AD1] text-white flex items-center justify-center font-black text-xl shadow-md mx-auto">
+          <div className="w-12 h-12 rounded-2xl bg-[#3A31CE] text-white flex items-center justify-center font-black text-xl shadow-md mx-auto">
             L
           </div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-[#820AD1] block">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-[#3A31CE] block">
             Jornada J4 &bull; Coleta Progressiva
           </span>
-          <h1 className="text-2xl font-extrabold text-[#191919]">Conte Mais Sobre Você</h1>
-          <p className="text-xs text-gray-500 max-w-sm mx-auto">
+          <h1 className="text-2xl font-extrabold text-[#14161D] font-heading">
+            Conte Mais Sobre Você
+          </h1>
+          <p className="text-xs text-[#5A6072] max-w-sm mx-auto">
             Pedimos seus dados na proporção do seu vínculo conosco. Tudo é opcional e você pode
             completar em etapas curtas!
           </p>
@@ -144,7 +146,7 @@ export default function RetornoFormulario() {
         {step === 'identify' && (
           <form onSubmit={handleIdentify} className="space-y-4 pt-2 text-xs">
             <div className="space-y-1">
-              <Label className="font-semibold text-gray-700">
+              <Label className="font-semibold text-[#14161D]">
                 Informe o seu WhatsApp cadastrado no culto
               </Label>
               <Input
@@ -152,9 +154,9 @@ export default function RetornoFormulario() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="(11) 98765-4321"
-                className="h-11 rounded-2xl bg-[#F0F1F5] border-transparent text-sm font-semibold"
+                className="h-11 rounded-2xl bg-[#F8F9FB] border-[#E1E3EB] text-sm font-semibold text-[#14161D]"
               />
-              <p className="text-[10px] text-gray-400">
+              <p className="text-[10px] text-[#6B7183]">
                 Localizamos sua presença anterior para pré-preencher seus dados e nunca re-perguntar
                 o que você já respondeu.
               </p>
@@ -163,7 +165,7 @@ export default function RetornoFormulario() {
             <Button
               type="submit"
               disabled={isSearching}
-              className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-11 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all"
+              className="w-full bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-11 rounded-full font-bold shadow-md shadow-[#3A31CE]/20 active:scale-95 transition-all"
             >
               {isSearching ? 'Localizando cadastro...' : 'Continuar &rarr;'}
             </Button>
@@ -176,19 +178,19 @@ export default function RetornoFormulario() {
             {/* Header com indicador de progresso */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="font-bold text-[#820AD1] text-xs">
+                <span className="font-bold text-[#3A31CE] text-xs">
                   Etapa 1 de 2: Você e Família
                 </span>
-                <span className="text-[10px] text-gray-400">50% concluído</span>
+                <span className="text-[10px] text-[#6B7183]">50% concluído</span>
               </div>
-              <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
-                <div className="bg-[#820AD1] h-full w-1/2 rounded-full transition-all" />
+              <div className="w-full bg-[#F2F1FB] h-2 rounded-full overflow-hidden">
+                <div className="bg-[#3A31CE] h-full w-1/2 rounded-full transition-all" />
               </div>
             </div>
 
-            <div className="bg-[#F7EEFD] p-3.5 rounded-2xl border border-purple-200">
-              <p className="font-bold text-[#820AD1] text-sm">Olá, {matchedPerson.name}!</p>
-              <p className="text-[11px] text-[#820AD1]/90 mt-0.5">
+            <div className="bg-[#F2F1FB] p-3.5 rounded-2xl border border-[#DAD7F3]">
+              <p className="font-bold text-[#3A31CE] text-sm">Olá, {matchedPerson.name}!</p>
+              <p className="text-[11px] text-[#3A31CE]/90 mt-0.5">
                 Microcopy de propósito: Solicitamos estas informações para lembrarmos do seu
                 aniversário e indicar programações para sua família.
               </p>
@@ -204,55 +206,55 @@ export default function RetornoFormulario() {
               {/* Campo 1: Data de nascimento */}
               <div className="space-y-1">
                 <div className="flex justify-between items-center">
-                  <Label className="font-semibold text-gray-700">Data de Nascimento</Label>
-                  <span className="text-[10px] text-[#820AD1]">Para comemorarmos seu dia</span>
+                  <Label className="font-semibold text-[#14161D]">Data de Nascimento</Label>
+                  <span className="text-[10px] text-[#3A31CE]">Para comemorarmos seu dia</span>
                 </div>
                 <Input
                   type="date"
                   value={birthDate}
                   onChange={(e) => setBirthDate(e.target.value)}
-                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent"
+                  className="h-10 rounded-2xl bg-[#F8F9FB] border-[#E1E3EB]"
                 />
               </div>
 
               {/* Campo 2: Bairro */}
               <div className="space-y-1">
                 <div className="flex justify-between items-center">
-                  <Label className="font-semibold text-gray-700">Seu Bairro / Região</Label>
-                  <span className="text-[10px] text-gray-400">Para grupos próximos</span>
+                  <Label className="font-semibold text-[#14161D]">Seu Bairro / Região</Label>
+                  <span className="text-[10px] text-[#6B7183]">Para grupos próximos</span>
                 </div>
                 <Input
                   value={neighborhood}
                   onChange={(e) => setNeighborhood(e.target.value)}
                   placeholder="Ex: Pinheiros, Vila Madalena..."
-                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent"
+                  className="h-10 rounded-2xl bg-[#F8F9FB] border-[#E1E3EB]"
                 />
               </div>
 
               {/* Campo 3: Como conheceu */}
               <div className="space-y-1">
                 <div className="flex justify-between items-center">
-                  <Label className="font-semibold text-gray-700">
+                  <Label className="font-semibold text-[#14161D]">
                     Como conheceu a Defesa da Fé?
                   </Label>
-                  <span className="text-[10px] text-gray-400">Opcional</span>
+                  <span className="text-[10px] text-[#6B7183]">Opcional</span>
                 </div>
                 <Input
                   value={howMet}
                   onChange={(e) => setHowMet(e.target.value)}
                   placeholder="Ex: Amigo, Instagram, convite da família..."
-                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent"
+                  className="h-10 rounded-2xl bg-[#F8F9FB] border-[#E1E3EB]"
                 />
               </div>
 
               {/* Campo 4: Filhos */}
-              <div className="p-3.5 rounded-2xl bg-[#F8F9FB] border border-gray-100 space-y-2.5">
-                <label className="flex items-center gap-2 cursor-pointer font-bold text-gray-800">
+              <div className="p-3.5 rounded-2xl bg-[#F8F9FB] border border-[#E8EAF0] space-y-2.5">
+                <label className="flex items-center gap-2 cursor-pointer font-bold text-[#14161D]">
                   <input
                     type="checkbox"
                     checked={hasChildren}
                     onChange={(e) => setHasChildren(e.target.checked)}
-                    className="rounded text-[#820AD1] focus:ring-[#820AD1]"
+                    className="rounded text-[#3A31CE] focus:ring-[#3A31CE]"
                   />
                   <span>Tenho filhos</span>
                 </label>
@@ -260,16 +262,16 @@ export default function RetornoFormulario() {
                 {hasChildren && (
                   <div className="space-y-1 pt-1">
                     <div className="flex justify-between items-center">
-                      <Label className="text-[11px] font-semibold text-gray-600">
+                      <Label className="text-[11px] font-semibold text-[#5A6072]">
                         Nomes e idades dos filhos
                       </Label>
-                      <span className="text-[10px] text-[#820AD1]">Para o Ministério Kids</span>
+                      <span className="text-[10px] text-[#3A31CE]">Para o Ministério Kids</span>
                     </div>
                     <Input
                       value={childrenInfo}
                       onChange={(e) => setChildrenInfo(e.target.value)}
                       placeholder="Ex: Mariana (6 anos) e Davi (9 anos)"
-                      className="h-9 rounded-2xl bg-white border-gray-200"
+                      className="h-9 rounded-2xl bg-white border-[#E1E3EB]"
                     />
                   </div>
                 )}
@@ -277,7 +279,7 @@ export default function RetornoFormulario() {
 
               <Button
                 type="submit"
-                className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-11 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all"
+                className="w-full bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-11 rounded-full font-bold shadow-md shadow-[#3A31CE]/20 active:scale-95 transition-all"
               >
                 Avançar para Etapa 2 &rarr;
               </Button>
@@ -291,18 +293,18 @@ export default function RetornoFormulario() {
             {/* Indicador de progresso */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="font-bold text-[#820AD1] text-xs">
+                <span className="font-bold text-[#3A31CE] text-xs">
                   Etapa 2 de 2: Comunhão &amp; Membresia
                 </span>
-                <span className="text-[10px] text-gray-400">100%</span>
+                <span className="text-[10px] text-[#6B7183]">100%</span>
               </div>
-              <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
-                <div className="bg-[#820AD1] h-full w-full rounded-full transition-all" />
+              <div className="w-full bg-[#F2F1FB] h-2 rounded-full overflow-hidden">
+                <div className="bg-[#3A31CE] h-full w-full rounded-full transition-all" />
               </div>
             </div>
 
-            <div className="bg-[#F7EEFD] p-3.5 rounded-2xl border border-purple-200">
-              <p className="text-[11px] text-[#820AD1]/90">
+            <div className="bg-[#F2F1FB] p-3.5 rounded-2xl border border-[#DAD7F3]">
+              <p className="text-[11px] text-[#3A31CE]/90">
                 Microcopy de propósito: Para aproximar você do caminho da membresia, grupos pequenos
                 e comunhão bíblica.
               </p>
@@ -312,63 +314,63 @@ export default function RetornoFormulario() {
               {/* Campo 1: Endereço */}
               <div className="space-y-1">
                 <div className="flex justify-between items-center">
-                  <Label className="font-semibold text-gray-700">Endereço Residencial</Label>
-                  <span className="text-[10px] text-gray-400">Opcional</span>
+                  <Label className="font-semibold text-[#14161D]">Endereço Residencial</Label>
+                  <span className="text-[10px] text-[#6B7183]">Opcional</span>
                 </div>
                 <Input
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   placeholder="Rua, número e complemento"
-                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent"
+                  className="h-10 rounded-2xl bg-[#F8F9FB] border-[#E1E3EB]"
                 />
               </div>
 
               {/* Campo 2: Interesse em membresia */}
-              <div className="p-3 bg-purple-50/50 rounded-2xl border border-purple-100">
-                <label className="flex items-center gap-2 cursor-pointer font-bold text-gray-800">
+              <div className="p-3 bg-[#F2F1FB] rounded-2xl border border-[#DAD7F3]">
+                <label className="flex items-center gap-2 cursor-pointer font-bold text-[#14161D]">
                   <input
                     type="checkbox"
                     checked={interestInMembership}
                     onChange={(e) => setInterestInMembership(e.target.checked)}
-                    className="rounded text-[#820AD1] focus:ring-[#820AD1]"
+                    className="rounded text-[#3A31CE] focus:ring-[#3A31CE]"
                   />
                   <span>Tenho interesse em ser membro da Defesa da Fé</span>
                 </label>
               </div>
 
               {/* Campo 3 & 4: Batismo nas águas */}
-              <div className="p-3.5 rounded-2xl bg-[#F8F9FB] border border-gray-100 space-y-3">
-                <label className="flex items-center gap-2 cursor-pointer font-bold text-gray-800">
+              <div className="p-3.5 rounded-2xl bg-[#F8F9FB] border border-[#E8EAF0] space-y-3">
+                <label className="flex items-center gap-2 cursor-pointer font-bold text-[#14161D]">
                   <input
                     type="checkbox"
                     checked={hasBaptism}
                     onChange={(e) => setHasBaptism(e.target.checked)}
-                    className="rounded text-[#820AD1] focus:ring-[#820AD1]"
+                    className="rounded text-[#3A31CE] focus:ring-[#3A31CE]"
                   />
                   <span>Já sou batizado nas águas (em qualquer igreja evangélica)</span>
                 </label>
 
                 {hasBaptism && (
-                  <div className="space-y-3 pt-2 border-t border-gray-200">
+                  <div className="space-y-3 pt-2 border-t border-[#E8EAF0]">
                     <div className="space-y-1">
-                      <Label className="font-semibold text-gray-700">Data do Batismo</Label>
+                      <Label className="font-semibold text-[#14161D]">Data do Batismo</Label>
                       <Input
                         type="date"
                         value={baptismDate}
                         onChange={(e) => setBaptismDate(e.target.value)}
-                        className="h-9 rounded-2xl bg-white border-gray-200"
+                        className="h-9 rounded-2xl bg-white border-[#E1E3EB]"
                       />
                     </div>
 
                     <div className="space-y-1">
-                      <Label className="font-semibold text-gray-700">Onde foi batizado?</Label>
+                      <Label className="font-semibold text-[#14161D]">Onde foi batizado?</Label>
                       <Select
                         value={baptismLocation}
                         onValueChange={(val) =>
                           setBaptismLocation(val as 'defesa_da_fe' | 'outra_igreja')
                         }
                       >
-                        <SelectTrigger className="h-9 rounded-2xl bg-white border-gray-200">
+                        <SelectTrigger className="h-9 rounded-2xl bg-white border-[#E1E3EB]">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="bg-white rounded-2xl shadow-xl">
@@ -382,12 +384,12 @@ export default function RetornoFormulario() {
 
                     {baptismLocation === 'outra_igreja' && (
                       <div className="space-y-1">
-                        <Label className="font-semibold text-gray-700">Nome da Igreja</Label>
+                        <Label className="font-semibold text-[#14161D]">Nome da Igreja</Label>
                         <Input
                           value={baptismChurchName}
                           onChange={(e) => setBaptismChurchName(e.target.value)}
                           placeholder="Ex: Igreja Presbiteriana Central"
-                          className="h-9 rounded-2xl bg-white border-gray-200"
+                          className="h-9 rounded-2xl bg-white border-[#E1E3EB]"
                         />
                       </div>
                     )}
@@ -400,7 +402,7 @@ export default function RetornoFormulario() {
                   type="button"
                   variant="outline"
                   onClick={() => setStep('etapa1')}
-                  className="rounded-full h-11 px-4 border-gray-200 text-gray-600 font-bold"
+                  className="rounded-full h-11 px-4 border-[#E1E3EB] text-[#5A6072] font-bold hover:bg-[#F2F1FB]"
                 >
                   <ChevronLeft className="w-4 h-4 mr-1" />
                   Voltar
@@ -408,7 +410,7 @@ export default function RetornoFormulario() {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-11 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all"
+                  className="flex-1 bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-11 rounded-full font-bold shadow-md shadow-[#3A31CE]/20 active:scale-95 transition-all"
                 >
                   {isSubmitting ? 'Salvando...' : 'Concluir Meu Cadastro'}
                 </Button>
@@ -421,14 +423,16 @@ export default function RetornoFormulario() {
         {step === 'success' && (
           <div className="text-center py-6 space-y-4">
             <CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto animate-bounce" />
-            <h2 className="text-xl font-extrabold text-[#191919]">Cadastro Atualizado!</h2>
-            <p className="text-xs text-gray-500 max-w-xs mx-auto">
+            <h2 className="text-xl font-extrabold text-[#14161D] font-heading">
+              Cadastro Atualizado!
+            </h2>
+            <p className="text-xs text-[#5A6072] max-w-xs mx-auto">
               Seus dados foram vinculados com sucesso à secretaria da Igreja Defesa da Fé. Deus
               abençoe sua caminhada conosco!
             </p>
             <Button
               onClick={() => (window.location.href = '/')}
-              className="bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-10 px-6 rounded-full font-bold"
+              className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-10 px-6 rounded-full font-bold"
             >
               Acessar Página Inicial
             </Button>

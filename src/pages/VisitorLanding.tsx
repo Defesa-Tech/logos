@@ -582,7 +582,9 @@ export default function VisitorLanding() {
                       <span className="text-[10px] font-black uppercase text-[#3A31CE] tracking-wider font-heading">
                         Passo Único &bull; 4 campos rápidos
                       </span>
-                      <h3 className="font-bold text-[#14161D] text-sm font-heading">Conte mais sobre você</h3>
+                      <h3 className="font-bold text-[#14161D] text-sm font-heading">
+                        Conte mais sobre você
+                      </h3>
                     </div>
                     <span className="text-[10px] text-[#6B7183] bg-gray-100 px-2 py-0.5 rounded-full">
                       Tudo opcional
@@ -791,7 +793,9 @@ export default function VisitorLanding() {
             <span className="text-[10px] uppercase font-bold tracking-wider text-[#3A31CE] bg-[#F2F1FB] px-3 py-1 rounded-full font-heading">
               Reconhecimento do Aparelho
             </span>
-            <h1 className="text-2xl font-black text-[#14161D] font-heading">Olá de novo, {firstName}!</h1>
+            <h1 className="text-2xl font-black text-[#14161D] font-heading">
+              Olá de novo, {firstName}!
+            </h1>
             <p className="text-xs text-[#5A6072] leading-relaxed">
               {activeCulto
                 ? `Confirmar sua presença hoje no ${activeCulto.name}?`
@@ -969,8 +973,8 @@ export default function VisitorLanding() {
                 className="mt-0.5 rounded text-[#3A31CE] focus:ring-[#3A31CE]"
               />
               <span>
-                Autorizo a Igreja a enviar uma mensagem de acolhimento e avisos sobre
-                nossas atividades bíblicas, conforme a{' '}
+                Autorizo a Igreja a enviar uma mensagem de acolhimento e avisos sobre nossas
+                atividades bíblicas, conforme a{' '}
                 <span className="text-[#3A31CE] underline">Política de Privacidade (LGPD)</span>.
               </span>
             </label>

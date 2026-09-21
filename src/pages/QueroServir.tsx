@@ -256,17 +256,17 @@ export function QueroServir() {
 
   return (
     <PageTransition className="space-y-6 sm:space-y-8 max-w-5xl mx-auto pb-12">
-      {/* Header com estilo Nubank */}
-      <section className="bg-white p-5 sm:p-6 rounded-3xl border border-gray-100 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Header com estilo Logos */}
+      <section className="bg-white p-5 sm:p-6 rounded-[22px] border border-[#E8EAF0] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#820AD1] mb-1">
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#3A31CE] mb-1">
             <HeartHandshake className="w-4 h-4" />
             <span>Jornada do Voluntário &bull; Igreja Defesa da Fé</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191919]">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#14161D] font-heading">
             Quero Servir
           </h1>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1 max-w-2xl">
+          <p className="text-xs sm:text-sm text-[#5A6072] mt-1 max-w-2xl">
             Descubra o caminho claro para exercer seus dons e servir nos ministérios da igreja.
             Preencha seus interesses, cumpra o C1 e conecte-se com a liderança.
           </p>
@@ -275,13 +275,13 @@ export function QueroServir() {
         {/* Alternador de Visão para Líderes / Secretaria */}
         <div className="flex items-center gap-2">
           {isLeaderOrSecretary && (
-            <div className="flex bg-[#F8F9FB] p-1 rounded-full border border-gray-200 text-xs">
+            <div className="flex bg-[#F2F1FB] p-1 rounded-full border border-[#DAD7F3] text-xs">
               <button
                 onClick={() => setViewMode('jornada')}
                 className={`px-3 py-1.5 rounded-full font-bold transition-all cursor-pointer ${
                   viewMode === 'jornada'
-                    ? 'bg-[#820AD1] text-white shadow-xs'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-[#3A31CE] text-white shadow-xs'
+                    : 'text-[#5A6072] hover:text-[#14161D]'
                 }`}
               >
                 Minha Jornada
@@ -290,8 +290,8 @@ export function QueroServir() {
                 onClick={() => setViewMode('candidatos_lider')}
                 className={`px-3 py-1.5 rounded-full font-bold transition-all cursor-pointer ${
                   viewMode === 'candidatos_lider'
-                    ? 'bg-[#820AD1] text-white shadow-xs'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-[#3A31CE] text-white shadow-xs'
+                    : 'text-[#5A6072] hover:text-[#14161D]'
                 }`}
               >
                 Candidatos a Voluntário ({allCandidateProfiles.length})
@@ -303,8 +303,8 @@ export function QueroServir() {
 
       {/* Seletor de pessoa para simulação se for Secretaria */}
       {permissions.isSecretaria && (
-        <div className="p-3 bg-purple-50 rounded-2xl border border-purple-200 flex items-center justify-between gap-3 text-xs flex-wrap">
-          <span className="font-semibold text-purple-900">
+        <div className="p-3 bg-[#F2F1FB] rounded-2xl border border-[#DAD7F3] flex items-center justify-between gap-3 text-xs flex-wrap">
+          <span className="font-semibold text-[#14161D]">
             Visualizando jornada para:{' '}
             <strong>{activePerson?.name || 'Selecione um membro'}</strong> (
             {activePerson?.stage || 'frequentador'})
@@ -315,7 +315,7 @@ export function QueroServir() {
               const p = allMembers.find((m) => m.id === e.target.value)
               if (p) loadData(p)
             }}
-            className="rounded-xl border border-purple-200 bg-white text-xs h-8 px-2 font-medium"
+            className="rounded-xl border border-[#DAD7F3] bg-white text-xs h-8 px-2 font-medium text-[#14161D]"
           >
             {allMembers.map((m) => (
               <option key={m.id} value={m.id}>
@@ -331,17 +331,17 @@ export function QueroServir() {
           ===================================================================== */}
       {viewMode === 'jornada' && (
         <div className="space-y-6">
-          {/* MAPA DA JORNADA COMPLETA (VISUAL NUBANK) */}
-          <section className="bg-gradient-to-br from-[#820AD1] to-[#5A0792] p-6 sm:p-7 rounded-3xl text-white shadow-md space-y-6">
+          {/* MAPA DA JORNADA COMPLETA (VISUAL LOGOS) */}
+          <section className="bg-gradient-to-br from-[#3A31CE] to-[#2A23A6] p-6 sm:p-7 rounded-[24px] text-white shadow-md space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-purple-200">
+                <span className="text-xs font-bold uppercase tracking-wider text-indigo-100">
                   Caminho do Voluntariado
                 </span>
-                <h2 className="text-xl sm:text-2xl font-extrabold mt-0.5">
+                <h2 className="text-xl sm:text-2xl font-extrabold mt-0.5 font-heading">
                   Seu Caminho Para Servir
                 </h2>
-                <p className="text-xs text-purple-100 mt-1 max-w-xl">
+                <p className="text-xs text-indigo-100/90 mt-1 max-w-xl">
                   Cada etapa foi pensada com carinho para preparar você ministerialmente e
                   teologicamente. Veja abaixo o seu progresso atual:
                 </p>
@@ -349,7 +349,7 @@ export function QueroServir() {
 
               {/* Status Badge Principal */}
               <div className="self-start sm:self-auto bg-white/10 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/20 text-xs">
-                <span className="text-purple-200 block text-[10px] uppercase font-bold">
+                <span className="text-indigo-200 block text-[10px] uppercase font-bold">
                   Status Atual
                 </span>
                 <span className="font-extrabold text-white text-sm">
@@ -371,7 +371,7 @@ export function QueroServir() {
                 className={`p-3.5 rounded-2xl border transition-all ${
                   step1Completed
                     ? 'bg-white/15 border-emerald-400/80 text-white'
-                    : 'bg-white/5 border-white/20 text-purple-100'
+                    : 'bg-white/5 border-white/20 text-indigo-100'
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
@@ -381,11 +381,11 @@ export function QueroServir() {
                   {step1Completed ? (
                     <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                   ) : (
-                    <Clock className="w-4 h-4 text-purple-300" />
+                    <Clock className="w-4 h-4 text-indigo-200" />
                   )}
                 </div>
                 <p className="font-bold text-xs text-white">Perfil de Serviço</p>
-                <p className="text-[11px] text-purple-200 mt-0.5 leading-snug">
+                <p className="text-[11px] text-indigo-100/80 mt-0.5 leading-snug">
                   Habilidades, dons e departamentos de interesse.
                 </p>
               </div>
@@ -397,7 +397,7 @@ export function QueroServir() {
                     ? 'bg-white/15 border-emerald-400/80 text-white'
                     : step2Enrolled
                       ? 'bg-white/20 border-amber-300 text-white'
-                      : 'bg-white/5 border-white/20 text-purple-100'
+                      : 'bg-white/5 border-white/20 text-indigo-100'
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
@@ -409,11 +409,11 @@ export function QueroServir() {
                   ) : step2Enrolled ? (
                     <Clock className="w-4 h-4 text-amber-300 animate-pulse" />
                   ) : (
-                    <span className="text-[10px] text-purple-300 font-bold">Obrigatório</span>
+                    <span className="text-[10px] text-indigo-200 font-bold">Obrigatório</span>
                   )}
                 </div>
                 <p className="font-bold text-xs text-white">Curso C1</p>
-                <p className="text-[11px] text-purple-200 mt-0.5 leading-snug">
+                <p className="text-[11px] text-indigo-100/80 mt-0.5 leading-snug">
                   {step2Completed
                     ? c1Status.isWaived
                       ? 'C1 Dispensado pela Secretaria'
@@ -429,17 +429,17 @@ export function QueroServir() {
                 className={`p-3.5 rounded-2xl border transition-all ${
                   step3Completed
                     ? 'bg-white/15 border-white/40 text-white'
-                    : 'bg-white/5 border-white/20 text-purple-200'
+                    : 'bg-white/5 border-white/20 text-indigo-100'
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-white/20">
                     Etapa 3
                   </span>
-                  {step3Completed && <Sparkles className="w-4 h-4 text-purple-200" />}
+                  {step3Completed && <Sparkles className="w-4 h-4 text-indigo-200" />}
                 </div>
                 <p className="font-bold text-xs text-white">Conversa com Líder</p>
-                <p className="text-[11px] text-purple-200 mt-0.5 leading-snug">
+                <p className="text-[11px] text-indigo-100/80 mt-0.5 leading-snug">
                   Alinhamento de chamado e requisitos do departamento.
                 </p>
               </div>
@@ -449,17 +449,17 @@ export function QueroServir() {
                 className={`p-3.5 rounded-2xl border transition-all ${
                   step4Completed
                     ? 'bg-white/15 border-emerald-400 text-white'
-                    : 'bg-white/5 border-white/20 text-purple-200'
+                    : 'bg-white/5 border-white/20 text-indigo-100'
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-white/20">
                     Etapa 4
                   </span>
-                  <Briefcase className="w-4 h-4 text-purple-300" />
+                  <Briefcase className="w-4 h-4 text-indigo-200" />
                 </div>
                 <p className="font-bold text-xs text-white">Início na Função</p>
-                <p className="text-[11px] text-purple-200 mt-0.5 leading-snug">
+                <p className="text-[11px] text-indigo-100/80 mt-0.5 leading-snug">
                   Atuação oficial com mentoria e escala de serviço.
                 </p>
               </div>
@@ -467,17 +467,17 @@ export function QueroServir() {
           </section>
 
           {/* BLOCO ETAPA 2: C1 (STATUS & INSCRIÇÃO EM UM TOQUE) */}
-          <section className="bg-white rounded-3xl p-6 sm:p-7 shadow-sm border border-gray-100 space-y-4">
+          <section className="bg-white rounded-[22px] p-6 sm:p-7 shadow-xs border border-[#E8EAF0] space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-purple-50 text-[#820AD1] flex items-center justify-center font-bold">
+                <div className="w-9 h-9 rounded-xl bg-[#F2F1FB] text-[#3A31CE] flex items-center justify-center font-bold">
                   2
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-[#191919] text-base">
+                  <h3 className="font-extrabold text-[#14161D] text-base font-heading">
                     C1 — Curso de Fundamentos &amp; Serviço
                   </h3>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-[#5A6072]">
                     Política padrão da Igreja: o C1 é requisito universal para qualquer função
                     ministerial.
                   </p>
@@ -525,14 +525,14 @@ export function QueroServir() {
               </div>
             ) : openClasses.length > 0 ? (
               /* Cenário C: Turma aberta com inscrição em 1 toque */
-              <div className="p-5 rounded-2xl bg-[#F8F9FB] border border-gray-200 space-y-4">
+              <div className="p-5 rounded-2xl bg-[#F8F9FB] border border-[#E8EAF0] space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#3A31CE] bg-[#F2F1FB] px-2.5 py-0.5 rounded-full border border-[#DAD7F3]">
                       Próxima Turma Aberta
                     </span>
-                    <h4 className="font-bold text-[#191919] text-sm mt-1">{openClasses[0].name}</h4>
-                    <p className="text-xs text-gray-500">
+                    <h4 className="font-bold text-[#14161D] text-sm mt-1">{openClasses[0].name}</h4>
+                    <p className="text-xs text-[#5A6072]">
                       Início em {new Date(openClasses[0].start_date).toLocaleDateString('pt-BR')}{' '}
                       &bull; {openClasses[0].schedule_info || 'Aos domingos'}
                     </p>
@@ -540,15 +540,15 @@ export function QueroServir() {
 
                   <Button
                     onClick={() => handleEnrollC1Quick(openClasses[0].id)}
-                    className="bg-[#820AD1] hover:bg-[#7008B7] text-white font-bold text-xs h-10 px-5 rounded-full shadow-md shadow-[#820AD1]/20 self-start sm:self-auto"
+                    className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white font-bold text-xs h-10 px-5 rounded-full shadow-md shadow-[#3A31CE]/20 self-start sm:self-auto"
                   >
                     Inscrever-me em 1 Toque
                     <ArrowRight className="w-4 h-4 ml-1.5" />
                   </Button>
                 </div>
 
-                <div className="text-[11px] text-gray-500 flex items-center gap-2 pt-1 border-t border-gray-200">
-                  <Info className="w-3.5 h-3.5 text-purple-600" />
+                <div className="text-[11px] text-[#5A6072] flex items-center gap-2 pt-1 border-t border-[#E8EAF0]">
+                  <Info className="w-3.5 h-3.5 text-[#3A31CE]" />
                   <span>
                     Aberto a membros e frequentadores. O frequentador ganha tempo e fica pronto para
                     servir logo após o batismo.
@@ -557,12 +557,12 @@ export function QueroServir() {
               </div>
             ) : (
               /* Cenário D: Nenhuma turma aberta no momento ("Me avise quando abrir") */
-              <div className="p-5 rounded-2xl bg-purple-50/50 border border-purple-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <div className="p-5 rounded-2xl bg-[#F2F1FB] border border-[#DAD7F3] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                 <div>
-                  <h4 className="font-bold text-[#191919] text-sm">
+                  <h4 className="font-bold text-[#14161D] text-sm">
                     Nenhuma turma aberta neste instante
                   </h4>
-                  <p className="text-gray-500 mt-0.5">
+                  <p className="text-[#5A6072] mt-0.5">
                     Não se preocupe! Cadastre seu perfil abaixo e clique no botão para ser avisado
                     em primeira mão assim que a Secretaria abrir vagas.
                   </p>
@@ -571,7 +571,7 @@ export function QueroServir() {
                 <Button
                   onClick={handleNotifyMeC1}
                   variant="outline"
-                  className="rounded-full text-xs font-bold border-purple-300 text-[#820AD1] hover:bg-purple-100 self-start sm:self-auto"
+                  className="rounded-full text-xs font-bold border-[#DAD7F3] text-[#3A31CE] hover:bg-[#DAD7F3]/40 self-start sm:self-auto"
                 >
                   <Bell className="w-4 h-4 mr-1.5" />
                   Me avise quando abrir turma
@@ -581,14 +581,16 @@ export function QueroServir() {
           </section>
 
           {/* BLOCO ETAPA 1: PERFIL DE SERVIÇO (HABILIDADES, INTERESSES, DISPONIBILIDADE) */}
-          <section className="bg-white rounded-3xl p-6 sm:p-7 shadow-sm border border-gray-100 space-y-6">
+          <section className="bg-white rounded-[22px] p-6 sm:p-7 shadow-xs border border-[#E8EAF0] space-y-6">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-purple-50 text-[#820AD1] flex items-center justify-center font-bold">
+              <div className="w-9 h-9 rounded-xl bg-[#F2F1FB] text-[#3A31CE] flex items-center justify-center font-bold">
                 1
               </div>
               <div>
-                <h3 className="font-extrabold text-[#191919] text-base">Seu Perfil de Serviço</h3>
-                <p className="text-xs text-gray-500">
+                <h3 className="font-extrabold text-[#14161D] text-base font-heading">
+                  Seu Perfil de Serviço
+                </h3>
+                <p className="text-xs text-[#5A6072]">
                   É preenchido mesmo sem C1, porque seu interesse já é valioso para a igreja.
                 </p>
               </div>
@@ -596,7 +598,7 @@ export function QueroServir() {
 
             {/* Habilidades & Dons */}
             <div className="space-y-2.5">
-              <label className="font-bold text-xs text-gray-700 block">
+              <label className="font-bold text-xs text-[#14161D] block">
                 Suas Habilidades &amp; Dons (Selecione as que você se identifica)
               </label>
               <div className="flex flex-wrap gap-2">
@@ -609,8 +611,8 @@ export function QueroServir() {
                       onClick={() => handleToggleSkill(skill)}
                       className={`text-xs px-3.5 py-1.5 rounded-full font-medium transition-all cursor-pointer border ${
                         isSelected
-                          ? 'bg-[#820AD1] text-white border-[#820AD1] shadow-xs'
-                          : 'bg-[#F8F9FB] text-gray-700 border-gray-200 hover:border-purple-300'
+                          ? 'bg-[#3A31CE] text-white border-[#3A31CE] shadow-xs'
+                          : 'bg-[#F8F9FB] text-[#5A6072] border-[#E8EAF0] hover:border-[#DAD7F3]'
                       }`}
                     >
                       {isSelected && <Check className="w-3.5 h-3.5 inline-block mr-1 -mt-0.5" />}
@@ -632,12 +634,12 @@ export function QueroServir() {
                       handleAddCustomSkill()
                     }
                   }}
-                  className="rounded-xl text-xs h-9"
+                  className="rounded-xl text-xs h-9 border-[#E1E3EB]"
                 />
                 <Button
                   type="button"
                   onClick={handleAddCustomSkill}
-                  className="rounded-xl text-xs h-9 bg-purple-100 text-[#820AD1] hover:bg-purple-200 font-bold px-3 shrink-0"
+                  className="rounded-xl text-xs h-9 bg-[#F2F1FB] text-[#3A31CE] hover:bg-[#DAD7F3] font-bold px-3 shrink-0"
                 >
                   Adicionar
                 </Button>
@@ -645,8 +647,8 @@ export function QueroServir() {
             </div>
 
             {/* Departamentos de Interesse */}
-            <div className="space-y-2.5 pt-2 border-t border-gray-100">
-              <label className="font-bold text-xs text-gray-700 block">
+            <div className="space-y-2.5 pt-2 border-t border-[#E8EAF0]">
+              <label className="font-bold text-xs text-[#14161D] block">
                 Departamentos Onde Gostaria de Servir
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
@@ -658,16 +660,16 @@ export function QueroServir() {
                       onClick={() => handleToggleDept(dept.name)}
                       className={`p-3 rounded-2xl border cursor-pointer transition-all ${
                         isSelected
-                          ? 'bg-purple-50/70 border-[#820AD1] text-[#820AD1]'
-                          : 'bg-[#F8F9FB] border-gray-200 text-gray-700 hover:border-purple-200'
+                          ? 'bg-[#F2F1FB] border-[#3A31CE] text-[#3A31CE]'
+                          : 'bg-[#F8F9FB] border-[#E8EAF0] text-[#5A6072] hover:border-[#DAD7F3]'
                       }`}
                     >
                       <div className="flex items-center justify-between">
                         <span className="font-bold text-xs">{dept.name}</span>
-                        {isSelected && <CheckCircle2 className="w-4 h-4 text-[#820AD1]" />}
+                        {isSelected && <CheckCircle2 className="w-4 h-4 text-[#3A31CE]" />}
                       </div>
                       {dept.description && (
-                        <p className="text-[10px] text-gray-500 mt-1 line-clamp-1">
+                        <p className="text-[10px] text-[#6B7183] mt-1 line-clamp-1">
                           {dept.description}
                         </p>
                       )}
@@ -678,28 +680,28 @@ export function QueroServir() {
             </div>
 
             {/* Disponibilidade */}
-            <div className="space-y-1.5 pt-2 border-t border-gray-100">
-              <label className="font-bold text-xs text-gray-700 block">
+            <div className="space-y-1.5 pt-2 border-t border-[#E8EAF0]">
+              <label className="font-bold text-xs text-[#14161D] block">
                 Disponibilidade de Dias e Horários
               </label>
               <Input
                 placeholder="Ex.: Domingos pela manhã, cultos de quarta-feira, sábados à tarde..."
                 value={availability}
                 onChange={(e) => setAvailability(e.target.value)}
-                className="rounded-xl text-xs h-10"
+                className="rounded-xl text-xs h-10 border-[#E1E3EB]"
               />
             </div>
 
             {/* Observações */}
             <div className="space-y-1.5">
-              <label className="font-bold text-xs text-gray-700 block">
+              <label className="font-bold text-xs text-[#14161D] block">
                 Algo mais que a liderança pastoral deveria saber? (opcional)
               </label>
               <Textarea
                 placeholder="Compartilhe seu testemunho, experiências anteriores em outras igrejas, ou preferências..."
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                className="rounded-xl text-xs"
+                className="rounded-xl text-xs border-[#E1E3EB]"
                 rows={3}
               />
             </div>
@@ -708,7 +710,7 @@ export function QueroServir() {
               <Button
                 onClick={handleSaveProfile}
                 disabled={savingProfile}
-                className="bg-[#820AD1] hover:bg-[#7008B7] text-white font-bold text-xs h-10 px-6 rounded-full shadow-md shadow-[#820AD1]/20"
+                className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white font-bold text-xs h-10 px-6 rounded-full shadow-md shadow-[#3A31CE]/20"
               >
                 {savingProfile ? 'Salvando...' : 'Salvar Perfil de Serviço'}
               </Button>
@@ -721,12 +723,14 @@ export function QueroServir() {
           VISÃO 2: LÍDERES — CANDIDATOS A VOLUNTÁRIOS ("AGUARDANDO C1" VS "APTO")
           ===================================================================== */}
       {viewMode === 'candidatos_lider' && (
-        <section className="bg-white rounded-3xl p-6 sm:p-7 shadow-sm border border-gray-100 space-y-5">
-          <div className="p-4 rounded-2xl bg-purple-50/70 border border-purple-200 text-xs text-purple-900 flex items-start gap-2.5">
-            <Users className="w-4 h-4 text-[#820AD1] shrink-0 mt-0.5" />
+        <section className="bg-white rounded-[22px] p-6 sm:p-7 shadow-xs border border-[#E8EAF0] space-y-5">
+          <div className="p-4 rounded-2xl bg-[#F2F1FB] border border-[#DAD7F3] text-xs text-[#14161D] flex items-start gap-2.5">
+            <Users className="w-4 h-4 text-[#3A31CE] shrink-0 mt-0.5" />
             <div>
-              <p className="font-bold">Visão da Liderança Ministerial — Banco de Voluntários:</p>
-              <p className="text-[11px] text-purple-800 mt-0.5">
+              <p className="font-bold text-[#3A31CE]">
+                Visão da Liderança Ministerial — Banco de Voluntários:
+              </p>
+              <p className="text-[11px] text-[#5A6072] mt-0.5">
                 Você pode conhecer as pessoas interessadas com a etiqueta{' '}
                 <strong>&ldquo;Aguardando C1&rdquo;</strong> e planejar suas escalas. O sistema
                 permite ativar a atuação formal somente após a conclusão do C1 (ou dispensa da
@@ -757,7 +761,7 @@ export function QueroServir() {
                   >
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-bold text-[#191919] text-sm">
+                        <span className="font-bold text-[#14161D] text-sm">
                           {person?.name || 'Membro'}
                         </span>
 
@@ -774,7 +778,7 @@ export function QueroServir() {
                           </span>
                         )}
 
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#F2F1FB] text-[#3A31CE]">
                           {person?.stage || 'frequentador'}
                         </span>
                       </div>
@@ -800,14 +804,14 @@ export function QueroServir() {
 
                       {/* Departamentos de interesse */}
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-[11px] font-semibold text-purple-700">
+                        <span className="text-[11px] font-semibold text-[#3A31CE]">
                           Interesse nos Departamentos:
                         </span>
                         {cp.interested_departments && cp.interested_departments.length > 0 ? (
                           cp.interested_departments.map((d, idx) => (
                             <span
                               key={idx}
-                              className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-[#820AD1]"
+                              className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#F2F1FB] text-[#3A31CE] border border-[#DAD7F3]"
                             >
                               {d}
                             </span>
@@ -835,7 +839,7 @@ export function QueroServir() {
                         }}
                         className={`rounded-full text-xs font-bold h-9 px-4 ${
                           isReady
-                            ? 'bg-[#820AD1] hover:bg-[#7008B7] text-white shadow-sm'
+                            ? 'bg-[#3A31CE] hover:bg-[#2A23A6] text-white shadow-sm'
                             : 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'
                         }`}
                       >
