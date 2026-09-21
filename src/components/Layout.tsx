@@ -27,6 +27,7 @@ import {
   CreditCard,
   User,
   AlertTriangle,
+  Church,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { personsService, activitiesService } from '@/services/church'
@@ -103,6 +104,8 @@ export default function Layout() {
 
   const navItems = [
     { label: 'Início', fullLabel: 'Visão Geral', path: '/', icon: LayoutDashboard },
+    // Grupo 4: Igreja & Institucional
+    { label: 'Igreja', fullLabel: 'Igreja & Departamentos', path: '/igreja', icon: Church },
     // Grupo 3: Agenda & Escalas
     { label: 'Agenda', fullLabel: 'Agenda & Escalas', path: '/agenda', icon: Calendar },
     // J1/J2 Cultos & Presença
@@ -358,11 +361,25 @@ export default function Layout() {
             )
           })}
 
-          {/* Quick link: Reception */}
-          <div className="pt-6">
+          {/* Quick links: Reception & Página Pública */}
+          <div className="pt-6 space-y-1.5">
             <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 px-3 py-1 mb-1">
               Acesso Público
             </p>
+            <Link
+              to="/publica"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-between px-3.5 py-2.5 rounded-[14px] text-xs text-[#5A6072] hover:text-[#3A31CE] hover:bg-[#F2F1FB] border border-[#E8EAF0] transition-all group"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-[10px] bg-[#F2F1FB] text-[#3A31CE] flex items-center justify-center">
+                  <Church className="w-3.5 h-3.5" strokeWidth={2} />
+                </div>
+                <span className="tracking-tight font-semibold text-[#14161D]">Página Pública</span>
+              </div>
+              <ExternalLink className="w-3 h-3 text-[#6B7183] group-hover:text-[#3A31CE] transition-colors" />
+            </Link>
             <Link
               to="/visitante-cadastro"
               target="_blank"

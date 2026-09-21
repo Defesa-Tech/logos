@@ -29,6 +29,9 @@ import RetornoFormulario from './pages/RetornoFormulario'
 import Agenda from './pages/Agenda'
 import Disponibilidade from './pages/Disponibilidade'
 import BloquearPeriodo from './pages/BloquearPeriodo'
+import Igreja from './pages/Igreja'
+import QuemSomos from './pages/QuemSomos'
+import PaginaPublica from './pages/PaginaPublica'
 
 const App = () => (
   <BrowserRouter>
@@ -37,7 +40,10 @@ const App = () => (
         <Toaster />
         <Sonner />
         <Routes>
-          {/* Public landing for visitors / QR Code */}
+          {/* Public entrypoint / landing for visitors */}
+          <Route path="/publica" element={<PaginaPublica />} />
+          <Route path="/pagina-publica" element={<PaginaPublica />} />
+          <Route path="/visitar" element={<VisitorLanding />} />
           <Route path="/visitante-cadastro" element={<VisitorLanding />} />
           <Route path="/retorno-cadastro" element={<RetornoFormulario />} />
 
@@ -49,6 +55,8 @@ const App = () => (
           <Route element={<Layout />}>
             <Route path="/" element={<Index />} />
             <Route path="/dashboard" element={<Index />} />
+            <Route path="/igreja" element={<Igreja />} />
+            <Route path="/quem-somos" element={<QuemSomos />} />
             <Route path="/agenda" element={<Agenda />} />
             <Route path="/disponibilidade" element={<Disponibilidade />} />
             <Route path="/bloquear-periodo" element={<BloquearPeriodo />} />
