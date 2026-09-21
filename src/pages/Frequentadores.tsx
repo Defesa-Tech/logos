@@ -200,16 +200,16 @@ export default function Frequentadores() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#820AD1] mb-1">
-            <span className="w-2 h-2 rounded-full bg-[#820AD1]" />
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#3A31CE] mb-1">
+            <span className="w-2 h-2 rounded-full bg-[#3A31CE]" />
             <span>Jornada J5</span>
             <span className="text-gray-300">/</span>
             <span>Regras R4 & R5 &bull; Coleta Progressiva</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191919]">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#14161D] font-heading">
             Virada para Frequentador
           </h1>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1 max-w-2xl font-normal">
+          <p className="text-xs sm:text-sm text-[#5A6072] mt-1 max-w-2xl font-normal">
             Regra R4: presença em <strong>{settings.weeksRequired} semanas diferentes</strong>{' '}
             dentro de <strong>{settings.windowWeeks} semanas</strong>. Na confirmação (R5),
             coletamos progressivamente endereço, família, batismo e interesse em membresia
@@ -217,17 +217,19 @@ export default function Frequentadores() {
           </p>
         </div>
 
-        <div className="bg-[#F7EEFD] text-[#820AD1] border border-purple-200 px-3.5 py-2 rounded-2xl text-xs font-bold self-start sm:self-auto">
+        <div className="bg-[#F2F1FB] text-[#3A31CE] border border-[#DAD7F3] px-3.5 py-2 rounded-2xl text-xs font-bold self-start sm:self-auto">
           {eligibleCandidates.length} pronto(s) para virada
         </div>
       </div>
 
       {/* Eligible Candidates Box */}
-      <section className="bg-white rounded-3xl p-6 sm:p-7 border border-gray-100 shadow-sm space-y-4">
-        <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+      <section className="bg-white rounded-[22px] p-6 sm:p-7 border border-[#E8EAF0] shadow-sm space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-[#E8EAF0]">
           <div>
-            <h2 className="text-base font-bold text-[#191919]">Sugestões de Virada Atingidas</h2>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <h2 className="text-base font-bold text-[#14161D] font-heading">
+              Sugestões de Virada Atingidas
+            </h2>
+            <p className="text-xs text-[#5A6072] mt-0.5">
               Pessoas que cumpriram a meta de frequência regular nos cultos
             </p>
           </div>
@@ -250,17 +252,17 @@ export default function Frequentadores() {
                 className="py-4 px-2 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-[#F8F9FB] rounded-2xl transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[#F7EEFD] text-[#820AD1] flex items-center justify-center font-bold text-xs flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-[#F2F1FB] text-[#3A31CE] flex items-center justify-center font-bold text-xs flex-shrink-0 font-heading">
                     {cand.person.name.slice(0, 2).toUpperCase()}
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-[#191919] text-sm">{cand.person.name}</span>
+                      <span className="font-bold text-[#14161D] text-sm">{cand.person.name}</span>
                       <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
                         {cand.distinctWeeksCount} de {settings.weeksRequired} semanas distintas
                       </span>
                     </div>
-                    <p className="text-[11px] text-gray-500 mt-0.5">
+                    <p className="text-[11px] text-[#5A6072] mt-0.5">
                       Telefone: {cand.person.phone || cand.person.whatsapp || 'Sem telefone'} &bull;{' '}
                       {cand.regularCultosPresences.length} cultos regulares registrados
                       {cand.person.neighborhood && ` &bull; Bairro: ${cand.person.neighborhood}`}
@@ -273,7 +275,7 @@ export default function Frequentadores() {
                     size="sm"
                     variant="outline"
                     onClick={() => handlePostpone(cand)}
-                    className="text-xs h-9 px-3 rounded-full text-gray-600 border-gray-200 hover:bg-gray-50"
+                    className="text-xs h-9 px-3 rounded-full text-[#5A6072] border-[#E8EAF0] hover:bg-[#F2F1FB]"
                   >
                     Adiar
                   </Button>
@@ -281,7 +283,7 @@ export default function Frequentadores() {
                     size="sm"
                     disabled={!permissions.canConfirmFrequentador}
                     onClick={() => openConfirmModal(cand)}
-                    className="bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-9 px-4 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all cursor-pointer"
+                    className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-9 px-4 rounded-full font-bold shadow-md shadow-[#3A31CE]/20 active:scale-95 transition-all cursor-pointer"
                     title={
                       !permissions.canConfirmFrequentador
                         ? 'Exclusivo do Líder do Boas-Vindas ou Secretaria'
@@ -299,17 +301,21 @@ export default function Frequentadores() {
       </section>
 
       {/* Progressing Visitors (not yet reached R4) */}
-      <section className="bg-white rounded-3xl p-6 sm:p-7 border border-gray-100 shadow-sm space-y-4">
-        <div className="pb-3 border-b border-gray-100">
-          <h2 className="text-base font-bold text-[#191919]">Em Acompanhamento de Frequência</h2>
-          <p className="text-xs text-gray-500 mt-0.5">
+      <section className="bg-white rounded-[22px] p-6 sm:p-7 border border-[#E8EAF0] shadow-sm space-y-4">
+        <div className="pb-3 border-b border-[#E8EAF0]">
+          <h2 className="text-base font-bold text-[#14161D] font-heading">
+            Em Acompanhamento de Frequência
+          </h2>
+          <p className="text-xs text-[#5A6072] mt-0.5">
             Visitantes acumulando presenças nos cultos regulares
           </p>
         </div>
 
-        <div className="divide-y divide-gray-100 text-xs">
+        <div className="divide-y divide-[#E8EAF0] text-xs">
           {pendingCandidates.length === 0 ? (
-            <p className="text-center py-6 text-gray-400">Nenhum visitante com presenças ativas.</p>
+            <p className="text-center py-6 text-[#6B7183]">
+              Nenhum visitante com presenças ativas.
+            </p>
           ) : (
             pendingCandidates.map((cand) => (
               <div
@@ -317,8 +323,8 @@ export default function Frequentadores() {
                 className="py-3 px-2 flex items-center justify-between text-xs"
               >
                 <div>
-                  <span className="font-bold text-[#191919]">{cand.person.name}</span>
-                  <p className="text-[11px] text-gray-400">
+                  <span className="font-bold text-[#14161D]">{cand.person.name}</span>
+                  <p className="text-[11px] text-[#6B7183]">
                     {cand.distinctWeeksCount} de {settings.weeksRequired} semanas necessárias
                   </p>
                 </div>
@@ -327,7 +333,7 @@ export default function Frequentadores() {
                     <span
                       key={i}
                       className={`w-3 h-3 rounded-full ${
-                        i < cand.distinctWeeksCount ? 'bg-[#820AD1]' : 'bg-gray-200'
+                        i < cand.distinctWeeksCount ? 'bg-[#3A31CE]' : 'bg-[#E8EAF0]'
                       }`}
                     />
                   ))}
@@ -343,19 +349,19 @@ export default function Frequentadores() {
         <DialogContent className="sm:max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border-gray-100 max-h-[90vh] overflow-y-auto">
           <DialogHeader className="border-b border-gray-100 pb-3">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#820AD1] bg-purple-50 px-2.5 py-0.5 rounded-full">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#3A31CE] bg-[#F2F1FB] px-2.5 py-0.5 rounded-full">
                 Jornada J5 &bull; Coleta Progressiva
               </span>
             </div>
-            <DialogTitle className="text-xl font-bold text-[#191919]">
+            <DialogTitle className="text-xl font-bold text-[#14161D] font-heading">
               Confirmar Frequentador: {selectedCandidate?.person.name}
             </DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleConfirmWithData} className="space-y-4 pt-2 text-xs">
-            <div className="p-3 bg-purple-50 rounded-2xl border border-purple-100 text-[11px] text-[#820AD1] space-y-1">
+            <div className="p-3 bg-[#F2F1FB] rounded-2xl border border-[#DAD7F3] text-[11px] text-[#3A31CE] space-y-1">
               <strong>Microcopy de Propósito:</strong>
-              <p>
+              <p className="text-[#5A6072]">
                 Solicitamos estes dados para aproximar a pessoa da comunhão bíblica, grupos pequenos
                 e do caminho da membresia. Campos opcionais.
               </p>
@@ -403,47 +409,47 @@ export default function Frequentadores() {
                   type="checkbox"
                   checked={hasBaptism}
                   onChange={(e) => setHasBaptism(e.target.checked)}
-                  className="rounded text-[#820AD1] focus:ring-[#820AD1]"
+                  className="rounded text-[#3A31CE] focus:ring-[#3A31CE]"
                 />
                 <span>Já é batizado(a) nas águas</span>
               </label>
 
               {hasBaptism && (
                 <div className="space-y-1 pt-1">
-                  <Label className="text-[11px] font-semibold text-gray-600">
+                  <Label className="text-[11px] font-semibold text-[#5A6072]">
                     Data aproximada do batismo
                   </Label>
                   <Input
                     type="date"
                     value={baptismDate}
                     onChange={(e) => setBaptismDate(e.target.value)}
-                    className="h-9 rounded-2xl bg-white border-gray-200"
+                    className="h-9 rounded-[14px] bg-white border-[#E8EAF0]"
                   />
                 </div>
               )}
             </div>
 
             {/* Campo 4: Interesse em Membresia ou Batismo */}
-            <div className="space-y-2 p-3 bg-purple-50/50 rounded-2xl border border-purple-100">
-              <Label className="font-bold text-gray-800 block">
+            <div className="space-y-2 p-3 bg-[#F2F1FB] rounded-2xl border border-[#DAD7F3]">
+              <Label className="font-bold text-[#14161D] block">
                 Caminho da Membresia (Interesses Declarados):
               </Label>
-              <label className="flex items-center gap-2 cursor-pointer text-gray-700">
+              <label className="flex items-center gap-2 cursor-pointer text-[#5A6072]">
                 <input
                   type="checkbox"
                   checked={interestInMembership}
                   onChange={(e) => setInterestInMembership(e.target.checked)}
-                  className="rounded text-[#820AD1] focus:ring-[#820AD1]"
+                  className="rounded text-[#3A31CE] focus:ring-[#3A31CE]"
                 />
                 <span>Tem interesse em se tornar membro oficial</span>
               </label>
               {!hasBaptism && (
-                <label className="flex items-center gap-2 cursor-pointer text-gray-700">
+                <label className="flex items-center gap-2 cursor-pointer text-[#5A6072]">
                   <input
                     type="checkbox"
                     checked={interestInBaptism}
                     onChange={(e) => setInterestInBaptism(e.target.checked)}
-                    className="rounded text-[#820AD1] focus:ring-[#820AD1]"
+                    className="rounded text-[#3A31CE] focus:ring-[#3A31CE]"
                   />
                   <span>Deseja ser batizado(a) nas águas</span>
                 </label>
@@ -453,7 +459,7 @@ export default function Frequentadores() {
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-11 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all mt-2"
+              className="w-full bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-11 rounded-full font-bold shadow-md shadow-[#3A31CE]/20 active:scale-95 transition-all mt-2"
             >
               {isSubmitting ? 'Salvando...' : 'Efetivar Virada para Frequentador'}
             </Button>

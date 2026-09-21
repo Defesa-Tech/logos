@@ -237,23 +237,23 @@ export default function Secretary() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#820AD1] mb-1">
-            <span className="w-2 h-2 rounded-full bg-[#820AD1]" />
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#3A31CE] mb-1">
+            <span className="w-2 h-2 rounded-full bg-[#3A31CE]" />
             <span>Gestão Institucional</span>
             <span className="text-gray-300">/</span>
             <span>{invites.filter((i) => !i.used).length} convites pendentes</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191919]">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#14161D] font-heading">
             Secretaria & Acessos
           </h1>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1 max-w-2xl font-normal">
+          <p className="text-xs sm:text-sm text-[#5A6072] mt-1 max-w-2xl font-normal">
             Geração de links de convite por e-mail com vinculação direta de papéis ministeriais.
           </p>
         </div>
 
         <Button
           onClick={() => setDialogOpen(true)}
-          className="bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-10 px-5 rounded-full font-bold shadow-md shadow-[#820AD1]/20 cursor-pointer self-start sm:self-auto active:scale-95 transition-all"
+          className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-10 px-5 rounded-full font-bold shadow-md shadow-[#3A31CE]/20 cursor-pointer self-start sm:self-auto active:scale-95 transition-all"
         >
           <Plus className="w-4 h-4 mr-1.5" strokeWidth={2.5} />
           Gerar Novo Convite
@@ -323,7 +323,7 @@ export default function Secretary() {
                         setOrphanToLink(orphan)
                         setLinkOrphanModalOpen(true)
                       }}
-                      className="bg-[#820AD1] hover:bg-[#7008B7] text-white font-bold text-xs h-8 px-3 rounded-full cursor-pointer"
+                      className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white font-bold text-xs h-8 px-3 rounded-full cursor-pointer"
                     >
                       <LinkIcon className="w-3.5 h-3.5 mr-1" />
                       Vincular a Evento
@@ -388,7 +388,7 @@ export default function Secretary() {
                     </div>
                     <p className="text-gray-600 text-[11px]">
                       Valor Atual: <strong>{div.current_value || 'Nenhum'}</strong> &rarr; Submetido
-                      no QR: <strong className="text-[#820AD1]">{div.submitted_value}</strong>
+                      no QR: <strong className="text-[#3A31CE]">{div.submitted_value}</strong>
                     </p>
                     {div.notes && <p className="text-[10px] text-gray-400 italic">{div.notes}</p>}
                   </div>
@@ -461,7 +461,7 @@ export default function Secretary() {
 
                     {/* Role */}
                     <td className="py-3.5 px-4">
-                      <span className="text-[10px] font-bold uppercase px-2.5 py-1 rounded-full bg-[#F7EEFD] text-[#820AD1]">
+                      <span className="text-[10px] font-bold uppercase px-2.5 py-1 rounded-full bg-[#F2F1FB] text-[#3A31CE]">
                         {roleLabels[inv.role] || inv.role}
                       </span>
                     </td>
@@ -503,7 +503,7 @@ export default function Secretary() {
                             size="sm"
                             variant="ghost"
                             onClick={() => handleCopyLink(inv.token, inv.id)}
-                            className="h-8 px-3 text-xs text-[#820AD1] hover:bg-[#F7EEFD] rounded-full font-bold active:scale-95"
+                            className="h-8 px-3 text-xs text-[#3A31CE] hover:bg-[#F2F1FB] rounded-full font-bold active:scale-95"
                           >
                             {copiedId === inv.id ? (
                               <span className="text-emerald-600 flex items-center gap-1">
@@ -511,7 +511,7 @@ export default function Secretary() {
                               </span>
                             ) : (
                               <span className="flex items-center gap-1">
-                                <Copy className="w-3.5 h-3.5 text-[#820AD1]" /> Copiar link
+                                <Copy className="w-3.5 h-3.5 text-[#3A31CE]" /> Copiar link
                               </span>
                             )}
                           </Button>
@@ -577,7 +577,7 @@ export default function Secretary() {
               <Button
                 onClick={handleLinkOrphan}
                 disabled={!linkTargetCultoId}
-                className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#820AD1]/20 cursor-pointer"
+                className="w-full bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#3A31CE]/20 cursor-pointer"
               >
                 Confirmar Vinculação
               </Button>
@@ -590,17 +590,17 @@ export default function Secretary() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-md bg-white rounded-3xl border-gray-100 shadow-2xl p-6 sm:p-8">
           <DialogHeader className="border-b border-gray-100 pb-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#820AD1] text-white flex items-center justify-center font-bold mb-1">
+            <div className="w-10 h-10 rounded-2xl bg-[#3A31CE] text-white flex items-center justify-center font-bold mb-1 font-heading">
               L
             </div>
-            <DialogTitle className="text-xl font-bold text-[#191919]">
+            <DialogTitle className="text-xl font-bold text-[#14161D] font-heading">
               Gerar Convite de Acesso
             </DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleCreateInvite} className="space-y-4 pt-2 text-xs">
             <div className="space-y-1">
-              <Label htmlFor="inv-email" className="font-semibold text-gray-700">
+              <Label htmlFor="inv-email" className="font-semibold text-[#5A6072]">
                 E-mail do Convidado *
               </Label>
               <Input
@@ -610,12 +610,11 @@ export default function Secretary() {
                 value={inviteEmail}
                 onChange={(e) => setInviteEmail(e.target.value)}
                 placeholder="convidado@exemplo.com"
-                className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                className="h-10 rounded-[14px] bg-[#F2F3F7] border-transparent focus:bg-white focus:border-[#3A31CE]"
               />
             </div>
-
             <div className="space-y-1">
-              <Label htmlFor="inv-role" className="font-semibold text-gray-700">
+              <Label htmlFor="inv-role" className="font-semibold text-[#5A6072]">
                 Papel a Conceder
               </Label>
               <Select
@@ -626,32 +625,31 @@ export default function Secretary() {
               >
                 <SelectTrigger
                   id="inv-role"
-                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                  className="h-10 rounded-[14px] bg-[#F2F3F7] border-transparent focus:bg-white focus:border-[#3A31CE]"
                 >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-white rounded-2xl shadow-xl border-gray-100">
                   <SelectItem value="member">Membro</SelectItem>
-                  <SelectItem value="leader">Líder de Grupo</SelectItem>
-                  <SelectItem value="pastor">Pastor</SelectItem>
-                  <SelectItem value="secretary">Secretaria (Acesso Pleno)</SelectItem>
+                  <SelectItem value="leader">Líder de Ministério</SelectItem>
+                  <SelectItem value="pastor">Pastor / Bispo</SelectItem>
+                  <SelectItem value="secretary">Secretaria Geral</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-
             <div className="space-y-1">
-              <Label htmlFor="inv-person" className="font-semibold text-gray-700">
-                Vincular a Cadastro Existente (Opcional)
+              <Label htmlFor="inv-person" className="font-semibold text-[#5A6072]">
+                Vincular a Pessoa Existente (Opcional)
               </Label>
               <Select value={invitePersonId} onValueChange={setInvitePersonId}>
                 <SelectTrigger
                   id="inv-person"
-                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                  className="h-10 rounded-[14px] bg-[#F2F3F7] border-transparent focus:bg-white focus:border-[#3A31CE]"
                 >
-                  <SelectValue placeholder="Selecione se já houver registro" />
+                  <SelectValue placeholder="Selecione caso já cadastrado" />
                 </SelectTrigger>
                 <SelectContent className="bg-white rounded-2xl shadow-xl border-gray-100 max-h-56">
-                  <SelectItem value="none">Criar/vincular posteriormente</SelectItem>
+                  <SelectItem value="none">Nenhum (convite livre)</SelectItem>
                   {persons.map((p) => (
                     <SelectItem key={p.id} value={p.id}>
                       {p.name} ({p.status})
@@ -660,14 +658,13 @@ export default function Secretary() {
                 </SelectContent>
               </Select>
             </div>
-
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all"
+              className="w-full bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#3A31CE]/20 active:scale-95 transition-all"
             >
-              {isSubmitting ? 'Gerando...' : 'Criar Link de Convite'}
-            </Button>
+              {isSubmitting ? 'Gerando Link...' : 'Gerar Convite de Acesso'}
+            </Button>{' '}
           </form>
         </DialogContent>
       </Dialog>

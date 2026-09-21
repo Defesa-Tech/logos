@@ -210,16 +210,16 @@ export default function Families() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#820AD1] mb-1">
-            <span className="w-2 h-2 rounded-full bg-[#820AD1]" />
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#3A31CE] mb-1">
+            <span className="w-2 h-2 rounded-full bg-[#3A31CE]" />
             <span>Estrutura Eclesial</span>
             <span className="text-gray-300">/</span>
             <span>{visibleFamilies.length} lares organizados</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191919]">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#14161D] font-heading">
             Núcleos Familiares
           </h1>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1 max-w-2xl font-normal">
+          <p className="text-xs sm:text-sm text-[#5A6072] mt-1 max-w-2xl font-normal">
             Mapeamento dos lares cristãos, responsáveis, cônjuges e filhos para acompanhamento
             pastoral integrado.
           </p>
@@ -228,7 +228,7 @@ export default function Families() {
         {canAccessAll && (
           <Button
             onClick={openCreateDialog}
-            className="bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-10 px-5 rounded-full font-bold shadow-md shadow-[#820AD1]/20 cursor-pointer self-start sm:self-auto active:scale-95 transition-all"
+            className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-10 px-5 rounded-full font-bold shadow-md shadow-[#3A31CE]/20 cursor-pointer self-start sm:self-auto active:scale-95 transition-all"
           >
             <Plus className="w-4 h-4 mr-1.5" strokeWidth={2.5} />
             Novo Núcleo Familiar
@@ -254,28 +254,28 @@ export default function Families() {
             return (
               <div
                 key={fam.id}
-                className="bg-white border border-gray-100 rounded-3xl p-6 sm:p-7 space-y-4 hover:border-purple-200 shadow-sm transition-all"
+                className="bg-white border border-[#E8EAF0] rounded-[22px] p-6 sm:p-7 space-y-4 hover:border-[#DAD7F3] shadow-sm transition-all"
               >
                 {/* Family Title Bar */}
-                <div className="flex items-start justify-between gap-3 pb-3 border-b border-gray-100">
+                <div className="flex items-start justify-between gap-3 pb-3 border-b border-[#E8EAF0]">
                   <div className="min-w-0 flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-full bg-[#F7EEFD] text-[#820AD1] font-bold text-sm flex items-center justify-center flex-shrink-0">
+                    <div className="w-11 h-11 rounded-full bg-[#F2F1FB] text-[#3A31CE] font-bold text-sm flex items-center justify-center flex-shrink-0 font-heading">
                       {fam.name.slice(0, 2).toUpperCase()}
                     </div>
                     <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#820AD1] block">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#3A31CE] block">
                         Lar Acolhido
                       </span>
-                      <h2 className="text-lg font-bold text-[#191919] truncate mt-0.5">
+                      <h2 className="text-lg font-bold text-[#14161D] font-heading truncate mt-0.5">
                         {fam.name}
                       </h2>
                       {fam.address ? (
-                        <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5 truncate">
-                          <MapPin className="w-3 h-3 text-[#820AD1] flex-shrink-0" />
+                        <p className="text-xs text-[#5A6072] flex items-center gap-1 mt-0.5 truncate">
+                          <MapPin className="w-3 h-3 text-[#3A31CE] flex-shrink-0" />
                           <span>{fam.address}</span>
                         </p>
                       ) : (
-                        <p className="text-xs text-gray-400 italic mt-0.5">
+                        <p className="text-xs text-[#6B7183] italic mt-0.5">
                           Endereço não cadastrado
                         </p>
                       )}
@@ -288,7 +288,7 @@ export default function Families() {
                         size="sm"
                         variant="ghost"
                         onClick={() => openEditDialog(fam)}
-                        className="h-8 w-8 rounded-full p-0 text-gray-400 hover:text-[#820AD1] hover:bg-[#F7EEFD]"
+                        className="h-8 w-8 rounded-full p-0 text-[#6B7183] hover:text-[#3A31CE] hover:bg-[#F2F1FB]"
                         title="Editar"
                       >
                         <Edit className="w-3.5 h-3.5" strokeWidth={2} />
@@ -297,7 +297,7 @@ export default function Families() {
                         size="sm"
                         variant="ghost"
                         onClick={() => handleDeleteFamily(fam.id)}
-                        className="h-8 w-8 rounded-full p-0 text-gray-400 hover:text-red-600 hover:bg-red-50"
+                        className="h-8 w-8 rounded-full p-0 text-[#6B7183] hover:text-red-600 hover:bg-red-50"
                         title="Excluir"
                       >
                         <Trash2 className="w-3.5 h-3.5" strokeWidth={2} />
@@ -308,22 +308,22 @@ export default function Families() {
 
                 {/* Head of household highlight */}
                 {headOfHouse ? (
-                  <div className="p-4 bg-[#F8F9FB] rounded-2xl border border-gray-100 text-xs flex items-center justify-between">
+                  <div className="p-4 bg-[#F8F9FB] rounded-2xl border border-[#E8EAF0] text-xs flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 block">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#6B7183] block">
                         Responsável pelo Lar
                       </span>
-                      <p className="font-bold text-[#191919] mt-0.5">{headOfHouse.name}</p>
-                      <p className="text-[11px] text-gray-400">
+                      <p className="font-bold text-[#14161D] mt-0.5">{headOfHouse.name}</p>
+                      <p className="text-[11px] text-[#6B7183]">
                         {headOfHouse.whatsapp || headOfHouse.email || 'Sem contato'}
                       </p>
                     </div>
-                    <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-white border border-gray-200 text-gray-700">
+                    <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-white border border-[#E8EAF0] text-[#14161D]">
                       Responsável
                     </span>
                   </div>
                 ) : (
-                  <div className="p-4 bg-[#F8F9FB] border border-dashed border-gray-200 rounded-2xl text-xs text-gray-400 italic">
+                  <div className="p-4 bg-[#F8F9FB] border border-dashed border-[#E8EAF0] rounded-2xl text-xs text-[#6B7183] italic">
                     Responsável pelo lar ainda não definido.
                   </div>
                 )}
@@ -331,13 +331,13 @@ export default function Families() {
                 {/* Other members list */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#6B7183]">
                       Membros da Casa ({familyMembers.length})
                     </span>
                     {canAccessAll && (
                       <button
                         onClick={() => handleOpenAddMember(fam.id)}
-                        className="text-xs text-[#820AD1] hover:underline flex items-center gap-1 font-bold cursor-pointer"
+                        className="text-xs text-[#3A31CE] hover:underline flex items-center gap-1 font-bold cursor-pointer"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         Vincular pessoa
@@ -386,16 +386,16 @@ export default function Families() {
       <Dialog open={familyDialogOpen} onOpenChange={setFamilyDialogOpen}>
         <DialogContent className="sm:max-w-md bg-white rounded-3xl border-gray-100 shadow-2xl p-6 sm:p-8">
           <DialogHeader className="border-b border-gray-100 pb-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#820AD1] text-white flex items-center justify-center font-bold mb-1">
+            <div className="w-10 h-10 rounded-2xl bg-[#3A31CE] text-white flex items-center justify-center font-bold mb-1 font-heading">
               L
             </div>
-            <DialogTitle className="text-xl font-bold text-[#191919]">
+            <DialogTitle className="text-xl font-bold text-[#14161D] font-heading">
               {editingFamilyId ? 'Editar Núcleo Familiar' : 'Novo Núcleo Familiar'}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSaveFamily} className="space-y-4 pt-2 text-xs">
             <div className="space-y-1">
-              <Label htmlFor="fam-name" className="font-semibold text-gray-700">
+              <Label htmlFor="fam-name" className="font-semibold text-[#5A6072]">
                 Sobrenome / Nome do Lar *
               </Label>
               <Input
@@ -404,11 +404,11 @@ export default function Families() {
                 value={familyName}
                 onChange={(e) => setFamilyName(e.target.value)}
                 placeholder="Ex: Família Souza Lima"
-                className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                className="h-10 rounded-[14px] bg-[#F2F3F7] border-transparent focus:bg-white focus:border-[#3A31CE]"
               />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="fam-addr" className="font-semibold text-gray-700">
+              <Label htmlFor="fam-addr" className="font-semibold text-[#5A6072]">
                 Endereço Completo
               </Label>
               <Input
@@ -416,13 +416,13 @@ export default function Families() {
                 value={familyAddress}
                 onChange={(e) => setFamilyAddress(e.target.value)}
                 placeholder="Rua das Palmeiras, 120 - Apto 32"
-                className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                className="h-10 rounded-[14px] bg-[#F2F3F7] border-transparent focus:bg-white focus:border-[#3A31CE]"
               />
             </div>
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all"
+              className="w-full bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#3A31CE]/20 active:scale-95 transition-all"
             >
               {isSubmitting
                 ? 'Gravando...'
@@ -438,22 +438,22 @@ export default function Families() {
       <Dialog open={memberDialogOpen} onOpenChange={setMemberDialogOpen}>
         <DialogContent className="sm:max-w-md bg-white rounded-3xl border-gray-100 shadow-2xl p-6 sm:p-8">
           <DialogHeader className="border-b border-gray-100 pb-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#820AD1] text-white flex items-center justify-center font-bold mb-1">
+            <div className="w-10 h-10 rounded-2xl bg-[#3A31CE] text-white flex items-center justify-center font-bold mb-1 font-heading">
               L
             </div>
-            <DialogTitle className="text-xl font-bold text-[#191919]">
+            <DialogTitle className="text-xl font-bold text-[#14161D] font-heading">
               Vincular Pessoa ao Lar
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleAssignPersonToFamily} className="space-y-4 pt-2 text-xs">
             <div className="space-y-1">
-              <Label htmlFor="select-person" className="font-semibold text-gray-700">
+              <Label htmlFor="select-person" className="font-semibold text-[#5A6072]">
                 Selecionar Pessoa
               </Label>
               <Select value={selectedPersonId} onValueChange={setSelectedPersonId}>
                 <SelectTrigger
                   id="select-person"
-                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                  className="h-10 rounded-[14px] bg-[#F2F3F7] border-transparent focus:bg-white focus:border-[#3A31CE]"
                 >
                   <SelectValue placeholder="Escolha um cadastro sem família..." />
                 </SelectTrigger>
@@ -474,7 +474,7 @@ export default function Families() {
             </div>
 
             <div className="space-y-1">
-              <Label htmlFor="select-role" className="font-semibold text-gray-700">
+              <Label htmlFor="select-role" className="font-semibold text-[#5A6072]">
                 Papel no Lar
               </Label>
               <Select
@@ -483,7 +483,7 @@ export default function Families() {
               >
                 <SelectTrigger
                   id="select-role"
-                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                  className="h-10 rounded-[14px] bg-[#F2F3F7] border-transparent focus:bg-white focus:border-[#3A31CE]"
                 >
                   <SelectValue />
                 </SelectTrigger>
@@ -499,7 +499,7 @@ export default function Families() {
             <Button
               type="submit"
               disabled={isSubmitting || !selectedPersonId}
-              className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all"
+              className="w-full bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#3A31CE]/20 active:scale-95 transition-all"
             >
               {isSubmitting ? 'Vinculando...' : 'Confirmar Vínculo Familiar'}
             </Button>

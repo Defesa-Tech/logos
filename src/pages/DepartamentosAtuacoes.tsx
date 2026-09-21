@@ -719,14 +719,14 @@ export function DepartamentosAtuacoes() {
       {/* Header */}
       <section className="bg-white p-5 sm:p-6 rounded-3xl border border-gray-100 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#820AD1] mb-1">
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#3A31CE] mb-1">
             <Layers className="w-4 h-4" />
-            <span>Estrutura Departamental &bull; Igreja Defesa da Fé</span>
+            <span>Estrutura Departamental &bull; Logos Igreja</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191919]">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#14161D] font-heading">
             Departamentos, Funções &amp; Equipes
           </h1>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1 max-w-2xl">
+          <p className="text-xs sm:text-sm text-[#5A6072] mt-1 max-w-2xl">
             Gestão unificada de unidades (departamento e subdepartamento), funções com checklist de
             requisitos, regras de sobreposição e atuações ministeriais.
           </p>
@@ -748,7 +748,7 @@ export function DepartamentosAtuacoes() {
                 setBlockingOverlapError(null)
                 setIsAssignModalOpen(true)
               }}
-              className="bg-[#820AD1] hover:bg-[#7008B7] text-white font-bold text-xs h-10 px-5 rounded-full shadow-md shadow-[#820AD1]/20"
+              className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white font-bold text-xs h-10 px-5 rounded-full shadow-md shadow-[#3A31CE]/20"
             >
               <Plus className="w-4 h-4 mr-1.5" />
               Alocar Pessoa na Função
@@ -767,7 +767,7 @@ export function DepartamentosAtuacoes() {
                 })
                 setIsUnitModalOpen(true)
               }}
-              className="bg-[#820AD1] hover:bg-[#7008B7] text-white font-bold text-xs h-10 px-5 rounded-full"
+              className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white font-bold text-xs h-10 px-5 rounded-full"
             >
               <Plus className="w-4 h-4 mr-1.5" />
               Nova Unidade
@@ -786,7 +786,7 @@ export function DepartamentosAtuacoes() {
                 })
                 setIsRoleModalOpen(true)
               }}
-              className="bg-[#820AD1] hover:bg-[#7008B7] text-white font-bold text-xs h-10 px-5 rounded-full"
+              className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white font-bold text-xs h-10 px-5 rounded-full"
             >
               <Plus className="w-4 h-4 mr-1.5" />
               Nova Função
@@ -823,7 +823,7 @@ export function DepartamentosAtuacoes() {
                       })
                       setIsChurchReqModalOpen(true)
                     }}
-                    className="bg-[#820AD1] hover:bg-[#7008B7] text-white font-bold text-xs h-10 px-4 rounded-full"
+                    className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white font-bold text-xs h-10 px-4 rounded-full"
                   >
                     <Plus className="w-4 h-4 mr-1.5" />
                     Novo Requisito Igreja
@@ -836,7 +836,7 @@ export function DepartamentosAtuacoes() {
           {activeTab === 'sobreposicoes' && permissions.canManageOverlaps && (
             <Button
               onClick={() => setIsOverlapModalOpen(true)}
-              className="bg-[#820AD1] hover:bg-[#7008B7] text-white font-bold text-xs h-10 px-5 rounded-full"
+              className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white font-bold text-xs h-10 px-5 rounded-full"
             >
               <Plus className="w-4 h-4 mr-1.5" />
               Nova Regra de Sobreposição
@@ -846,13 +846,13 @@ export function DepartamentosAtuacoes() {
       </section>
 
       {/* Tabs Bar */}
-      <div className="flex items-center gap-2 border-b border-gray-200 pb-2 overflow-x-auto text-xs font-bold">
+      <div className="flex items-center gap-2 border-b border-[#E8EAF0] pb-2 overflow-x-auto text-xs font-bold">
         <button
           onClick={() => setActiveTab('equipe')}
           className={`px-4 py-2 rounded-full transition-all cursor-pointer ${
             activeTab === 'equipe'
-              ? 'bg-[#820AD1] text-white shadow-sm'
-              : 'text-gray-600 hover:bg-gray-100'
+              ? 'bg-[#3A31CE] text-white shadow-sm'
+              : 'text-[#5A6072] hover:bg-[#F2F1FB] hover:text-[#3A31CE]'
           }`}
         >
           Equipes &amp; Atuações ({assignments.length})
@@ -862,8 +862,8 @@ export function DepartamentosAtuacoes() {
           onClick={() => setActiveTab('unidades')}
           className={`px-4 py-2 rounded-full transition-all cursor-pointer ${
             activeTab === 'unidades'
-              ? 'bg-[#820AD1] text-white shadow-sm'
-              : 'text-gray-600 hover:bg-gray-100'
+              ? 'bg-[#3A31CE] text-white shadow-sm'
+              : 'text-[#5A6072] hover:bg-[#F2F1FB] hover:text-[#3A31CE]'
           }`}
         >
           Unidades &amp; Subdepartamentos ({departments.length})
@@ -873,8 +873,8 @@ export function DepartamentosAtuacoes() {
           onClick={() => setActiveTab('funcoes')}
           className={`px-4 py-2 rounded-full transition-all cursor-pointer ${
             activeTab === 'funcoes'
-              ? 'bg-[#820AD1] text-white shadow-sm'
-              : 'text-gray-600 hover:bg-gray-100'
+              ? 'bg-[#3A31CE] text-white shadow-sm'
+              : 'text-[#5A6072] hover:bg-[#F2F1FB] hover:text-[#3A31CE]'
           }`}
         >
           Funções &amp; Requisitos ({roles.length})
@@ -884,8 +884,8 @@ export function DepartamentosAtuacoes() {
           onClick={() => setActiveTab('requisitos_igreja')}
           className={`px-4 py-2 rounded-full transition-all cursor-pointer ${
             activeTab === 'requisitos_igreja'
-              ? 'bg-[#820AD1] text-white shadow-sm'
-              : 'text-gray-600 hover:bg-gray-100'
+              ? 'bg-[#3A31CE] text-white shadow-sm'
+              : 'text-[#5A6072] hover:bg-[#F2F1FB] hover:text-[#3A31CE]'
           }`}
         >
           Requisitos em Camadas &amp; Dispensas ({churchRequirements.length + waivers.length})
@@ -895,8 +895,8 @@ export function DepartamentosAtuacoes() {
           onClick={() => setActiveTab('sobreposicoes')}
           className={`px-4 py-2 rounded-full transition-all cursor-pointer ${
             activeTab === 'sobreposicoes'
-              ? 'bg-[#820AD1] text-white shadow-sm'
-              : 'text-gray-600 hover:bg-gray-100'
+              ? 'bg-[#3A31CE] text-white shadow-sm'
+              : 'text-[#5A6072] hover:bg-[#F2F1FB] hover:text-[#3A31CE]'
           }`}
         >
           Regras de Sobreposição ({overlapRules.length})
@@ -1042,7 +1042,7 @@ export function DepartamentosAtuacoes() {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-xl bg-purple-100 text-[#820AD1] flex items-center justify-center font-bold">
+                      <div className="w-8 h-8 rounded-xl bg-[#F2F1FB] text-[#3A31CE] flex items-center justify-center font-bold">
                         <Layers className="w-4 h-4" />
                       </div>
                       <div>
@@ -1079,7 +1079,7 @@ export function DepartamentosAtuacoes() {
                               })
                               setIsUnitModalOpen(true)
                             }}
-                            className="h-7 text-[11px] rounded-full border-purple-200 text-purple-700 font-bold hover:bg-purple-50"
+                            className="h-7 text-[11px] rounded-full border-[#DAD7F3] text-[#3A31CE] font-bold hover:bg-[#F2F1FB]"
                           >
                             + Subdepartamento
                           </Button>
@@ -1145,7 +1145,7 @@ export function DepartamentosAtuacoes() {
           <div className="p-4 sm:p-5 rounded-2xl bg-purple-50/70 border border-purple-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#820AD1]" />
+                <span className="w-2 h-2 rounded-full bg-[#3A31CE]" />
                 <h3 className="font-extrabold text-[#191919] text-sm sm:text-base">
                   Requisitos em 3 Camadas Que Se Somam
                 </h3>
@@ -1164,7 +1164,7 @@ export function DepartamentosAtuacoes() {
               </p>
             </div>
             <div className="shrink-0 p-3 bg-white rounded-xl border border-purple-200 text-xs">
-              <p className="font-bold text-[#820AD1] flex items-center gap-1.5">
+              <p className="font-bold text-[#3A31CE] flex items-center gap-1.5">
                 <Lock className="w-3.5 h-3.5" /> Dispensa Exclusiva
               </p>
               <p className="text-[11px] text-gray-500 mt-0.5 max-w-xs">
@@ -1179,7 +1179,7 @@ export function DepartamentosAtuacoes() {
             <div className="flex items-center justify-between">
               <div>
                 <h4 className="font-bold text-sm text-[#191919] flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded-full bg-purple-100 text-[#820AD1] text-[10px] uppercase font-bold">
+                  <span className="px-2 py-0.5 rounded-full bg-[#F2F1FB] text-[#3A31CE] text-[10px] uppercase font-bold">
                     Nível 1 &bull; Igreja
                   </span>
                   <span>Requisitos Padrão da Igreja Defesa da Fé</span>
@@ -1201,19 +1201,19 @@ export function DepartamentosAtuacoes() {
                     <div className="flex items-center gap-2">
                       <h5 className="font-bold text-sm text-[#191919]">{cr.title}</h5>
                       {cr.is_default && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#820AD1] text-white">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#3A31CE] text-white">
                           Padrão Universal
                         </span>
                       )}
                     </div>
                     <p className="text-xs text-gray-600">{cr.description}</p>
-                    <p className="text-[11px] text-[#820AD1] font-semibold">
+                    <p className="text-[11px] text-[#3A31CE] font-semibold">
                       Código: {cr.code} &bull; Definido por: Secretaria Geral
                     </p>
                   </div>
                   {cr.is_default && (
                     <div
-                      className="p-2 bg-purple-100 rounded-xl text-[#820AD1] shrink-0"
+                      className="p-2 bg-[#F2F1FB] rounded-xl text-[#3A31CE] shrink-0"
                       title="Requisito não removível por líderes"
                     >
                       <Lock className="w-4 h-4" />
@@ -1267,7 +1267,7 @@ export function DepartamentosAtuacoes() {
                     className="p-4 rounded-2xl border border-gray-200 bg-[#F8F9FB] space-y-2"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-xs text-[#820AD1] uppercase tracking-wide">
+                      <span className="font-bold text-xs text-[#3A31CE] uppercase tracking-wide">
                         {dept.name}
                       </span>
                       <span className="text-[10px] font-bold px-2 py-0.5 bg-gray-200 rounded-full text-gray-700">
@@ -1615,11 +1615,11 @@ export function DepartamentosAtuacoes() {
             {/* FEATURE 1: CHECKLIST COMPLETO SOMANDO OS 3 NÍVEIS + REGRA R8 */}
             <div className="p-4 bg-purple-50/60 border border-purple-200 rounded-2xl space-y-3">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5 font-bold text-[#820AD1]">
+                <div className="flex items-center gap-1.5 font-bold text-[#3A31CE]">
                   <ListCheck className="w-4 h-4" />
                   <span>Checklist Cumulativo em 3 Camadas</span>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-[#820AD1]">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#F2F1FB] text-[#3A31CE]">
                   Soma dos 3 Níveis
                 </span>
               </div>
@@ -1729,7 +1729,7 @@ export function DepartamentosAtuacoes() {
               {/* NÍVEL 3: FUNÇÃO */}
               <div className="p-3 bg-white rounded-xl border border-purple-100 space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] uppercase font-bold text-[#820AD1]">
+                  <span className="text-[10px] uppercase font-bold text-[#3A31CE]">
                     3. Nível Função ({selectedRoleRecord?.name || 'Função'})
                   </span>
                   <span className="text-[10px] text-gray-400">Líder ou Secretaria</span>
@@ -1757,7 +1757,7 @@ export function DepartamentosAtuacoes() {
                             },
                           }))
                         }
-                        className="rounded text-[#820AD1] focus:ring-[#820AD1]"
+                        className="rounded text-[#3A31CE] focus:ring-[#3A31CE]"
                       />
                       <span className="font-medium text-gray-800">{req.title}</span>
                     </label>
@@ -1789,10 +1789,10 @@ export function DepartamentosAtuacoes() {
             <Button
               onClick={handleCreateAssignment}
               disabled={!!blockingOverlapError}
-              className="bg-[#820AD1] hover:bg-[#7008B7] text-white font-bold text-xs rounded-full px-5"
+              className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white font-bold text-xs rounded-full px-5"
             >
-              Confirmar Alocação
-            </Button>
+              Salvar Atuação
+            </Button>{' '}
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1880,7 +1880,7 @@ export function DepartamentosAtuacoes() {
             </Button>
             <Button
               onClick={handleSaveUnit}
-              className="bg-[#820AD1] hover:bg-[#7008B7] text-white font-bold text-xs rounded-full px-5"
+              className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white font-bold text-xs rounded-full px-5"
             >
               Salvar Unidade
             </Button>
@@ -1944,7 +1944,7 @@ export function DepartamentosAtuacoes() {
             {/* Requisitos Checklist Management */}
             <div className="p-4 bg-purple-50/50 border border-purple-200 rounded-2xl space-y-3">
               <div className="flex items-center justify-between">
-                <span className="font-bold text-[#820AD1]">
+                <span className="font-bold text-[#3A31CE]">
                   Requisitos para Exercer a Função (D18)
                 </span>
                 <span className="text-[10px] text-gray-500">
@@ -1968,7 +1968,7 @@ export function DepartamentosAtuacoes() {
                 <Button
                   type="button"
                   onClick={handleAddRequirement}
-                  className="bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-9 rounded-xl font-bold px-3 shrink-0"
+                  className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-9 rounded-xl font-bold px-3 shrink-0"
                 >
                   Adicionar
                 </Button>
@@ -2008,7 +2008,7 @@ export function DepartamentosAtuacoes() {
             </Button>
             <Button
               onClick={handleSaveRole}
-              className="bg-[#820AD1] hover:bg-[#7008B7] text-white font-bold text-xs rounded-full px-5"
+              className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white font-bold text-xs rounded-full px-5"
             >
               Salvar Função
             </Button>
@@ -2173,7 +2173,7 @@ export function DepartamentosAtuacoes() {
             </Button>
             <Button
               onClick={handleAddDeptRequirement}
-              className="bg-[#820AD1] hover:bg-[#7008B7] text-white font-bold text-xs rounded-full px-5"
+              className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white font-bold text-xs rounded-full px-5"
             >
               Salvar Requisito
             </Button>
@@ -2237,10 +2237,10 @@ export function DepartamentosAtuacoes() {
             </Button>
             <Button
               onClick={handleSaveChurchRequirement}
-              className="bg-[#820AD1] hover:bg-[#7008B7] text-white font-bold text-xs rounded-full px-5"
+              className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white font-bold text-xs rounded-full px-5"
             >
-              Salvar Requisito de Igreja
-            </Button>
+              Salvar Regra
+            </Button>{' '}
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -2351,10 +2351,10 @@ export function DepartamentosAtuacoes() {
             </Button>
             <Button
               onClick={handleSaveOverlapRule}
-              className="bg-[#820AD1] hover:bg-[#7008B7] text-white font-bold text-xs rounded-full px-5"
+              className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white font-bold text-xs rounded-full px-5"
             >
-              Criar Regra
-            </Button>
+              Salvar Parâmetros
+            </Button>{' '}
           </DialogFooter>
         </DialogContent>
       </Dialog>

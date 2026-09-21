@@ -118,16 +118,16 @@ export default function AtencaoAusencia() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#820AD1] mb-1">
-            <span className="w-2 h-2 rounded-full bg-[#820AD1]" />
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#3A31CE] mb-1">
+            <span className="w-2 h-2 rounded-full bg-[#3A31CE]" />
             <span>Regra R10</span>
             <span className="text-gray-300">/</span>
             <span>Cuidado Pastoral & Retenção</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191919]">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#14161D] font-heading">
             Lista de Atenção por Ausência
           </h1>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1 max-w-2xl font-normal">
+          <p className="text-xs sm:text-sm text-[#5A6072] mt-1 max-w-2xl font-normal">
             Frequentadores ou membros sem presença registrada há mais de{' '}
             <strong>{absenceWeeksLimit} semanas</strong> aparecem nesta lista de alerta. O sistema{' '}
             <strong>não muda de estágio sozinho</strong>, servindo como suporte pastoral.
@@ -141,23 +141,25 @@ export default function AtencaoAusencia() {
       </div>
 
       {/* List */}
-      <section className="bg-white rounded-3xl p-6 sm:p-7 border border-gray-100 shadow-sm space-y-4">
-        <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+      <section className="bg-white rounded-[22px] p-6 sm:p-7 border border-[#E8EAF0] shadow-sm space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-[#E8EAF0]">
           <div>
-            <h2 className="text-base font-bold text-[#191919]">
+            <h2 className="text-base font-bold text-[#14161D] font-heading">
               Irmãos sem Presença Recente (&gt; {absenceWeeksLimit} semanas)
             </h2>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-[#5A6072] mt-0.5">
               Acione uma visita, mensagem ou ligação pastoral de acolhimento
             </p>
           </div>
         </div>
 
-        <div className="divide-y divide-gray-100 text-xs">
+        <div className="divide-y divide-[#E8EAF0] text-xs">
           {loading ? (
-            <p className="text-center py-10 text-gray-400">Verificando histórico de presenças...</p>
+            <p className="text-center py-10 text-[#6B7183]">
+              Verificando histórico de presenças...
+            </p>
           ) : absents.length === 0 ? (
-            <div className="p-8 text-center text-gray-400">
+            <div className="p-8 text-center text-[#6B7183]">
               Glória a Deus! Nenhum membro ou frequentador ausente há mais de {absenceWeeksLimit}{' '}
               semanas.
             </div>
@@ -173,15 +175,15 @@ export default function AtencaoAusencia() {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-[#191919] text-sm">{item.person.name}</span>
-                      <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-purple-100 text-[#820AD1]">
+                      <span className="font-bold text-[#14161D] text-sm">{item.person.name}</span>
+                      <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-[#F2F1FB] text-[#3A31CE]">
                         {item.person.stage || item.person.status}
                       </span>
                       <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-red-100 text-red-700">
                         {item.weeksAbsent} semanas ausente
                       </span>
                     </div>
-                    <p className="text-[11px] text-gray-500 mt-0.5">
+                    <p className="text-[11px] text-[#5A6072] mt-0.5">
                       Telefone: {item.person.phone || item.person.whatsapp || 'Sem telefone'} &bull;{' '}
                       Última presença:{' '}
                       {item.lastPresenceDate
@@ -195,8 +197,9 @@ export default function AtencaoAusencia() {
                   <Button
                     size="sm"
                     onClick={() => handleCreatePastoralTask(item)}
-                    className="bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-9 px-4 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all cursor-pointer"
+                    className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-9 px-4 rounded-full font-bold shadow-md shadow-[#3A31CE]/20 active:scale-95 transition-all cursor-pointer"
                   >
+                    {' '}
                     <MessageCircle className="w-3.5 h-3.5 mr-1" />
                     Gerar Cuidado Pastoral
                   </Button>

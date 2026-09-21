@@ -112,16 +112,16 @@ export default function Journey() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#820AD1] mb-1">
-            <span className="w-2 h-2 rounded-full bg-[#820AD1]" />
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#3A31CE] mb-1">
+            <span className="w-2 h-2 rounded-full bg-[#3A31CE]" />
             <span>Fluxo Pastoral</span>
             <span className="text-gray-300">/</span>
             <span>Pipeline de Integração</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191919]">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#14161D] font-heading">
             Jornada Logos
           </h1>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1 max-w-2xl font-normal">
+          <p className="text-xs sm:text-sm text-[#5A6072] mt-1 max-w-2xl font-normal">
             Acompanhamento do acolhimento: do primeiro contato como visitante à maturidade e
             liderança comunitária.
           </p>
@@ -140,15 +140,15 @@ export default function Journey() {
           return (
             <div
               key={col.id}
-              className="bg-white border border-gray-100 rounded-3xl p-4 sm:p-5 space-y-3.5 min-h-[500px] flex flex-col shadow-sm"
+              className="bg-white border border-[#E8EAF0] rounded-[22px] p-4 sm:p-5 space-y-3.5 min-h-[500px] flex flex-col shadow-sm"
             >
               {/* Column Header */}
-              <div className="pb-3 border-b border-gray-100 flex items-center justify-between">
+              <div className="pb-3 border-b border-[#E8EAF0] flex items-center justify-between">
                 <div>
-                  <h2 className="text-xs font-bold text-[#191919]">{col.label}</h2>
-                  <p className="text-[10px] text-gray-400 mt-0.5">{col.desc}</p>
+                  <h2 className="text-xs font-bold text-[#14161D] font-heading">{col.label}</h2>
+                  <p className="text-[10px] text-[#6B7183] mt-0.5">{col.desc}</p>
                 </div>
-                <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#F7EEFD] text-[#820AD1] tabular-nums">
+                <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#F2F1FB] text-[#3A31CE] tabular-nums">
                   {colPersons.length}
                 </span>
               </div>
@@ -165,31 +165,31 @@ export default function Journey() {
                   colPersons.map((p) => (
                     <div
                       key={p.id}
-                      className="bg-[#F8F9FB] hover:bg-[#F7EEFD] border border-gray-100 rounded-2xl p-4 space-y-3 transition-all shadow-xs"
+                      className="bg-[#F8F9FB] hover:bg-[#F2F1FB] border border-[#E8EAF0] rounded-2xl p-4 space-y-3 transition-all shadow-xs"
                     >
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-full bg-white text-[#820AD1] font-bold text-xs flex items-center justify-center flex-shrink-0 border border-purple-100">
+                        <div className="w-8 h-8 rounded-full bg-white text-[#3A31CE] font-bold text-xs flex items-center justify-center flex-shrink-0 border border-[#DAD7F3] font-heading">
                           {p.name.slice(0, 2).toUpperCase()}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="font-bold text-xs text-[#191919] truncate">{p.name}</p>
-                          <p className="text-[10px] text-gray-400 mt-0.5 truncate">
+                          <p className="font-bold text-xs text-[#14161D] truncate">{p.name}</p>
+                          <p className="text-[10px] text-[#6B7183] mt-0.5 truncate">
                             {p.whatsapp || p.email || 'Sem contato'}
                           </p>
                         </div>
                       </div>
 
                       {/* Checklist micro toggles */}
-                      <div className="pt-2 border-t border-gray-200/60 space-y-1.5 text-[11px]">
+                      <div className="pt-2 border-t border-[#E8EAF0] space-y-1.5 text-[11px]">
                         <button
                           type="button"
                           onClick={() => handleToggleChecklist(p, 'checklist_welcome_class')}
                           className="w-full flex items-center justify-between text-left hover:bg-white p-1 rounded-xl transition-colors cursor-pointer"
                         >
-                          <span className="text-gray-600 font-medium">Classe Boas-Vindas</span>
+                          <span className="text-[#5A6072] font-medium">Classe Boas-Vindas</span>
                           <span
                             className={`w-2.5 h-2.5 rounded-full ${
-                              p.checklist_welcome_class ? 'bg-[#820AD1]' : 'bg-gray-300'
+                              p.checklist_welcome_class ? 'bg-[#3A31CE]' : 'bg-gray-300'
                             }`}
                           />
                         </button>
@@ -198,10 +198,10 @@ export default function Journey() {
                           onClick={() => handleToggleChecklist(p, 'checklist_baptized')}
                           className="w-full flex items-center justify-between text-left hover:bg-white p-1 rounded-xl transition-colors cursor-pointer"
                         >
-                          <span className="text-gray-600 font-medium">Batismo</span>
+                          <span className="text-[#5A6072] font-medium">Batismo</span>
                           <span
                             className={`w-2.5 h-2.5 rounded-full ${
-                              p.checklist_baptized ? 'bg-[#820AD1]' : 'bg-gray-300'
+                              p.checklist_baptized ? 'bg-[#3A31CE]' : 'bg-gray-300'
                             }`}
                           />
                         </button>
@@ -210,10 +210,10 @@ export default function Journey() {
                           onClick={() => handleToggleChecklist(p, 'checklist_small_group')}
                           className="w-full flex items-center justify-between text-left hover:bg-white p-1 rounded-xl transition-colors cursor-pointer"
                         >
-                          <span className="text-gray-600 font-medium">Pequeno Grupo</span>
+                          <span className="text-[#5A6072] font-medium">Pequeno Grupo</span>
                           <span
                             className={`w-2.5 h-2.5 rounded-full ${
-                              p.checklist_small_group ? 'bg-[#820AD1]' : 'bg-gray-300'
+                              p.checklist_small_group ? 'bg-[#3A31CE]' : 'bg-gray-300'
                             }`}
                           />
                         </button>
@@ -222,10 +222,10 @@ export default function Journey() {
                           onClick={() => handleToggleChecklist(p, 'checklist_ministry')}
                           className="w-full flex items-center justify-between text-left hover:bg-white p-1 rounded-xl transition-colors cursor-pointer"
                         >
-                          <span className="text-gray-600 font-medium">Ministério</span>
+                          <span className="text-[#5A6072] font-medium">Ministério</span>
                           <span
                             className={`w-2.5 h-2.5 rounded-full ${
-                              p.checklist_ministry ? 'bg-[#820AD1]' : 'bg-gray-300'
+                              p.checklist_ministry ? 'bg-[#3A31CE]' : 'bg-gray-300'
                             }`}
                           />
                         </button>
@@ -233,15 +233,15 @@ export default function Journey() {
 
                       {/* Advance Stage button */}
                       {col.next && canAccessAll && (
-                        <div className="pt-2 border-t border-gray-200/60">
+                        <div className="pt-2 border-t border-[#E8EAF0]">
                           <Button
                             size="sm"
                             variant="outline"
                             onClick={() => handleAdvanceStatus(p, col.next!)}
-                            className="w-full h-8 text-[11px] border-gray-200 text-[#820AD1] hover:bg-white rounded-full justify-between font-bold cursor-pointer active:scale-95 transition-all"
+                            className="w-full h-8 text-[11px] border-[#DAD7F3] text-[#3A31CE] hover:bg-white rounded-full justify-between font-bold cursor-pointer active:scale-95 transition-all"
                           >
                             <span>Avançar estágio</span>
-                            <ArrowRight className="w-3.5 h-3.5 text-[#820AD1]" />
+                            <ArrowRight className="w-3.5 h-3.5 text-[#3A31CE]" />
                           </Button>
                         </div>
                       )}

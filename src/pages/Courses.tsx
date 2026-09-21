@@ -267,14 +267,14 @@ export function Courses() {
       {/* Header Visual Nubank */}
       <section className="bg-white p-5 sm:p-6 rounded-3xl border border-gray-100 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#820AD1] mb-1">
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#3A31CE] mb-1">
             <GraduationCap className="w-4 h-4" />
             <span>Módulo Enxuto de Cursos &bull; C1 Padrão</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191919]">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#14161D] font-heading">
             Cursos &amp; Turmas
           </h1>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1 max-w-2xl">
+          <p className="text-xs sm:text-sm text-[#5A6072] mt-1 max-w-2xl">
             Gestão do C1 e outros cursos. Abertura de turmas com datas, controle de vagas e registro
             de conclusão pela Secretaria para liberação de voluntários.
           </p>
@@ -293,7 +293,7 @@ export function Courses() {
                 setIsEnrollModalOpen(true)
               }}
               variant="outline"
-              className="rounded-full text-xs border-purple-200 text-[#820AD1] font-bold h-10 px-4 hover:bg-purple-50"
+              className="rounded-full text-xs border-[#DAD7F3] text-[#3A31CE] font-bold h-10 px-4 hover:bg-[#F2F1FB]"
             >
               <Users className="w-4 h-4 mr-1.5" />
               Inscrever Aluno
@@ -315,7 +315,7 @@ export function Courses() {
                 })
                 setIsClassModalOpen(true)
               }}
-              className="bg-[#820AD1] hover:bg-[#7008B7] text-white font-bold text-xs h-10 px-5 rounded-full shadow-md shadow-[#820AD1]/20"
+              className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white font-bold text-xs h-10 px-5 rounded-full shadow-md shadow-[#3A31CE]/20"
             >
               <Plus className="w-4 h-4 mr-1.5" />
               Nova Turma
@@ -326,23 +326,23 @@ export function Courses() {
 
       {/* Cards de Resumo */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-5 rounded-3xl bg-white border border-gray-100 shadow-xs flex items-center justify-between">
+        <div className="p-5 rounded-[22px] bg-white border border-[#E8EAF0] shadow-xs flex items-center justify-between">
           <div className="space-y-1">
-            <p className="text-xs font-semibold text-gray-500">Turmas Ativas</p>
-            <p className="text-2xl font-extrabold text-[#191919]">
+            <p className="text-xs font-semibold text-[#6B7183]">Turmas Ativas</p>
+            <p className="text-2xl font-extrabold text-[#14161D] font-heading">
               {classes.filter((c) => c.status === 'aberta').length}
             </p>
-            <p className="text-[11px] text-[#820AD1] font-medium">Com inscrições abertas</p>
+            <p className="text-[11px] text-[#3A31CE] font-medium">Com inscrições abertas</p>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-purple-50 text-[#820AD1] flex items-center justify-center font-bold">
+          <div className="w-12 h-12 rounded-2xl bg-[#F2F1FB] text-[#3A31CE] flex items-center justify-center font-bold">
             <Calendar className="w-6 h-6" />
           </div>
         </div>
 
-        <div className="p-5 rounded-3xl bg-white border border-gray-100 shadow-xs flex items-center justify-between">
+        <div className="p-5 rounded-[22px] bg-white border border-[#E8EAF0] shadow-xs flex items-center justify-between">
           <div className="space-y-1">
-            <p className="text-xs font-semibold text-gray-500">Alunos em Andamento</p>
-            <p className="text-2xl font-extrabold text-[#191919]">{enrolledCount}</p>
+            <p className="text-xs font-semibold text-[#6B7183]">Alunos em Andamento</p>
+            <p className="text-2xl font-extrabold text-[#14161D] font-heading">{enrolledCount}</p>
             <p className="text-[11px] text-amber-600 font-medium">Aguardando conclusão</p>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
@@ -350,10 +350,12 @@ export function Courses() {
           </div>
         </div>
 
-        <div className="p-5 rounded-3xl bg-white border border-gray-100 shadow-xs flex items-center justify-between">
+        <div className="p-5 rounded-[22px] bg-white border border-[#E8EAF0] shadow-xs flex items-center justify-between">
           <div className="space-y-1">
-            <p className="text-xs font-semibold text-gray-500">Conclusões Registradas</p>
-            <p className="text-2xl font-extrabold text-emerald-600">{completedCount}</p>
+            <p className="text-xs font-semibold text-[#6B7183]">Conclusões Registradas</p>
+            <p className="text-2xl font-extrabold text-emerald-600 font-heading">
+              {completedCount}
+            </p>
             <p className="text-[11px] text-emerald-700 font-medium">Aptos para voluntariado</p>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
@@ -363,13 +365,13 @@ export function Courses() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-gray-200 pb-2 overflow-x-auto text-xs font-bold">
+      <div className="flex items-center gap-2 border-b border-[#E8EAF0] pb-2 overflow-x-auto text-xs font-bold">
         <button
           onClick={() => setActiveTab('turmas')}
           className={`px-4 py-2 rounded-full transition-all cursor-pointer ${
             activeTab === 'turmas'
-              ? 'bg-[#820AD1] text-white shadow-sm'
-              : 'text-gray-600 hover:bg-gray-100'
+              ? 'bg-[#3A31CE] text-white shadow-sm'
+              : 'text-[#5A6072] hover:bg-[#F2F1FB] hover:text-[#3A31CE]'
           }`}
         >
           Turmas do C1 &amp; Cursos ({classes.length})
@@ -379,8 +381,8 @@ export function Courses() {
           onClick={() => setActiveTab('conclusoes')}
           className={`px-4 py-2 rounded-full transition-all cursor-pointer ${
             activeTab === 'conclusoes'
-              ? 'bg-[#820AD1] text-white shadow-sm'
-              : 'text-gray-600 hover:bg-gray-100'
+              ? 'bg-[#3A31CE] text-white shadow-sm'
+              : 'text-[#5A6072] hover:bg-[#F2F1FB] hover:text-[#3A31CE]'
           }`}
         >
           Inscrições &amp; Conclusão da Secretaria ({enrollments.length})
@@ -390,8 +392,8 @@ export function Courses() {
           onClick={() => setActiveTab('cursos')}
           className={`px-4 py-2 rounded-full transition-all cursor-pointer ${
             activeTab === 'cursos'
-              ? 'bg-[#820AD1] text-white shadow-sm'
-              : 'text-gray-600 hover:bg-gray-100'
+              ? 'bg-[#3A31CE] text-white shadow-sm'
+              : 'text-[#5A6072] hover:bg-[#F2F1FB] hover:text-[#3A31CE]'
           }`}
         >
           Catálogo de Cursos ({courses.length})
@@ -405,8 +407,10 @@ export function Courses() {
         <section className="bg-white rounded-3xl p-6 sm:p-7 shadow-sm border border-gray-100 space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h2 className="text-base font-bold text-[#191919]">Turmas Cadastradas</h2>
-              <p className="text-xs text-gray-500">
+              <h2 className="text-base font-bold text-[#14161D] font-heading">
+                Turmas Cadastradas
+              </h2>
+              <p className="text-xs text-[#5A6072]">
                 Datas de início e fim, horário, capacidade de vagas e status da turma.
               </p>
             </div>
@@ -453,42 +457,42 @@ export function Courses() {
                               cls.status === 'aberta'
                                 ? 'bg-emerald-100 text-emerald-800'
                                 : cls.status === 'concluida'
-                                  ? 'bg-purple-100 text-purple-800'
+                                  ? 'bg-[#F2F1FB] text-[#3A31CE]'
                                   : 'bg-gray-200 text-gray-700'
                             }`}
                           >
                             {cls.status}
                           </span>
                         </div>
-                        <p className="text-[11px] text-[#820AD1] font-semibold mt-0.5">
+                        <p className="text-[11px] text-[#3A31CE] font-semibold mt-0.5">
                           {cls.expand?.course?.name || 'C1 — Curso de Fundamentos & Serviço'}
                         </p>
                       </div>
                     </div>
 
-                    <div className="text-xs text-gray-600 space-y-1 bg-white p-3 rounded-xl border border-gray-100">
+                    <div className="text-xs text-[#5A6072] space-y-1 bg-white p-3 rounded-xl border border-[#E8EAF0]">
                       <div className="flex items-center justify-between text-[11px]">
-                        <span className="text-gray-500">Período:</span>
-                        <span className="font-bold text-gray-800">
+                        <span className="text-[#6B7183]">Período:</span>
+                        <span className="font-bold text-[#14161D]">
                           {new Date(cls.start_date).toLocaleDateString('pt-BR')} até{' '}
                           {new Date(cls.end_date).toLocaleDateString('pt-BR')}
                         </span>
                       </div>
                       {cls.schedule_info && (
                         <div className="flex items-center justify-between text-[11px]">
-                          <span className="text-gray-500">Horário:</span>
-                          <span className="font-medium text-gray-800">{cls.schedule_info}</span>
+                          <span className="text-[#6B7183]">Horário:</span>
+                          <span className="font-medium text-[#14161D]">{cls.schedule_info}</span>
                         </div>
                       )}
                       {cls.location && (
                         <div className="flex items-center justify-between text-[11px]">
-                          <span className="text-gray-500">Local:</span>
-                          <span className="font-medium text-gray-800">{cls.location}</span>
+                          <span className="text-[#6B7183]">Local:</span>
+                          <span className="font-medium text-[#14161D]">{cls.location}</span>
                         </div>
                       )}
-                      <div className="flex items-center justify-between text-[11px] pt-1 border-t border-gray-100">
-                        <span className="text-gray-500">Inscritos / Vagas:</span>
-                        <span className="font-bold text-[#820AD1]">
+                      <div className="flex items-center justify-between text-[11px] pt-1 border-t border-[#E8EAF0]">
+                        <span className="text-[#6B7183]">Inscritos / Vagas:</span>
+                        <span className="font-bold text-[#3A31CE]">
                           {classEnrollments.length} / {cls.capacity || 'Ilimitadas'}{' '}
                           {isFull && <span className="text-red-500">(Lotada)</span>}
                         </span>
@@ -496,7 +500,7 @@ export function Courses() {
                     </div>
 
                     <div className="flex items-center justify-between pt-1">
-                      <span className="text-[11px] text-gray-500">
+                      <span className="text-[11px] text-[#6B7183]">
                         {classEnrollments.filter((e) => e.status === 'concluido').length} alunos já
                         concluíram
                       </span>
@@ -509,7 +513,7 @@ export function Courses() {
                             setSelectedClassId(cls.id)
                             setActiveTab('conclusoes')
                           }}
-                          className="rounded-full text-xs h-8 border-purple-200 text-[#820AD1] hover:bg-purple-50"
+                          className="rounded-full text-xs h-8 border-[#DAD7F3] text-[#3A31CE] hover:bg-[#F2F1FB]"
                         >
                           Ver Inscrições <ChevronRight className="w-3.5 h-3.5 ml-1" />
                         </Button>
@@ -528,11 +532,13 @@ export function Courses() {
           ===================================================================== */}
       {activeTab === 'conclusoes' && (
         <section className="bg-white rounded-3xl p-6 sm:p-7 shadow-sm border border-gray-100 space-y-5">
-          <div className="p-4 rounded-2xl bg-purple-50/70 border border-purple-200 text-xs text-purple-900 flex items-start gap-2.5">
-            <UserCheck className="w-4 h-4 text-[#820AD1] shrink-0 mt-0.5" />
+          <div className="p-4 rounded-2xl bg-[#F2F1FB] border border-[#DAD7F3] text-xs text-[#14161D] flex items-start gap-2.5">
+            <UserCheck className="w-4 h-4 text-[#3A31CE] shrink-0 mt-0.5" />
             <div>
-              <p className="font-bold">Módulo Mínimo de Cursos — Conclusão Oficial no MVP:</p>
-              <p className="text-[11px] text-purple-800 mt-0.5">
+              <p className="font-bold text-[#3A31CE]">
+                Módulo Mínimo de Cursos — Conclusão Oficial no MVP:
+              </p>
+              <p className="text-[11px] text-[#5A6072] mt-0.5">
                 No MVP, a Secretaria marca quem concluiu cada turma em um clique. Ao marcar
                 &ldquo;Concluído&rdquo;, o sistema atualiza automaticamente o C1 do voluntário para
                 cumprir o requisito universal de Igreja.
@@ -600,7 +606,7 @@ export function Courses() {
                           {enr.status}
                         </span>
                         {person?.stage && (
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#F2F1FB] text-[#3A31CE]">
                             Estágio: {person.stage}
                           </span>
                         )}
@@ -675,8 +681,10 @@ export function Courses() {
         <section className="bg-white rounded-3xl p-6 sm:p-7 shadow-sm border border-gray-100 space-y-5">
           <div className="flex items-center justify-between pb-3 border-b border-gray-100">
             <div>
-              <h2 className="text-base font-bold text-[#191919]">Catálogo de Cursos da Igreja</h2>
-              <p className="text-xs text-gray-500">
+              <h2 className="text-base font-bold text-[#14161D] font-heading">
+                Catálogo de Cursos da Igreja
+              </h2>
+              <p className="text-xs text-[#5A6072]">
                 C1 é o curso padrão preparatório para o voluntariado. Novos cursos podem ser
                 adicionados no futuro.
               </p>
@@ -687,7 +695,7 @@ export function Courses() {
                   setCourseForm({ name: '', code: '', description: '' })
                   setIsCourseModalOpen(true)
                 }}
-                className="bg-[#820AD1] hover:bg-[#7008B7] text-white font-bold text-xs h-9 px-4 rounded-full"
+                className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white font-bold text-xs h-9 px-4 rounded-full"
               >
                 <Plus className="w-3.5 h-3.5 mr-1" />
                 Novo Curso
@@ -699,16 +707,16 @@ export function Courses() {
             {courses.map((course) => (
               <div
                 key={course.id}
-                className="p-5 rounded-2xl border border-gray-200 bg-[#F8F9FB] space-y-2.5"
+                className="p-5 rounded-2xl border border-[#E8EAF0] bg-[#F8F9FB] space-y-2.5"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-xl bg-purple-100 text-[#820AD1] flex items-center justify-center font-bold">
+                    <div className="w-8 h-8 rounded-xl bg-[#F2F1FB] text-[#3A31CE] flex items-center justify-center font-bold">
                       <BookOpen className="w-4 h-4" />
                     </div>
-                    <h3 className="font-bold text-[#191919] text-sm">{course.name}</h3>
+                    <h3 className="font-bold text-[#14161D] text-sm">{course.name}</h3>
                   </div>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-[#820AD1]">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#F2F1FB] text-[#3A31CE]">
                     Código: {course.code}
                   </span>
                 </div>
@@ -857,7 +865,7 @@ export function Courses() {
             </Button>
             <Button
               onClick={handleCreateClass}
-              className="bg-[#820AD1] hover:bg-[#7008B7] text-white font-bold text-xs rounded-full px-5"
+              className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white font-bold text-xs rounded-full px-5"
             >
               Salvar Turma
             </Button>
@@ -875,7 +883,7 @@ export function Courses() {
           </DialogHeader>
 
           <div className="space-y-3 pt-2 text-xs">
-            <div className="p-3 bg-purple-50 rounded-xl border border-purple-200 text-purple-900 text-[11px]">
+            <div className="p-3 bg-[#F2F1FB] rounded-xl border border-[#DAD7F3] text-[#3A31CE] text-[11px]">
               <strong>Decisão aprovada:</strong> A inscrição no C1 é aberta a membros e
               frequentadores (o frequentador ganha tempo e se prepara para servir assim que virar
               membro).
@@ -940,7 +948,7 @@ export function Courses() {
             </Button>
             <Button
               onClick={handleEnrollPerson}
-              className="bg-[#820AD1] hover:bg-[#7008B7] text-white font-bold text-xs rounded-full px-5"
+              className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white font-bold text-xs rounded-full px-5"
             >
               Confirmar Inscrição
             </Button>
@@ -1002,7 +1010,7 @@ export function Courses() {
             </Button>
             <Button
               onClick={handleCreateCourse}
-              className="bg-[#820AD1] hover:bg-[#7008B7] text-white font-bold text-xs rounded-full px-5"
+              className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white font-bold text-xs rounded-full px-5"
             >
               Salvar Curso
             </Button>

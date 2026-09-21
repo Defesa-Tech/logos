@@ -188,16 +188,16 @@ Qualquer dúvida ou se precisar de oração, estou por aqui!`
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#820AD1] mb-1">
-            <span className="w-2 h-2 rounded-full bg-[#820AD1]" />
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#3A31CE] mb-1">
+            <span className="w-2 h-2 rounded-full bg-[#3A31CE]" />
             <span>Jornada J3</span>
             <span className="text-gray-300">/</span>
             <span>Acompanhamento Pós-Culto</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191919]">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#14161D] font-heading">
             Follow-up de Visitantes
           </h1>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1 max-w-2xl font-normal">
+          <p className="text-xs sm:text-sm text-[#5A6072] mt-1 max-w-2xl font-normal">
             No follow-up da 1ª visita, envie a mensagem pessoal acolhedora com o link do app da
             igreja (D13 revisada). Anote o que surgir espontaneamente na conversa, sem sensação de
             ficha.
@@ -220,8 +220,8 @@ Qualquer dúvida ou se precisar de oração, estou por aqui!`
           onClick={() => setStatusFilter('aberta')}
           className={`h-9 rounded-full text-xs font-bold transition-all ${
             statusFilter === 'aberta'
-              ? 'bg-[#820AD1] text-white shadow-sm'
-              : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
+              ? 'bg-[#3A31CE] text-white shadow-sm'
+              : 'bg-white text-[#5A6072] hover:bg-[#F2F1FB] hover:text-[#3A31CE] border border-[#E8EAF0]'
           }`}
         >
           Tarefas Pendentes ({tasks.filter((t) => t.status === 'aberta').length})
@@ -231,8 +231,8 @@ Qualquer dúvida ou se precisar de oração, estou por aqui!`
           onClick={() => setStatusFilter('concluida')}
           className={`h-9 rounded-full text-xs font-bold transition-all ${
             statusFilter === 'concluida'
-              ? 'bg-[#820AD1] text-white shadow-sm'
-              : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
+              ? 'bg-[#3A31CE] text-white shadow-sm'
+              : 'bg-white text-[#5A6072] hover:bg-[#F2F1FB] hover:text-[#3A31CE] border border-[#E8EAF0]'
           }`}
         >
           Concluídas ({tasks.filter((t) => t.status === 'concluida').length})
@@ -242,16 +242,16 @@ Qualquer dúvida ou se precisar de oração, estou por aqui!`
           onClick={() => setStatusFilter('all')}
           className={`h-9 rounded-full text-xs font-bold transition-all ${
             statusFilter === 'all'
-              ? 'bg-[#820AD1] text-white shadow-sm'
-              : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
+              ? 'bg-[#3A31CE] text-white shadow-sm'
+              : 'bg-white text-[#5A6072] hover:bg-[#F2F1FB] hover:text-[#3A31CE] border border-[#E8EAF0]'
           }`}
         >
           Todas
         </Button>
       </div>
 
-      {/* Task List (Nubank Extrato style) */}
-      <div className="bg-white rounded-3xl border border-gray-100 shadow-sm divide-y divide-gray-100 overflow-hidden">
+      {/* Task List */}
+      <div className="bg-white rounded-[22px] border border-[#E8EAF0] shadow-sm divide-y divide-[#E8EAF0] overflow-hidden">
         {loading ? (
           <p className="text-center py-12 text-xs text-gray-400">Carregando tarefas...</p>
         ) : filteredTasks.length === 0 ? (
@@ -276,7 +276,7 @@ Qualquer dúvida ou se precisar de oração, estou por aqui!`
                         ? 'bg-red-50 text-red-600 border border-red-200'
                         : task.status === 'concluida'
                           ? 'bg-emerald-50 text-emerald-700'
-                          : 'bg-[#F7EEFD] text-[#820AD1]'
+                          : 'bg-[#F2F1FB] text-[#3A31CE]'
                     }`}
                   >
                     {person?.name ? person.name.slice(0, 2).toUpperCase() : 'FL'}
@@ -284,7 +284,7 @@ Qualquer dúvida ou se precisar de oração, estou por aqui!`
 
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-bold text-[#191919] text-sm">
+                      <span className="font-bold text-[#14161D] text-sm">
                         {person?.name || 'Visitante'}
                       </span>
                       {overdue && (
@@ -296,25 +296,25 @@ Qualquer dúvida ou se precisar de oração, estou por aqui!`
                         className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
                           task.status === 'concluida'
                             ? 'bg-emerald-50 text-emerald-700'
-                            : 'bg-purple-50 text-[#820AD1]'
+                            : 'bg-[#F2F1FB] text-[#3A31CE]'
                         }`}
                       >
                         {task.status === 'concluida' ? 'Concluída' : 'Aberta'}
                       </span>
                       {person?.contact_preference && (
-                        <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
+                        <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-[#5A6072]">
                           Prefere: {person.contact_preference}
                         </span>
                       )}
                     </div>
 
-                    <p className="text-xs text-gray-600">
+                    <p className="text-xs text-[#5A6072]">
                       Contato:{' '}
-                      <strong className="text-[#191919]">
+                      <strong className="text-[#14161D]">
                         {person?.whatsapp || person?.phone || 'Sem telefone'}
                       </strong>{' '}
                       &bull; Responsável:{' '}
-                      <strong className="text-[#820AD1]">
+                      <strong className="text-[#3A31CE]">
                         {task.responsible_name || 'Equipe Boas-Vindas'}
                       </strong>
                     </p>
@@ -353,7 +353,7 @@ Qualquer dúvida ou se precisar de oração, estou por aqui!`
                           setSelectedTask(task)
                           setActionDialogOpen(true)
                         }}
-                        className="bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-9 px-4 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all"
+                        className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-9 px-4 rounded-full font-bold shadow-md shadow-[#3A31CE]/20 active:scale-95 transition-all"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
                         Registrar Resultado
@@ -398,7 +398,7 @@ Qualquer dúvida ou se precisar de oração, estou por aqui!`
           </DialogHeader>
 
           <div className="space-y-4 pt-2 text-xs">
-            <div className="p-3 bg-purple-50 rounded-2xl border border-purple-100 text-[11px] text-[#820AD1]">
+            <div className="p-3 bg-[#F2F1FB] rounded-2xl border border-[#DAD7F3] text-[11px] text-[#3A31CE]">
               <strong>Dica de Tom (CX Logos):</strong> Mensagem pessoal, calorosa e com tom de
               convite, nunca de marketing. O link do aplicativo da igreja é entregue de forma
               natural para quem deseja acompanhar a programação.
@@ -406,7 +406,7 @@ Qualquer dúvida ou se precisar de oração, estou por aqui!`
 
             <div className="space-y-1">
               <div className="flex justify-between items-center">
-                <Label className="font-semibold text-gray-700">
+                <Label className="font-semibold text-[#5A6072]">
                   Texto da Mensagem (Você pode editar antes de enviar)
                 </Label>
                 <button
@@ -415,7 +415,7 @@ Qualquer dúvida ou se precisar de oração, estou por aqui!`
                     navigator.clipboard.writeText(whatsappText)
                     toast.success('Texto copiado para a área de transferência!')
                   }}
-                  className="text-[11px] text-[#820AD1] font-bold hover:underline flex items-center gap-1"
+                  className="text-[11px] text-[#3A31CE] font-bold hover:underline flex items-center gap-1"
                 >
                   <Copy className="w-3 h-3" />
                   Copiar
@@ -426,7 +426,7 @@ Qualquer dúvida ou se precisar de oração, estou por aqui!`
                 rows={8}
                 value={whatsappText}
                 onChange={(e) => setWhatsappText(e.target.value)}
-                className="rounded-2xl bg-[#F0F1F5] border-transparent font-sans text-xs leading-relaxed focus:bg-white focus:border-[#820AD1]"
+                className="rounded-[14px] bg-[#F2F3F7] border-transparent font-sans text-xs leading-relaxed focus:bg-white focus:border-[#3A31CE]"
               />
             </div>
 
@@ -500,14 +500,14 @@ Qualquer dúvida ou se precisar de oração, estou por aqui!`
                 value={taskNotes}
                 onChange={(e) => setTaskNotes(e.target.value)}
                 placeholder="Anote o que surgir espontaneamente na conversa (ex: quem convidou, se veio com família, pedidos de oração)..."
-                className="rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                className="rounded-[14px] bg-[#F2F3F7] border-transparent focus:bg-white focus:border-[#3A31CE]"
               />
             </div>
 
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all"
+              className="w-full bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#3A31CE]/20 active:scale-95 transition-all"
             >
               {isSubmitting ? 'Salvando...' : 'Finalizar Tarefa'}
             </Button>
@@ -537,13 +537,13 @@ Qualquer dúvida ou se precisar de oração, estou por aqui!`
                 value={newResponsibleName}
                 onChange={(e) => setNewResponsibleName(e.target.value)}
                 placeholder="Ex: Voluntário João Santos"
-                className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                className="h-10 rounded-[14px] bg-[#F2F3F7] border-transparent focus:bg-white focus:border-[#3A31CE]"
               />
             </div>
 
             <Button
               type="submit"
-              className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#820AD1]/20"
+              className="w-full bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#3A31CE]/20"
             >
               Redistribuir Tarefa
             </Button>

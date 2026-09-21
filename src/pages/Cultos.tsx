@@ -528,7 +528,7 @@ export default function Cultos() {
                         setLinkTargetCultoId(selectedCulto?.id || '')
                         setLinkOrphanModalOpen(true)
                       }}
-                      className="h-8 text-xs bg-[#820AD1] hover:bg-[#7008B7] text-white rounded-full font-bold px-3 shadow-xs cursor-pointer"
+                      className="h-8 text-xs bg-[#3A31CE] hover:bg-[#2A23A6] text-white rounded-full font-bold px-3 shadow-xs cursor-pointer"
                     >
                       <LinkIcon className="w-3.5 h-3.5 mr-1" />
                       Vincular a Evento
@@ -666,17 +666,17 @@ export default function Cultos() {
 
           {/* Search Result Banner */}
           {isSearchingPhone ? (
-            <p className="text-xs text-purple-200">Consultando telefone...</p>
+            <p className="text-xs text-indigo-200">Consultando telefone...</p>
           ) : matchedPerson ? (
             <div className="bg-white/15 backdrop-blur-md p-4 rounded-2xl border border-white/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-extrabold text-white text-base">{matchedPerson.name}</span>
-                  <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-white/20 text-purple-100">
+                  <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-white/20 text-indigo-100">
                     {matchedPerson.stage || matchedPerson.status}
                   </span>
                 </div>
-                <p className="text-xs text-purple-200 mt-0.5">
+                <p className="text-xs text-indigo-200 mt-0.5">
                   Telefone: {matchedPerson.phone || matchedPerson.whatsapp || 'Cadastrado'} &bull;{' '}
                   {matchedPerson.how_found || 'Igreja Sede'}
                 </p>
@@ -692,7 +692,7 @@ export default function Cultos() {
             </div>
           ) : searchPhone.length >= 8 ? (
             <div className="bg-white/10 p-4 rounded-2xl border border-dashed border-white/20 flex items-center justify-between text-xs">
-              <span className="text-purple-200">
+              <span className="text-indigo-200">
                 Nenhum cadastro encontrado para este número. Clique em &quot;Primeira Visita&quot;
                 para registrar.
               </span>
@@ -710,7 +710,7 @@ export default function Cultos() {
           ) : null}
 
           {/* Anonymous count counter */}
-          <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs text-purple-200">
+          <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs text-indigo-200">
             <span>Pessoas que não querem cadastro (contagem anônima J1):</span>
             <div className="flex items-center gap-2">
               <Button
@@ -877,34 +877,34 @@ export default function Cultos() {
       <Dialog open={signupModalOpen} onOpenChange={setSignupModalOpen}>
         <DialogContent className="sm:max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border-gray-100">
           <DialogHeader className="border-b border-gray-100 pb-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#820AD1] text-white flex items-center justify-center font-bold mb-1">
+            <div className="w-10 h-10 rounded-2xl bg-[#3A31CE] text-white flex items-center justify-center font-bold mb-1">
               L
             </div>
-            <DialogTitle className="text-xl font-bold text-[#191919]">
+            <DialogTitle className="text-xl font-bold text-[#14161D] font-heading">
               Cadastro de Primeira Visita (J1)
             </DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleQuickSignup} className="space-y-4 pt-2 text-xs">
             <div className="space-y-1">
-              <Label className="font-semibold text-gray-700">Nome Completo *</Label>
+              <Label className="font-semibold text-[#5A6072]">Nome Completo *</Label>
               <Input
                 required
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 placeholder="Ex: Carlos Santana"
-                className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                className="h-10 rounded-[14px] bg-[#F2F3F7] border-transparent focus:bg-white focus:border-[#3A31CE]"
               />
             </div>
 
             <div className="space-y-1">
-              <Label className="font-semibold text-gray-700">Telefone / WhatsApp</Label>
+              <Label className="font-semibold text-[#5A6072]">Telefone / WhatsApp</Label>
               <Input
                 disabled={newNoContact}
                 value={newPhone}
                 onChange={(e) => setNewPhone(e.target.value)}
                 placeholder="(11) 98765-4321"
-                className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                className="h-10 rounded-[14px] bg-[#F2F3F7] border-transparent focus:bg-white focus:border-[#3A31CE]"
               />
             </div>
 
@@ -933,7 +933,7 @@ export default function Cultos() {
                   type="checkbox"
                   checked={newContactAuthorized}
                   onChange={(e) => setNewContactAuthorized(e.target.checked)}
-                  className="rounded text-[#820AD1] focus:ring-[#820AD1]"
+                  className="rounded text-[#3A31CE] focus:ring-[#3A31CE]"
                 />
                 <span className="font-semibold text-gray-800">
                   Autoriza contato da igreja (Boas-Vindas)?
@@ -1002,7 +1002,7 @@ export default function Cultos() {
 
             <Button
               onClick={handleMovePresence}
-              className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#820AD1]/20"
+              className="w-full bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#3A31CE]/20"
             >
               Transferir Presença
             </Button>
@@ -1024,11 +1024,11 @@ export default function Cultos() {
 
           {orphanToLink && (
             <div className="space-y-4 pt-2 text-xs">
-              <div className="p-3 bg-purple-50 rounded-2xl border border-purple-100">
-                <span className="font-bold text-purple-900 block">
+              <div className="p-3 bg-[#F2F1FB] rounded-2xl border border-[#DAD7F3]">
+                <span className="font-bold text-[#3A31CE] block">
                   {orphanToLink.expand?.person?.name || 'Pessoa'}
                 </span>
-                <span className="text-[11px] text-purple-700">
+                <span className="text-[11px] text-[#5A6072]">
                   Data/Hora do escaneamento:{' '}
                   {new Date(orphanToLink.created).toLocaleString('pt-BR')}
                 </span>
@@ -1145,31 +1145,31 @@ export default function Cultos() {
                 value={cultoName}
                 onChange={(e) => setCultoName(e.target.value)}
                 placeholder="Ex: Conferência da Família, Estudo Bíblico..."
-                className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                className="h-10 rounded-[14px] bg-[#F2F3F7] border-transparent focus:bg-white focus:border-[#3A31CE]"
               />
             </div>
 
             {/* Recorrência Semanal */}
-            <div className="p-3 bg-purple-50/70 border border-purple-200/80 rounded-2xl space-y-2.5">
+            <div className="p-3 bg-[#F2F1FB] border border-[#DAD7F3] rounded-2xl space-y-2.5">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={cultoIsRecurrent}
                   onChange={(e) => setCultoIsRecurrent(e.target.checked)}
-                  className="rounded text-[#820AD1] focus:ring-[#820AD1]"
+                  className="rounded text-[#3A31CE] focus:ring-[#3A31CE]"
                 />
-                <span className="font-bold text-purple-900 flex items-center gap-1.5">
+                <span className="font-bold text-[#3A31CE] flex items-center gap-1.5">
                   <Repeat className="w-3.5 h-3.5" />
                   Evento Recorrente Semanal (rotina automática)
                 </span>
               </label>
-              <p className="text-[11px] text-purple-700 leading-tight">
+              <p className="text-[11px] text-[#5A6072] leading-tight">
                 Gera automaticamente a janela de aceite de presença toda semana, sem depender de
                 cadastro manual antes de cada culto.
               </p>
 
               {cultoIsRecurrent && (
-                <div className="space-y-2 pt-1 border-t border-purple-200/60">
+                <div className="space-y-2 pt-1 border-t border-[#DAD7F3]/60">
                   <div className="space-y-1">
                     <Label className="text-[11px] font-semibold text-gray-700">
                       Dias da Semana
@@ -1200,8 +1200,8 @@ export default function Cultos() {
                             }}
                             className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all ${
                               selected
-                                ? 'bg-[#820AD1] text-white shadow-xs'
-                                : 'bg-white text-gray-600 border border-gray-200 hover:border-purple-300'
+                                ? 'bg-[#3A31CE] text-white shadow-xs'
+                                : 'bg-white text-[#5A6072] border border-[#E8EAF0] hover:border-[#DAD7F3]'
                             }`}
                           >
                             {d.label}
@@ -1249,17 +1249,17 @@ export default function Cultos() {
                   required
                   value={cultoDate}
                   onChange={(e) => setCultoDate(e.target.value)}
-                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                  className="h-10 rounded-[14px] bg-[#F2F3F7] border-transparent focus:bg-white focus:border-[#3A31CE]"
                 />
               </div>
 
               <div className="space-y-1">
-                <Label className="font-semibold text-gray-700">Término Previsto</Label>
+                <Label className="font-semibold text-[#5A6072]">Término Previsto</Label>
                 <Input
                   type="datetime-local"
                   value={cultoEndDate}
                   onChange={(e) => setCultoEndDate(e.target.value)}
-                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                  className="h-10 rounded-[14px] bg-[#F2F3F7] border-transparent focus:bg-white focus:border-[#3A31CE]"
                 />
               </div>
             </div>
@@ -1267,8 +1267,8 @@ export default function Cultos() {
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
-                  <Label className="font-semibold text-gray-700">Tolerância Antes</Label>
-                  <span className="text-[10px] text-[#820AD1] font-bold">padrão: 60 min</span>
+                  <Label className="font-semibold text-[#5A6072]">Tolerância Antes</Label>
+                  <span className="text-[10px] text-[#3A31CE] font-bold">padrão: 60 min</span>
                 </div>
                 <Input
                   type="number"
@@ -1276,14 +1276,14 @@ export default function Cultos() {
                   value={cultoTolBefore}
                   onChange={(e) => setCultoTolBefore(Number(e.target.value))}
                   placeholder="Minutos antes do início"
-                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                  className="h-10 rounded-[14px] bg-[#F2F3F7] border-transparent focus:bg-white focus:border-[#3A31CE]"
                 />
               </div>
 
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
-                  <Label className="font-semibold text-gray-700">Tolerância Após Término</Label>
-                  <span className="text-[10px] text-gray-500">padrão: 0 min</span>
+                  <Label className="font-semibold text-[#5A6072]">Tolerância Após Término</Label>
+                  <span className="text-[10px] text-[#6B7183]">padrão: 0 min</span>
                 </div>
                 <Input
                   type="number"
@@ -1291,7 +1291,7 @@ export default function Cultos() {
                   value={cultoTolAfter}
                   onChange={(e) => setCultoTolAfter(Number(e.target.value))}
                   placeholder="Minutos após o fim"
-                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                  className="h-10 rounded-[14px] bg-[#F2F3F7] border-transparent focus:bg-white focus:border-[#3A31CE]"
                 />
               </div>
             </div>
@@ -1302,9 +1302,9 @@ export default function Cultos() {
                   type="checkbox"
                   checked={cultoIsRegular}
                   onChange={(e) => setCultoIsRegular(e.target.checked)}
-                  className="rounded text-[#820AD1]"
+                  className="rounded text-[#3A31CE]"
                 />
-                <span className="font-semibold text-gray-800">
+                <span className="font-semibold text-[#14161D]">
                   É um culto regular da igreja? (Conta para regra R4 de Frequentador)
                 </span>
               </label>
@@ -1312,7 +1312,7 @@ export default function Cultos() {
 
             <Button
               type="submit"
-              className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#820AD1]/20 mt-2"
+              className="w-full bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#3A31CE]/20 mt-2"
             >
               Criar e Salvar Evento na Agenda
             </Button>

@@ -246,11 +246,11 @@ export default function People() {
   }
 
   const statusBadgeStyle: Record<PersonStatus, string> = {
-    visitor: 'bg-purple-50 text-[#820AD1] border-purple-100',
+    visitor: 'bg-[#F2F1FB] text-[#3A31CE] border-[#DAD7F3]',
     attender: 'bg-blue-50 text-blue-700 border-blue-100',
     member: 'bg-emerald-50 text-emerald-700 border-emerald-100',
-    leader: 'bg-[#F7EEFD] text-[#820AD1] font-bold border-purple-200',
-    pastor: 'bg-[#190326] text-white border-transparent',
+    leader: 'bg-[#F2F1FB] text-[#3A31CE] font-bold border-[#DAD7F3]',
+    pastor: 'bg-[#14161D] text-white border-transparent',
   }
 
   const familyRoleLabels: Record<FamilyRole, string> = {
@@ -273,16 +273,16 @@ export default function People() {
           ========================================================================= */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#820AD1] mb-1">
-            <span className="w-2 h-2 rounded-full bg-[#820AD1]" />
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#3A31CE] mb-1">
+            <span className="w-2 h-2 rounded-full bg-[#3A31CE]" />
             <span>Membros & Visitantes</span>
             <span className="text-gray-300">/</span>
             <span>{visiblePersons.length} cadastros</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191919]">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#14161D] font-heading">
             Pessoas & Membresia
           </h1>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1 max-w-2xl font-normal">
+          <p className="text-xs sm:text-sm text-[#5A6072] mt-1 max-w-2xl font-normal">
             {canAccessAll
               ? 'Diretório completo de membros, líderes, frequentadores e novos visitantes acolhidos.'
               : isLeader
@@ -294,7 +294,7 @@ export default function People() {
         {canAccessAll && (
           <Button
             onClick={openCreateDialog}
-            className="bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-10 px-5 rounded-full font-bold shadow-md shadow-[#820AD1]/20 self-start sm:self-auto cursor-pointer active:scale-95 transition-all"
+            className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-10 px-5 rounded-full font-bold shadow-md shadow-[#3A31CE]/20 self-start sm:self-auto cursor-pointer active:scale-95 transition-all"
           >
             <Plus className="w-4 h-4 mr-1.5" strokeWidth={2.5} />
             Cadastrar Pessoa
@@ -303,7 +303,7 @@ export default function People() {
       </div>
 
       {/* =========================================================================
-          FILTER TOOLBAR — Nubank Rounded Search and Pill Filters
+          FILTER TOOLBAR
           ========================================================================= */}
       <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
         {/* Search Input */}
@@ -317,12 +317,12 @@ export default function People() {
             placeholder="Buscar por nome, telefone ou e-mail..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 pr-8 text-xs h-10 rounded-full bg-white border-gray-200 focus:border-[#820AD1] focus:ring-1 focus:ring-[#820AD1] placeholder:text-gray-400 shadow-xs"
+            className="pl-9 pr-8 text-xs h-10 rounded-full bg-white border-[#E8EAF0] focus:border-[#3A31CE] focus:ring-1 focus:ring-[#3A31CE] placeholder:text-gray-400 shadow-xs"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 cursor-pointer"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#14161D] cursor-pointer"
             >
               <X className="w-4 h-4" strokeWidth={2} />
             </button>
@@ -346,8 +346,8 @@ export default function People() {
                 onClick={() => setStatusFilter(st.id)}
                 className={`text-xs px-3.5 py-1.5 font-bold whitespace-nowrap transition-all cursor-pointer rounded-full active:scale-95 ${
                   active
-                    ? 'bg-[#820AD1] text-white shadow-sm shadow-[#820AD1]/25'
-                    : 'bg-white text-gray-600 hover:text-[#820AD1] hover:bg-[#F7EEFD] border border-gray-200'
+                    ? 'bg-[#3A31CE] text-white shadow-sm shadow-[#3A31CE]/25'
+                    : 'bg-white text-[#5A6072] hover:text-[#3A31CE] hover:bg-[#F2F1FB] border border-[#E8EAF0]'
                 }`}
               >
                 {st.label}
@@ -358,7 +358,7 @@ export default function People() {
       </div>
 
       {/* =========================================================================
-          NUBANK DESKTOP LIST / TABLE (Rounded 3xl Container, Circular Avatars)
+          DESKTOP LIST / TABLE
           ========================================================================= */}
       <div className="hidden md:block bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100">
         <table className="w-full text-left text-xs">
@@ -407,14 +407,14 @@ export default function People() {
                     {/* Name + Avatar */}
                     <td className="py-3.5 px-5">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-[#F7EEFD] text-[#820AD1] font-bold text-xs flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                        <div className="w-9 h-9 rounded-full bg-[#F2F1FB] text-[#3A31CE] font-bold text-xs flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform font-heading">
                           {person.name.slice(0, 2).toUpperCase()}
                         </div>
                         <div>
-                          <p className="font-bold text-[#191919] group-hover:text-[#820AD1] transition-colors">
+                          <p className="font-bold text-[#14161D] group-hover:text-[#3A31CE] transition-colors">
                             {person.name}
                           </p>
-                          <p className="text-[11px] text-gray-400 mt-0.5">
+                          <p className="text-[11px] text-[#6B7183] mt-0.5">
                             Desde {new Date(person.created).toLocaleDateString('pt-BR')}
                           </p>
                         </div>
@@ -441,9 +441,9 @@ export default function People() {
                             e.stopPropagation()
                             handleOpenWhatsApp(person.whatsapp)
                           }}
-                          className="text-[#820AD1] hover:underline cursor-pointer flex items-center gap-1 font-semibold"
+                          className="text-[#3A31CE] hover:underline cursor-pointer flex items-center gap-1 font-semibold"
                         >
-                          <Phone className="w-3 h-3 text-[#820AD1]" strokeWidth={2} />
+                          <Phone className="w-3 h-3 text-[#3A31CE]" strokeWidth={2} />
                           <span>{person.whatsapp}</span>
                         </div>
                       ) : (
@@ -478,28 +478,28 @@ export default function People() {
                         <span
                           title="Classe Boas-Vindas"
                           className={`w-2.5 h-2.5 rounded-full ${
-                            person.checklist_welcome_class ? 'bg-[#820AD1]' : 'bg-gray-200'
+                            person.checklist_welcome_class ? 'bg-[#3A31CE]' : 'bg-gray-200'
                           }`}
                         />
                         <span
                           title="Batismo"
                           className={`w-2.5 h-2.5 rounded-full ${
-                            person.checklist_baptized ? 'bg-[#820AD1]' : 'bg-gray-200'
+                            person.checklist_baptized ? 'bg-[#3A31CE]' : 'bg-gray-200'
                           }`}
                         />
                         <span
                           title="Pequeno Grupo"
                           className={`w-2.5 h-2.5 rounded-full ${
-                            person.checklist_small_group ? 'bg-[#820AD1]' : 'bg-gray-200'
+                            person.checklist_small_group ? 'bg-[#3A31CE]' : 'bg-gray-200'
                           }`}
                         />
                         <span
                           title="Ministério"
                           className={`w-2.5 h-2.5 rounded-full ${
-                            person.checklist_ministry ? 'bg-[#820AD1]' : 'bg-gray-200'
+                            person.checklist_ministry ? 'bg-[#3A31CE]' : 'bg-gray-200'
                           }`}
                         />
-                        <span className="text-[11px] font-bold text-[#820AD1] ml-1">
+                        <span className="text-[11px] font-bold text-[#3A31CE] ml-1">
                           {
                             [
                               person.checklist_welcome_class,
@@ -529,7 +529,7 @@ export default function People() {
                               setStageHistoryList([])
                             }
                           }}
-                          className="h-8 px-3 rounded-full text-xs text-[#820AD1] hover:bg-[#F7EEFD] font-bold"
+                          className="h-8 px-3 rounded-full text-xs text-[#3A31CE] hover:bg-[#F2F1FB] font-bold"
                         >
                           Ver perfil &rarr;
                         </Button>
@@ -538,7 +538,7 @@ export default function People() {
                             size="sm"
                             variant="ghost"
                             onClick={() => openEditDialog(person)}
-                            className="h-8 w-8 rounded-full p-0 text-gray-400 hover:text-[#820AD1] hover:bg-[#F7EEFD]"
+                            className="h-8 w-8 rounded-full p-0 text-gray-400 hover:text-[#3A31CE] hover:bg-[#F2F1FB]"
                           >
                             <Edit className="w-3.5 h-3.5" strokeWidth={2} />
                           </Button>
@@ -583,7 +583,7 @@ export default function People() {
                 className="nu-list-item"
               >
                 {/* Nubank Avatar Circle */}
-                <div className="w-10 h-10 rounded-full bg-[#F7EEFD] text-[#820AD1] flex items-center justify-center font-bold text-xs flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-[#F2F1FB] text-[#3A31CE] flex items-center justify-center font-bold text-xs flex-shrink-0 font-heading">
                   {p.name.slice(0, 2).toUpperCase()}
                 </div>
 
@@ -619,11 +619,11 @@ export default function People() {
             <>
               <SheetHeader className="border-b border-gray-100 pb-4 text-left">
                 <div className="space-y-2">
-                  <div className="w-14 h-14 rounded-full bg-[#820AD1] text-white flex items-center justify-center font-bold text-lg shadow-md shadow-[#820AD1]/20">
+                  <div className="w-14 h-14 rounded-full bg-[#3A31CE] text-white flex items-center justify-center font-bold text-lg shadow-md shadow-[#3A31CE]/20 font-heading">
                     {selectedPerson.name.slice(0, 2).toUpperCase()}
                   </div>
                   <div>
-                    <SheetTitle className="text-xl font-bold text-[#191919]">
+                    <SheetTitle className="text-xl font-bold text-[#14161D] font-heading">
                       {selectedPerson.name}
                     </SheetTitle>
                     <div className="flex items-center gap-2 pt-1 text-xs">
@@ -634,7 +634,7 @@ export default function People() {
                       >
                         {statusLabel[selectedPerson.status]}
                       </span>
-                      <span className="text-[11px] text-gray-400">
+                      <span className="text-[11px] text-[#6B7183]">
                         ID: {selectedPerson.id.slice(0, 8)}
                       </span>
                     </div>
@@ -646,7 +646,7 @@ export default function People() {
               {selectedPerson.whatsapp && (
                 <Button
                   onClick={() => handleOpenWhatsApp(selectedPerson.whatsapp)}
-                  className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white font-bold text-xs h-10 rounded-full shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all"
+                  className="w-full bg-[#3A31CE] hover:bg-[#2A23A6] text-white font-bold text-xs h-10 rounded-full shadow-md shadow-[#3A31CE]/20 active:scale-95 transition-all"
                 >
                   <MessageSquare className="w-4 h-4 mr-2" strokeWidth={2} />
                   Conversar no WhatsApp
@@ -852,17 +852,17 @@ export default function People() {
       <Dialog open={formDialogOpen} onOpenChange={setFormDialogOpen}>
         <DialogContent className="sm:max-w-lg bg-white rounded-3xl border-gray-100 shadow-2xl max-h-[90vh] overflow-y-auto p-6 sm:p-8">
           <DialogHeader className="border-b border-gray-100 pb-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#820AD1] text-white flex items-center justify-center font-bold mb-1">
+            <div className="w-10 h-10 rounded-2xl bg-[#3A31CE] text-white flex items-center justify-center font-bold mb-1 font-heading">
               L
             </div>
-            <DialogTitle className="text-xl font-bold text-[#191919]">
+            <DialogTitle className="text-xl font-bold text-[#14161D] font-heading">
               {editingPersonId ? 'Editar Cadastro' : 'Novo Cadastro de Pessoa'}
             </DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleSavePerson} className="space-y-4 pt-2 text-xs">
             <div className="space-y-1">
-              <Label htmlFor="p-name" className="font-semibold text-gray-700">
+              <Label htmlFor="p-name" className="font-semibold text-[#5A6072]">
                 Nome Completo *
               </Label>
               <Input
@@ -871,13 +871,12 @@ export default function People() {
                 value={formName}
                 onChange={(e) => setFormName(e.target.value)}
                 placeholder="Ex: Gabriel Martins"
-                className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                className="h-10 rounded-[14px] bg-[#F2F3F7] border-transparent focus:bg-white focus:border-[#3A31CE]"
               />
             </div>
-
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
-                <Label htmlFor="p-whatsapp" className="font-semibold text-gray-700">
+                <Label htmlFor="p-whatsapp" className="font-semibold text-[#5A6072]">
                   WhatsApp com DDD
                 </Label>
                 <Input
@@ -885,11 +884,11 @@ export default function People() {
                   value={formWhatsapp}
                   onChange={(e) => setFormWhatsapp(e.target.value)}
                   placeholder="(11) 98765-4321"
-                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                  className="h-10 rounded-[14px] bg-[#F2F3F7] border-transparent focus:bg-white focus:border-[#3A31CE]"
                 />
               </div>
               <div className="space-y-1">
-                <Label htmlFor="p-birth" className="font-semibold text-gray-700">
+                <Label htmlFor="p-birth" className="font-semibold text-[#5A6072]">
                   Data de Nascimento
                 </Label>
                 <Input
@@ -897,14 +896,13 @@ export default function People() {
                   type="date"
                   value={formBirthDate}
                   onChange={(e) => setFormBirthDate(e.target.value)}
-                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                  className="h-10 rounded-[14px] bg-[#F2F3F7] border-transparent focus:bg-white focus:border-[#3A31CE]"
                 />
               </div>
             </div>
-
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
-                <Label htmlFor="p-email" className="font-semibold text-gray-700">
+                <Label htmlFor="p-email" className="font-semibold text-[#5A6072]">
                   E-mail
                 </Label>
                 <Input
@@ -913,11 +911,11 @@ export default function People() {
                   value={formEmail}
                   onChange={(e) => setFormEmail(e.target.value)}
                   placeholder="gabriel@exemplo.com"
-                  className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                  className="h-10 rounded-[14px] bg-[#F2F3F7] border-transparent focus:bg-white focus:border-[#3A31CE]"
                 />
               </div>
               <div className="space-y-1">
-                <Label htmlFor="p-status" className="font-semibold text-gray-700">
+                <Label htmlFor="p-status" className="font-semibold text-[#5A6072]">
                   Estágio na Jornada
                 </Label>
                 <Select
@@ -926,7 +924,7 @@ export default function People() {
                 >
                   <SelectTrigger
                     id="p-status"
-                    className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                    className="h-10 rounded-[14px] bg-[#F2F3F7] border-transparent focus:bg-white focus:border-[#3A31CE]"
                   >
                     <SelectValue />
                   </SelectTrigger>
@@ -940,17 +938,16 @@ export default function People() {
                 </Select>
               </div>
             </div>
-
             {/* Family Selection */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-gray-100">
               <div className="space-y-1">
-                <Label htmlFor="p-family" className="font-semibold text-gray-700">
+                <Label htmlFor="p-family" className="font-semibold text-[#5A6072]">
                   Núcleo Familiar
                 </Label>
                 <Select value={formFamily} onValueChange={setFormFamily}>
                   <SelectTrigger
                     id="p-family"
-                    className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                    className="h-10 rounded-[14px] bg-[#F2F3F7] border-transparent focus:bg-white focus:border-[#3A31CE]"
                   >
                     <SelectValue placeholder="Selecione a família" />
                   </SelectTrigger>
@@ -965,7 +962,7 @@ export default function People() {
                 </Select>
               </div>
               <div className="space-y-1">
-                <Label htmlFor="p-role" className="font-semibold text-gray-700">
+                <Label htmlFor="p-role" className="font-semibold text-[#5A6072]">
                   Papel no Lar
                 </Label>
                 <Select
@@ -975,7 +972,7 @@ export default function People() {
                 >
                   <SelectTrigger
                     id="p-role"
-                    className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                    className="h-10 rounded-[14px] bg-[#F2F3F7] border-transparent focus:bg-white focus:border-[#3A31CE]"
                   >
                     <SelectValue />
                   </SelectTrigger>
@@ -988,9 +985,8 @@ export default function People() {
                 </Select>
               </div>
             </div>
-
             <div className="space-y-1">
-              <Label htmlFor="p-notes" className="font-semibold text-gray-700">
+              <Label htmlFor="p-notes" className="font-semibold text-[#5A6072]">
                 Histórico & Observações
               </Label>
               <Textarea
@@ -999,21 +995,20 @@ export default function People() {
                 value={formNotes}
                 onChange={(e) => setFormNotes(e.target.value)}
                 placeholder="Ex: Conheceu a igreja pelo culto de domingo, deseja participar da próxima classe..."
-                className="rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                className="rounded-[14px] bg-[#F2F3F7] border-transparent focus:bg-white focus:border-[#3A31CE]"
               />
             </div>
-
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all"
+              className="w-full bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#3A31CE]/20 active:scale-95 transition-all"
             >
               {isSubmitting
-                ? 'Gravando...'
+                ? 'Salvando...'
                 : editingPersonId
                   ? 'Salvar Alterações'
-                  : 'Confirmar Cadastro'}
-            </Button>
+                  : 'Cadastrar Pessoa'}
+            </Button>{' '}
           </form>
         </DialogContent>
       </Dialog>

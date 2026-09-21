@@ -553,7 +553,7 @@ export default function Layout() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -2 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 p-2 z-50 divide-y divide-gray-100"
+                    className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-[#E8EAF0] p-2 z-50 divide-y divide-[#E8EAF0]"
                   >
                     {isSearching ? (
                       <p className="text-xs text-gray-400 p-4 text-center">Buscando...</p>
@@ -566,13 +566,14 @@ export default function Layout() {
                               setSearchQuery('')
                               navigate(`/pessoas?id=${p.id}`)
                             }}
-                            className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-[#F7EEFD] flex items-center justify-between text-xs cursor-pointer group"
+                            className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-[#F2F1FB] flex items-center justify-between text-xs cursor-pointer group"
                           >
+                            {' '}
                             <div className="min-w-0 pr-2">
-                              <p className="font-bold text-[#191919] group-hover:text-[#820AD1] truncate">
+                              <p className="font-bold text-[#14161D] group-hover:text-[#3A31CE] truncate">
                                 {p.name}
                               </p>
-                              <p className="text-[11px] text-gray-400">
+                              <p className="text-[11px] text-[#6B7183]">
                                 {p.whatsapp || p.email || 'Sem contato'}
                               </p>
                             </div>
@@ -757,11 +758,11 @@ export default function Layout() {
                           setMobileSearchOpen(false)
                           navigate(`/pessoas?id=${p.id}`)
                         }}
-                        className="w-full text-left p-3 flex items-center justify-between text-xs hover:bg-[#F7EEFD]"
+                        className="w-full text-left p-3 flex items-center justify-between text-xs hover:bg-[#F2F1FB]"
                       >
                         <div>
-                          <p className="font-bold text-[#191919]">{p.name}</p>
-                          <p className="text-[11px] text-gray-400">{p.whatsapp || p.email}</p>
+                          <p className="font-bold text-[#14161D]">{p.name}</p>
+                          <p className="text-[11px] text-[#6B7183]">{p.whatsapp || p.email}</p>
                         </div>
                         <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
                           {p.status}

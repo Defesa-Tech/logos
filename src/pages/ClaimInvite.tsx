@@ -131,15 +131,17 @@ export default function ClaimInvite() {
   }
 
   return (
-    <PageTransition className="min-h-screen bg-gradient-to-b from-[#820AD1] via-[#6807AB] to-[#190326] flex flex-col justify-between text-white selection:bg-white selection:text-[#820AD1]">
+    <PageTransition className="min-h-screen bg-gradient-to-b from-[#3A31CE] via-[#2A23A6] to-[#121035] flex flex-col justify-between text-white selection:bg-white selection:text-[#3A31CE]">
       {/* Header */}
-      <header className="border-b border-white/10 bg-[#820AD1]/90 backdrop-blur-md px-6 py-4 flex items-center justify-between text-white">
+      <header className="border-b border-white/10 bg-[#3A31CE]/90 backdrop-blur-md px-6 py-4 flex items-center justify-between text-white">
         <Link to="/" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-full bg-white text-[#820AD1] flex items-center justify-center font-bold text-xs shadow-xs">
+          <div className="w-8 h-8 rounded-full bg-white text-[#3A31CE] flex items-center justify-center font-bold text-xs shadow-xs font-heading">
             L
           </div>
           <div className="flex flex-col">
-            <span className="font-bold text-sm tracking-tight leading-tight">Logos</span>
+            <span className="font-bold text-sm tracking-tight leading-tight font-heading">
+              Logos
+            </span>
             <span className="text-[10px] text-purple-200 leading-none">Gestão de Igreja</span>
           </div>
         </Link>
@@ -166,7 +168,7 @@ export default function ClaimInvite() {
                 <Link to="/">
                   <Button
                     variant="outline"
-                    className="text-xs h-10 px-5 rounded-full border-gray-200 text-gray-800 hover:text-[#820AD1] hover:bg-[#F7EEFD] font-bold active:scale-95 transition-all"
+                    className="text-xs h-10 px-5 rounded-full border-gray-200 text-gray-800 hover:text-[#3A31CE] hover:bg-[#F2F1FB] font-bold active:scale-95 transition-all"
                   >
                     Voltar para o Início
                   </Button>
@@ -174,26 +176,26 @@ export default function ClaimInvite() {
               </div>
             </div>
           ) : claimed ? (
-            <div className="bg-white text-[#191919] rounded-3xl p-8 sm:p-10 shadow-2xl text-center space-y-6">
-              <div className="w-16 h-16 rounded-full bg-[#F7EEFD] text-[#820AD1] flex items-center justify-center mx-auto shadow-sm">
+            <div className="bg-white text-[#14161D] rounded-[22px] p-8 sm:p-10 shadow-2xl text-center space-y-6">
+              <div className="w-16 h-16 rounded-full bg-[#F2F1FB] text-[#3A31CE] flex items-center justify-center mx-auto shadow-sm">
                 <CheckCircle2 className="w-8 h-8" strokeWidth={2.2} />
               </div>
               <div className="space-y-2">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-[#820AD1] block">
+                <span className="text-[10px] uppercase font-bold tracking-wider text-[#3A31CE] block">
                   Acesso Liberado
                 </span>
-                <h1 className="text-2xl font-black text-[#191919] tracking-tight">
+                <h1 className="text-2xl font-black text-[#14161D] tracking-tight font-heading">
                   Conta Ativada com Sucesso!
                 </h1>
-                <p className="text-xs text-gray-500 leading-relaxed">
+                <p className="text-xs text-[#5A6072] leading-relaxed">
                   Seu perfil foi vinculado e as permissões de{' '}
-                  <strong className="text-[#820AD1]">{roleLabels[invite?.role || 'member']}</strong>{' '}
+                  <strong className="text-[#3A31CE]">{roleLabels[invite?.role || 'member']}</strong>{' '}
                   foram ativadas.
                 </p>
               </div>
               <Button
                 onClick={() => navigate('/')}
-                className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all"
+                className="w-full bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-10 rounded-full font-bold shadow-md shadow-[#3A31CE]/20 active:scale-95 transition-all"
               >
                 Acessar Painel da Igreja
               </Button>
@@ -224,7 +226,7 @@ export default function ClaimInvite() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-400 font-medium">Papel atribuído:</span>
-                    <span className="font-bold text-[#820AD1]">{invite?.role}</span>
+                    <span className="font-bold text-[#3A31CE]">{invite?.role}</span>
                   </div>
                 </div>
 
@@ -239,7 +241,7 @@ export default function ClaimInvite() {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Seu nome"
-                      className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                      className="h-10 rounded-[14px] bg-[#F2F3F7] border-transparent focus:bg-white focus:border-[#3A31CE]"
                     />
                   </div>
 
@@ -254,7 +256,7 @@ export default function ClaimInvite() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Mínimo 6 caracteres"
-                      className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                      className="h-10 rounded-[14px] bg-[#F2F3F7] border-transparent focus:bg-white focus:border-[#3A31CE]"
                     />
                   </div>
 
@@ -269,14 +271,14 @@ export default function ClaimInvite() {
                       value={passwordConfirm}
                       onChange={(e) => setPasswordConfirm(e.target.value)}
                       placeholder="Repita a senha"
-                      className="h-10 rounded-2xl bg-[#F0F1F5] border-transparent focus:bg-white focus:border-[#820AD1]"
+                      className="h-10 rounded-[14px] bg-[#F2F3F7] border-transparent focus:bg-white focus:border-[#3A31CE]"
                     />
                   </div>
 
                   <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-11 rounded-full font-bold shadow-md shadow-[#820AD1]/25 cursor-pointer active:scale-95 transition-all"
+                    className="w-full bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-11 rounded-full font-bold shadow-md shadow-[#3A31CE]/25 cursor-pointer active:scale-95 transition-all"
                   >
                     {isSubmitting ? 'Ativando...' : 'Concluir Cadastro & Entrar'}
                   </Button>

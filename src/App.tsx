@@ -2,7 +2,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Toaster } from '@/components/ui/toaster'
 import { Toaster as Sonner } from '@/components/ui/sonner'
-import { extractRunnerReady } from '@/lib/extract-runner'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { AuthProvider } from '@/contexts/AuthContext'
 import Index from './pages/Index'
@@ -85,9 +84,5 @@ const App = () => (
     </AuthProvider>
   </BrowserRouter>
 )
-
-if (!extractRunnerReady) {
-  console.log('Runner status check')
-}
 
 export default App

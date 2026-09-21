@@ -171,35 +171,35 @@ export default function IngressoMembro() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#820AD1] mb-1">
-            <span className="w-2 h-2 rounded-full bg-[#820AD1]" />
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#3A31CE] mb-1">
+            <span className="w-2 h-2 rounded-full bg-[#3A31CE]" />
             <span>Jornada J6</span>
             <span className="text-gray-300">/</span>
             <span>Exclusivo Secretaria (Regras R6 & R7 &bull; Coleta Progressiva)</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191919]">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#14161D] font-heading">
             Ingresso como Membro
           </h1>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1 max-w-2xl font-normal">
+          <p className="text-xs sm:text-sm text-[#5A6072] mt-1 max-w-2xl font-normal">
             No ingresso oficial na membresia, coletamos os dados formais: foto, dados do batismo,
             estado civil e forma de ingresso. <strong>Regra R6:</strong> sem batismo, o ingresso é
             estritamente bloqueado.
           </p>
         </div>
 
-        <div className="bg-[#F7EEFD] text-[#820AD1] border border-purple-200 px-4 py-2 rounded-2xl text-xs font-bold self-start sm:self-auto">
+        <div className="bg-[#F2F1FB] text-[#3A31CE] border border-[#DAD7F3] px-4 py-2 rounded-2xl text-xs font-bold self-start sm:self-auto">
           Secretaria Oficial
         </div>
       </div>
 
       {/* Candidatos a Membro (Frequentadores e Visitantes Batizados) */}
-      <section className="bg-white rounded-3xl p-6 sm:p-7 border border-gray-100 shadow-sm space-y-4">
-        <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+      <section className="bg-white rounded-[22px] p-6 sm:p-7 border border-[#E8EAF0] shadow-sm space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-[#E8EAF0]">
           <div>
-            <h2 className="text-base font-bold text-[#191919]">
+            <h2 className="text-base font-bold text-[#14161D] font-heading">
               Frequentadores e Visitantes para Ingresso
             </h2>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-[#5A6072] mt-0.5">
               Clique em &quot;Ingressar como Membro&quot; para registrar batismo, foto e matrícula
             </p>
           </div>
@@ -223,13 +223,13 @@ export default function IngressoMembro() {
                   className="py-4 px-2 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-[#F8F9FB] rounded-2xl transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[#F7EEFD] text-[#820AD1] flex items-center justify-center font-bold text-xs flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-[#F2F1FB] text-[#3A31CE] flex items-center justify-center font-bold text-xs flex-shrink-0 font-heading">
                       {p.name.slice(0, 2).toUpperCase()}
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-[#191919] text-sm">{p.name}</span>
-                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-purple-100 text-purple-800">
+                        <span className="font-bold text-[#14161D] text-sm">{p.name}</span>
+                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-[#F2F1FB] text-[#3A31CE]">
                           {p.stage || p.status}
                         </span>
                         {isBaptized ? (
@@ -257,7 +257,7 @@ export default function IngressoMembro() {
                     size="sm"
                     disabled={!permissions.canChangeStage}
                     onClick={() => openIngressModal(p)}
-                    className="bg-[#820AD1] hover:bg-[#7008B7] text-white text-xs h-9 px-4 rounded-full font-bold shadow-md shadow-[#820AD1]/20 active:scale-95 transition-all self-end md:self-auto cursor-pointer"
+                    className="bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-9 px-4 rounded-full font-bold shadow-md shadow-[#3A31CE]/20 active:scale-95 transition-all self-end md:self-auto cursor-pointer"
                   >
                     <UserCheck className="w-3.5 h-3.5 mr-1.5" />
                     Ingressar como Membro
@@ -274,20 +274,22 @@ export default function IngressoMembro() {
         <DialogContent className="sm:max-w-lg bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border-gray-100 max-h-[90vh] overflow-y-auto">
           <DialogHeader className="border-b border-gray-100 pb-3">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-[#F7EEFD] text-[#820AD1]">
+              <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-[#F2F1FB] text-[#3A31CE]">
                 Jornada J6 &bull; Secretaria &bull; Coleta Progressiva
               </span>
             </div>
-            <DialogTitle className="text-xl font-bold text-[#191919]">
+            <DialogTitle className="text-xl font-bold text-[#14161D] font-heading">
               Ingresso de Membro: {selectedPerson?.name}
             </DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleIngress} className="space-y-4 pt-2 text-xs">
             {/* Microcopy de Propósito */}
-            <div className="p-3 bg-purple-50 rounded-2xl border border-purple-100 text-[11px] text-[#820AD1]">
+            <div className="p-3 bg-[#F2F1FB] rounded-2xl border border-[#DAD7F3] text-[11px] text-[#3A31CE]">
               <strong>Microcopy de Propósito:</strong>
-              <p>Registro oficial e emissão de carteirinha com validação eclesiástica.</p>
+              <p className="text-[#5A6072]">
+                Registro oficial e emissão de carteirinha com validação eclesiástica.
+              </p>
             </div>
 
             {/* REGRA R6 BLOCKING BOX */}
@@ -297,8 +299,8 @@ export default function IngressoMembro() {
                 <span>Regra R6: Batismo Obrigatório para Membresia</span>
               </div>
               <p className="text-[11px] text-amber-800">
-                Pela constituição eclesiástica da Defesa da Fé, apenas pessoas batizadas nas águas
-                podem se tornar membros da igreja.
+                Pela constituição eclesiástica, apenas pessoas batizadas nas águas podem se tornar
+                membros da igreja.
               </p>
 
               <label className="flex items-center gap-2 cursor-pointer pt-1">
@@ -306,9 +308,9 @@ export default function IngressoMembro() {
                   type="checkbox"
                   checked={hasBaptism}
                   onChange={(e) => setHasBaptism(e.target.checked)}
-                  className="rounded text-[#820AD1] focus:ring-[#820AD1]"
+                  className="rounded text-[#3A31CE] focus:ring-[#3A31CE]"
                 />
-                <span className="font-bold text-gray-900">
+                <span className="font-bold text-[#14161D]">
                   Confirmar que esta pessoa foi batizada
                 </span>
               </label>
@@ -451,7 +453,7 @@ export default function IngressoMembro() {
               className={`w-full text-xs h-11 rounded-full font-bold shadow-md transition-all ${
                 !hasBaptism
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-[#820AD1] hover:bg-[#7008B7] text-white shadow-[#820AD1]/20 active:scale-95'
+                  : 'bg-[#3A31CE] hover:bg-[#2A23A6] text-white shadow-[#3A31CE]/20 active:scale-95'
               }`}
             >
               {isSubmitting
