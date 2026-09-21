@@ -958,10 +958,9 @@ export default function Cultos() {
 
             <Button
               type="submit"
-              disabled={submitting}
+              disabled={isSubmittingSignup}
               className="w-full bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-11 rounded-[14px] font-bold shadow-sm shadow-[#3A31CE]/20 active:scale-95 transition-all"
             >
-              {' '}
               {isSubmittingSignup ? 'Cadastrando...' : 'Confirmar Presença e Cadastrar'}
             </Button>
           </form>
@@ -1051,11 +1050,10 @@ export default function Cultos() {
               </div>
 
               <Button
-                onClick={handleCreateTotemPresence}
-                disabled={submitting}
-                className="w-full bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-10 rounded-[14px] font-bold shadow-sm shadow-[#3A31CE]/20"
+                onClick={handleLinkOrphan}
+                disabled={!linkTargetCultoId}
+                className="w-full bg-[#3A31CE] hover:bg-[#2A23A6] text-white text-xs h-10 rounded-[14px] font-bold shadow-sm shadow-[#3A31CE]/20 cursor-pointer"
               >
-                {' '}
                 Confirmar Vinculação
               </Button>
             </div>

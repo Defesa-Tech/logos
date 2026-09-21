@@ -30,7 +30,7 @@ export default function VerificarCarteirinha() {
     <div className="min-h-screen bg-[#F0F1F5] flex items-center justify-center p-4">
       <PageTransition className="w-full max-w-md bg-white rounded-[32px] p-6 sm:p-8 shadow-xl border border-gray-100 text-center space-y-6">
         <div className="flex justify-center">
-          <div className="w-12 h-12 rounded-2xl bg-[#820AD1] text-white flex items-center justify-center font-black text-xl shadow-md">
+          <div className="w-12 h-12 rounded-2xl bg-[#3A31CE] text-white flex items-center justify-center font-black text-xl shadow-md shadow-[#3A31CE]/20 font-heading">
             L
           </div>
         </div>
@@ -114,7 +114,7 @@ export default function VerificarCarteirinha() {
         <div className="pt-2 text-center">
           <Link
             to="/"
-            className="text-xs font-bold text-[#820AD1] hover:underline flex items-center justify-center gap-1"
+            className="text-xs font-bold text-[#3A31CE] hover:text-[#2A23A6] hover:underline flex items-center justify-center gap-1"
           >
             &larr; Voltar para o Logos Gestão
           </Link>

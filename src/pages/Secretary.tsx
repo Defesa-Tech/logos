@@ -548,11 +548,11 @@ export default function Secretary() {
 
           {orphanToLink && (
             <div className="space-y-4 pt-2 text-xs">
-              <div className="p-3 bg-purple-50 rounded-2xl border border-purple-100">
-                <span className="font-bold text-purple-900 block">
+              <div className="p-3 bg-[#F2F1FB] rounded-2xl border border-[#DAD7F3]">
+                <span className="font-bold text-[#14161D] block">
                   {orphanToLink.expand?.person?.name || 'Pessoa'}
                 </span>
-                <span className="text-[11px] text-purple-700">
+                <span className="text-[11px] text-[#3A31CE]">
                   Data/Hora do escaneamento:{' '}
                   {new Date(orphanToLink.created).toLocaleString('pt-BR')}
                 </span>

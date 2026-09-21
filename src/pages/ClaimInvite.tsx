@@ -142,7 +142,7 @@ export default function ClaimInvite() {
             <span className="font-bold text-sm tracking-tight leading-tight font-heading">
               Logos
             </span>
-            <span className="text-[10px] text-purple-200 leading-none">Gestão de Igreja</span>
+            <span className="text-[10px] text-[#DAD7F3] leading-none">Gestão de Igreja</span>
           </div>
         </Link>
         <span className="text-[11px] font-bold text-white bg-white/15 px-3 py-1 rounded-full border border-white/20 backdrop-blur-xs">
@@ -203,13 +203,13 @@ export default function ClaimInvite() {
           ) : (
             <div className="space-y-4">
               <div className="text-center space-y-2 mb-4 text-white">
-                <span className="text-xs font-bold uppercase tracking-wider text-purple-200">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#DAD7F3]">
                   Convite Institucional
                 </span>
                 <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
                   Ativar seu Acesso
                 </h1>
-                <p className="text-xs sm:text-sm text-purple-200 leading-relaxed">
+                <p className="text-xs sm:text-sm text-[#DAD7F3] leading-relaxed">
                   Você foi convidado com a função{' '}
                   <strong className="text-white underline">
                     {roleLabels[invite?.role || 'member']}
@@ -290,7 +290,7 @@ export default function ClaimInvite() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-white/10 py-4 px-6 text-center text-xs text-purple-200">
+      <footer className="border-t border-white/10 py-4 px-6 text-center text-xs text-[#DAD7F3]">
         Logos Gestão de Igreja &bull; Convite com token seguro
       </footer>
     </PageTransition>
